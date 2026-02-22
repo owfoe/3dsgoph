@@ -1,0 +1,21 @@
+#pragma once
+#include "BaseObject.h"
+
+class Entity : public BaseObject
+{
+private:
+    int hp;
+    float speed;
+
+public:
+    Entity(float x, float y, float height, float width, int hp, float speed)
+        : BaseObject(x, y, height, width), hp(hp), speed(speed) {};
+
+    int getHP() const { return this->hp; };
+    void damage(int hp = 1) { this->hp -= hp; };
+    void heal(int hp = 1) { this->hp += hp; };
+
+    float getSpeed() const { return this->speed; }
+    void moveLeft() { changeX(-getSpeed()); }
+    void moveRight() { changeX(getSpeed()); }
+};

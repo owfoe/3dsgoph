@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "3DS: Build & Run in Emu",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "C:\\path\\to\\3DS\\emulator\\such\\as\\azahar.exe",
+      "args": [
+        "${workspaceFolderBasename}.3dsx"
+      ],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "Make"
+    },
+    {
+      "name": "3dslink: Build & Run on Hardware",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "cmd.exe",
+      "args": [
+        "/c",
+        "3dslink -a 172.18.129.123 ${workspaceFolderBasename}.3dsx"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "d:/HSE/Subjects/course_projects/1/game",
+      "program": "d:/HSE/Subjects/course_projects/1/game/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "C:/Programming/mingw64/bin/gdb.exe",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}

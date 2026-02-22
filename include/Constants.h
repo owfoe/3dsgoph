@@ -1,0 +1,1 @@
+float RC_diff_h = 3.0, RC_diff_w = 3.0;
