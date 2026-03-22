@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "3DS: Build & Run in Emu",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "C:\\path\\to\\3DS\\emulator\\such\\as\\azahar.exe",
+      "args": [
+        "${workspaceFolderBasename}.3dsx"
+      ],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "Make"
+    },
+    {
+      "name": "3dslink: Build & Run on Hardware",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "cmd.exe",
+      "args": [
+        "/c",
+        "3dslink -a 192.168.1.83 ${workspaceFolderBasename}.3dsx"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "c:/devkitPro/examples/3ds/physics/box2d/source",
+      "program": "c:/devkitPro/examples/3ds/physics/box2d/source/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "C:/Programming/mingw64/bin/gdb.exe",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
