@@ -2,16 +2,12 @@
   "configurations": [
     {
       "name": "windows-gcc-x64",
-      "includePath": [
-        "${workspaceFolder}/**"
-      ],
+      "includePath": ["${workspaceFolder}/**"],
       "compilerPath": "C:/Programming/mingw64/bin/gcc.exe",
       "cStandard": "${default}",
       "cppStandard": "${default}",
       "intelliSenseMode": "windows-gcc-x64",
-      "compilerArgs": [
-        ""
-      ]
+      "compilerArgs": [""]
     },
     {
       "name": "3ds",
@@ -22,12 +18,7 @@
         "C:/devkitPro/devkitARM/arm-none-eabi/include",
         "C:/devkitPro/devkitARM/arm-none-eabi/include/c++/15.1.0"
       ],
-      "defines": [
-        "_DEBUG",
-        "UNICODE",
-        "_UNICODE",
-        "__3DS__"
-      ],
+      "defines": ["_DEBUG", "UNICODE", "_UNICODE", "__3DS__"],
       "windowsSdkVersion": "10.0.26100.0",
       "compilerPath": "C:/devkitPro/devkitARM/bin/arm-none-eabi-g++.exe",
       "cStandard": "c17",
