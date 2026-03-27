@@ -3,7 +3,7 @@
 
 class Entity : public BaseObject
 {
-private:
+protected:
     int hp;
     float speed;
 

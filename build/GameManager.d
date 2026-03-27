@@ -1,5 +1,10 @@
-GameManager.o: C:/Hackathon_Development/kursach/source/GameManager.cpp \
- C:/Hackathon_Development/kursach/include/GameManager.h \
+GameManager.o: \
+ D:/HSE/Subjects/course_projects/1/game/source/GameManager.cpp \
+ D:/HSE/Subjects/course_projects/1/game/include/GameManager.h \
+ D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h \
+ C:/devkitPro/libctru/include/citro2d.h \
+ C:/devkitPro/libctru/include/citro3d.h \
+ C:/devkitPro/libctru/include/c3d/types.h \
  C:/devkitPro/libctru/include/3ds.h \
  C:/devkitPro/libctru/include/3ds/types.h \
  C:/devkitPro/libctru/include/3ds/result.h \
@@ -85,8 +90,36 @@ GameManager.o: C:/Hackathon_Development/kursach/source/GameManager.cpp \
  C:/devkitPro/libctru/include/3ds/romfs.h \
  C:/devkitPro/libctru/include/3ds/font.h \
  C:/devkitPro/libctru/include/3ds/gdbhio_dev.h \
- C:/devkitPro/libctru/include/3ds/3dslink.h
-C:/Hackathon_Development/kursach/include/GameManager.h:
+ C:/devkitPro/libctru/include/3ds/3dslink.h \
+ C:/devkitPro/libctru/include/c3d/maths.h \
+ C:/devkitPro/libctru/include/c3d/mtxstack.h \
+ C:/devkitPro/libctru/include/c3d/uniforms.h \
+ C:/devkitPro/libctru/include/c3d/attribs.h \
+ C:/devkitPro/libctru/include/c3d/buffers.h \
+ C:/devkitPro/libctru/include/c3d/base.h \
+ C:/devkitPro/libctru/include/c3d/texenv.h \
+ C:/devkitPro/libctru/include/c3d/effect.h \
+ C:/devkitPro/libctru/include/c3d/texture.h \
+ C:/devkitPro/libctru/include/c3d/proctex.h \
+ C:/devkitPro/libctru/include/c3d/light.h \
+ C:/devkitPro/libctru/include/c3d/lightlut.h \
+ C:/devkitPro/libctru/include/c3d/fog.h \
+ C:/devkitPro/libctru/include/c3d/framebuffer.h \
+ C:/devkitPro/libctru/include/c3d/renderqueue.h \
+ C:/devkitPro/libctru/include/tex3ds.h \
+ C:/devkitPro/libctru/include/c2d/base.h \
+ C:/devkitPro/libctru/include/c2d/spritesheet.h \
+ C:/devkitPro/libctru/include/c2d/sprite.h \
+ C:/devkitPro/libctru/include/c2d/text.h \
+ C:/devkitPro/libctru/include/c2d/font.h \
+ D:/HSE/Subjects/course_projects/1/game/include/HitBox.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Ground.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Constants.h
+D:/HSE/Subjects/course_projects/1/game/include/GameManager.h:
+D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h:
+C:/devkitPro/libctru/include/citro2d.h:
+C:/devkitPro/libctru/include/citro3d.h:
+C:/devkitPro/libctru/include/c3d/types.h:
 C:/devkitPro/libctru/include/3ds.h:
 C:/devkitPro/libctru/include/3ds/types.h:
 C:/devkitPro/libctru/include/3ds/result.h:
@@ -173,3 +206,27 @@ C:/devkitPro/libctru/include/3ds/romfs.h:
 C:/devkitPro/libctru/include/3ds/font.h:
 C:/devkitPro/libctru/include/3ds/gdbhio_dev.h:
 C:/devkitPro/libctru/include/3ds/3dslink.h:
+C:/devkitPro/libctru/include/c3d/maths.h:
+C:/devkitPro/libctru/include/c3d/mtxstack.h:
+C:/devkitPro/libctru/include/c3d/uniforms.h:
+C:/devkitPro/libctru/include/c3d/attribs.h:
+C:/devkitPro/libctru/include/c3d/buffers.h:
+C:/devkitPro/libctru/include/c3d/base.h:
+C:/devkitPro/libctru/include/c3d/texenv.h:
+C:/devkitPro/libctru/include/c3d/effect.h:
+C:/devkitPro/libctru/include/c3d/texture.h:
+C:/devkitPro/libctru/include/c3d/proctex.h:
+C:/devkitPro/libctru/include/c3d/light.h:
+C:/devkitPro/libctru/include/c3d/lightlut.h:
+C:/devkitPro/libctru/include/c3d/fog.h:
+C:/devkitPro/libctru/include/c3d/framebuffer.h:
+C:/devkitPro/libctru/include/c3d/renderqueue.h:
+C:/devkitPro/libctru/include/tex3ds.h:
+C:/devkitPro/libctru/include/c2d/base.h:
+C:/devkitPro/libctru/include/c2d/spritesheet.h:
+C:/devkitPro/libctru/include/c2d/sprite.h:
+C:/devkitPro/libctru/include/c2d/text.h:
+C:/devkitPro/libctru/include/c2d/font.h:
+D:/HSE/Subjects/course_projects/1/game/include/HitBox.h:
+D:/HSE/Subjects/course_projects/1/game/include/Ground.h:
+D:/HSE/Subjects/course_projects/1/game/include/Constants.h:

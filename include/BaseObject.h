@@ -1,16 +1,18 @@
 #pragma once
+#include <citro2d.h>
 
 #include "HitBox.h"
 
 class BaseObject
 {
-private:
+protected:
     float x, y;
     float height, width;
 
 public:
     BaseObject(float x, float y, float height, float width)
         : x(x), y(y), height(height), width(width), hitbox(height, width) {}
+    virtual ~BaseObject() = default;
 
     HitBox hitbox;
 
@@ -24,5 +26,5 @@ public:
     float getHeight() const { return height; }
     float getWidth() const { return width; }
 
-    virtual void draw();
+    virtual void draw(C3D_RenderTarget *target) = 0;
 };
