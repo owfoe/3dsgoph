@@ -1,7 +1,6 @@
-GameManager.o: \
- D:/HSE/Subjects/course_projects/1/game/source/GameManager.cpp \
- D:/HSE/Subjects/course_projects/1/game/include/GameManager.h \
- D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h \
+GameManager.o: C:/Hackathon_Development/kursach/source/GameManager.cpp \
+ C:/Hackathon_Development/kursach/include/GameManager.h \
+ C:/Hackathon_Development/kursach/include/BaseObject.h \
  C:/devkitPro/libctru/include/citro2d.h \
  C:/devkitPro/libctru/include/citro3d.h \
  C:/devkitPro/libctru/include/c3d/types.h \
@@ -112,11 +111,11 @@ GameManager.o: \
  C:/devkitPro/libctru/include/c2d/sprite.h \
  C:/devkitPro/libctru/include/c2d/text.h \
  C:/devkitPro/libctru/include/c2d/font.h \
- D:/HSE/Subjects/course_projects/1/game/include/HitBox.h \
- D:/HSE/Subjects/course_projects/1/game/include/Ground.h \
- D:/HSE/Subjects/course_projects/1/game/include/Constants.h
-D:/HSE/Subjects/course_projects/1/game/include/GameManager.h:
-D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h:
+ C:/Hackathon_Development/kursach/include/HitBox.h \
+ C:/Hackathon_Development/kursach/include/Ground.h \
+ C:/Hackathon_Development/kursach/include/Constants.h
+C:/Hackathon_Development/kursach/include/GameManager.h:
+C:/Hackathon_Development/kursach/include/BaseObject.h:
 C:/devkitPro/libctru/include/citro2d.h:
 C:/devkitPro/libctru/include/citro3d.h:
 C:/devkitPro/libctru/include/c3d/types.h:
@@ -227,6 +226,6 @@ C:/devkitPro/libctru/include/c2d/spritesheet.h:
 C:/devkitPro/libctru/include/c2d/sprite.h:
 C:/devkitPro/libctru/include/c2d/text.h:
 C:/devkitPro/libctru/include/c2d/font.h:
-D:/HSE/Subjects/course_projects/1/game/include/HitBox.h:
-D:/HSE/Subjects/course_projects/1/game/include/Ground.h:
-D:/HSE/Subjects/course_projects/1/game/include/Constants.h:
+C:/Hackathon_Development/kursach/include/HitBox.h:
+C:/Hackathon_Development/kursach/include/Ground.h:
+C:/Hackathon_Development/kursach/include/Constants.h:
