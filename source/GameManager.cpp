@@ -10,10 +10,14 @@ GameManager::GameManager(int state) {}
 
 void GameManager::init()
 {
+    gfxInitDefault();
     romfsInit();
+    C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+    C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+    C2D_Prepare();
     consoleInit(GFX_TOP, NULL);
     // std::cout << GameManager::getTime() << std::endl;
-
+    std::cout << "start" << std::endl;
     //
     objects.push_back(std::make_unique<Ground>(
         SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 32, 64));
@@ -21,15 +25,19 @@ void GameManager::init()
 }
 void GameManager::exit()
 {
+    C2D_Fini();
+    C3D_Fini();
     gfxExit();
     romfsExit();
 }
 void GameManager::draw(C3D_RenderTarget *target)
 {
+    std::cout << "23453" << std::endl;
 
     for (auto &obj : objects)
     {
         obj->draw(target);
+        std::cout << "1" << std::endl;
     }
 }
 
