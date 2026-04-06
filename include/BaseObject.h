@@ -10,6 +10,7 @@ protected:
     float height, width;
 
 public:
+    BaseObject() {}
     BaseObject(float x, float y, float height, float width)
         : x(x), y(y), height(height), width(width), hitbox(height, width) {}
     virtual ~BaseObject() = default;
@@ -26,5 +27,5 @@ public:
     float getHeight() const { return height; }
     float getWidth() const { return width; }
 
-    virtual void draw(C3D_RenderTarget *target) = 0;
+    virtual void draw() = 0;
 };

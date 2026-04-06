@@ -4,6 +4,7 @@
 class Raycast
 {
 public:
+    Raycast() {}
     Raycast(float height, float width) : hitbox(height + RC_diff_h, width + RC_diff_w * 2) {}
     HitBox hitbox;
 };

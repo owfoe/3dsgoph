@@ -16,7 +16,7 @@ public:
     float getSpeed() const { return this->speed; }
     void moveLeft() { changeX(-getSpeed()); }
     void moveRight() { changeX(getSpeed()); }
-    void draw(C3D_RenderTarget *target) override
+    void draw() override
     {
         C2D_DrawRectSolid(x, y, 0, width, height, C2D_Color32f(0, 1, 0, 1));
     }

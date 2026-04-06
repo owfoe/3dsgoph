@@ -1,4 +1,4 @@
-main.o: C:/Hackathon_Development/kursach/source/main.cpp \
+main.o: D:/HSE/Subjects/course_projects/1/game/source/main.cpp \
  C:/devkitPro/libctru/include/citro2d.h \
  C:/devkitPro/libctru/include/citro3d.h \
  C:/devkitPro/libctru/include/c3d/types.h \
@@ -109,9 +109,13 @@ main.o: C:/Hackathon_Development/kursach/source/main.cpp \
  C:/devkitPro/libctru/include/c2d/sprite.h \
  C:/devkitPro/libctru/include/c2d/text.h \
  C:/devkitPro/libctru/include/c2d/font.h \
- C:/Hackathon_Development/kursach/include/GameManager.h \
- C:/Hackathon_Development/kursach/include/BaseObject.h \
- C:/Hackathon_Development/kursach/include/HitBox.h
+ D:/HSE/Subjects/course_projects/1/game/include/GameManager.h \
+ D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h \
+ D:/HSE/Subjects/course_projects/1/game/include/HitBox.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Player.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Entity.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Raycast.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Constants.h
 C:/devkitPro/libctru/include/citro2d.h:
 C:/devkitPro/libctru/include/citro3d.h:
 C:/devkitPro/libctru/include/c3d/types.h:
@@ -222,6 +226,10 @@ C:/devkitPro/libctru/include/c2d/spritesheet.h:
 C:/devkitPro/libctru/include/c2d/sprite.h:
 C:/devkitPro/libctru/include/c2d/text.h:
 C:/devkitPro/libctru/include/c2d/font.h:
-C:/Hackathon_Development/kursach/include/GameManager.h:
-C:/Hackathon_Development/kursach/include/BaseObject.h:
-C:/Hackathon_Development/kursach/include/HitBox.h:
+D:/HSE/Subjects/course_projects/1/game/include/GameManager.h:
+D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h:
+D:/HSE/Subjects/course_projects/1/game/include/HitBox.h:
+D:/HSE/Subjects/course_projects/1/game/include/Player.h:
+D:/HSE/Subjects/course_projects/1/game/include/Entity.h:
+D:/HSE/Subjects/course_projects/1/game/include/Raycast.h:
+D:/HSE/Subjects/course_projects/1/game/include/Constants.h:

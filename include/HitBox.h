@@ -6,6 +6,7 @@ protected:
     float lt, rt, top, btm;
 
 public:
+    HitBox() {}
     HitBox(float height, float width)
         : lt(0.0f), rt(width), top(0.0f), btm(height) {}
 

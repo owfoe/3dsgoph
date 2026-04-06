@@ -1,7 +1,7 @@
-Player.o: C:/Hackathon_Development/kursach/source/Player.cpp \
- C:/Hackathon_Development/kursach/include/Player.h \
- C:/Hackathon_Development/kursach/include/Entity.h \
- C:/Hackathon_Development/kursach/include/BaseObject.h \
+Player.o: D:/HSE/Subjects/course_projects/1/game/source/Player.cpp \
+ D:/HSE/Subjects/course_projects/1/game/include/Player.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Entity.h \
+ D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h \
  C:/devkitPro/libctru/include/citro2d.h \
  C:/devkitPro/libctru/include/citro3d.h \
  C:/devkitPro/libctru/include/c3d/types.h \
@@ -112,12 +112,12 @@ Player.o: C:/Hackathon_Development/kursach/source/Player.cpp \
  C:/devkitPro/libctru/include/c2d/sprite.h \
  C:/devkitPro/libctru/include/c2d/text.h \
  C:/devkitPro/libctru/include/c2d/font.h \
- C:/Hackathon_Development/kursach/include/HitBox.h \
- C:/Hackathon_Development/kursach/include/Raycast.h \
- C:/Hackathon_Development/kursach/include/Constants.h
-C:/Hackathon_Development/kursach/include/Player.h:
-C:/Hackathon_Development/kursach/include/Entity.h:
-C:/Hackathon_Development/kursach/include/BaseObject.h:
+ D:/HSE/Subjects/course_projects/1/game/include/HitBox.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Raycast.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Constants.h
+D:/HSE/Subjects/course_projects/1/game/include/Player.h:
+D:/HSE/Subjects/course_projects/1/game/include/Entity.h:
+D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h:
 C:/devkitPro/libctru/include/citro2d.h:
 C:/devkitPro/libctru/include/citro3d.h:
 C:/devkitPro/libctru/include/c3d/types.h:
@@ -228,6 +228,6 @@ C:/devkitPro/libctru/include/c2d/spritesheet.h:
 C:/devkitPro/libctru/include/c2d/sprite.h:
 C:/devkitPro/libctru/include/c2d/text.h:
 C:/devkitPro/libctru/include/c2d/font.h:
-C:/Hackathon_Development/kursach/include/HitBox.h:
-C:/Hackathon_Development/kursach/include/Raycast.h:
-C:/Hackathon_Development/kursach/include/Constants.h:
+D:/HSE/Subjects/course_projects/1/game/include/HitBox.h:
+D:/HSE/Subjects/course_projects/1/game/include/Raycast.h:
+D:/HSE/Subjects/course_projects/1/game/include/Constants.h:

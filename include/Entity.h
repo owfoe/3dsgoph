@@ -8,6 +8,7 @@ protected:
     float speed;
 
 public:
+    Entity() {}
     Entity(float x, float y, float height, float width, int hp, float speed)
         : BaseObject(x, y, height, width), hp(hp), speed(speed) {};
 
