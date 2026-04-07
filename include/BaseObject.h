@@ -28,4 +28,5 @@ public:
     float getWidth() const { return width; }
 
     virtual void draw() = 0;
+    virtual void update() {}
 };

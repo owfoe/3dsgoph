@@ -1,3 +1,4 @@
+#pragma once
 #include "BaseObject.h"
 
 class Ground : public BaseObject
@@ -20,4 +21,5 @@ public:
     {
         C2D_DrawRectSolid(x, y, 0, width, height, C2D_Color32f(0, 1, 0, 1));
     }
+    void update() override { return; }
 };

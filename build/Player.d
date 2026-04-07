@@ -114,7 +114,8 @@ Player.o: D:/HSE/Subjects/course_projects/1/game/source/Player.cpp \
  C:/devkitPro/libctru/include/c2d/font.h \
  D:/HSE/Subjects/course_projects/1/game/include/HitBox.h \
  D:/HSE/Subjects/course_projects/1/game/include/Raycast.h \
- D:/HSE/Subjects/course_projects/1/game/include/Constants.h
+ D:/HSE/Subjects/course_projects/1/game/include/Constants.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Ground.h
 D:/HSE/Subjects/course_projects/1/game/include/Player.h:
 D:/HSE/Subjects/course_projects/1/game/include/Entity.h:
 D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h:
@@ -231,3 +232,4 @@ C:/devkitPro/libctru/include/c2d/font.h:
 D:/HSE/Subjects/course_projects/1/game/include/HitBox.h:
 D:/HSE/Subjects/course_projects/1/game/include/Raycast.h:
 D:/HSE/Subjects/course_projects/1/game/include/Constants.h:
+D:/HSE/Subjects/course_projects/1/game/include/Ground.h:

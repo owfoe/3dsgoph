@@ -17,6 +17,6 @@ public:
     void heal(int hp = 1) { this->hp += hp; };
 
     float getSpeed() const { return this->speed; }
-    void moveLeft() { changeX(-getSpeed()); }
-    void moveRight() { changeX(getSpeed()); }
+    virtual void moveLeft() { changeX(-getSpeed()); }
+    virtual void moveRight() { changeX(getSpeed()); }
 };

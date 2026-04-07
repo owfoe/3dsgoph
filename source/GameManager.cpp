@@ -22,9 +22,8 @@ void GameManager::init()
     // console init
     consoleInit(GFX_BOTTOM, NULL);
     // object init
-    objects.push_back(std::make_unique<Ground>(
-        0, (SCREEN_HEIGHT / 4) * 3, SCREEN_HEIGHT / 4, SCREEN_WIDTH));
-    player = Player(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, SCREEN_HEIGHT / 2, 64, 3, 20);
+    grounds.push_back(Ground(0, (Const::SCREEN_HEIGHT / 4) * 3, 30, Const::SCREEN_WIDTH / 2));
+    player = Player(Const::SCREEN_WIDTH / 4, (Const::SCREEN_HEIGHT / 10) * 0, 30, 30);
 }
 void GameManager::exit()
 {
@@ -42,6 +41,14 @@ void GameManager::draw()
     C2D_SceneBegin(topRight);
     // draw
     player.draw();
+
+    // INFO: it can be deleted
+    C2D_DrawRectSolid(player.getX(), player.getY() + player.getHeight() - Const::RC_diff_h / 2, 0, player.getWidth(), Const::RC_diff_h, C2D_Color32f(0, 0, 1, 1));
+
+    for (Ground &ground : grounds)
+    {
+        ground.draw();
+    }
     for (auto &obj : objects)
     {
         obj->draw();
@@ -65,9 +72,26 @@ void GameManager::update(int &s)
         player.moveLeft();
     if (kHeld & KEY_RIGHT)
         player.moveRight();
+    if (kDown & KEY_A)
+        player.jump();
+    player.update(kHeld);
+
+    checkCollisions();
 }
 
-std::vector<std::unique_ptr<BaseObject>> &GameManager::get_objects()
+void GameManager::checkCollisions()
 {
-    return objects;
+    int i = 0;
+    player.setOnGround(false);
+    player.setIsJump(true);
+    for (Ground &ground : grounds)
+    {
+        if (Collisions(player.raycast.hitbox, player.getX(), player.getY() + player.getHeight(),
+                       ground.hitbox, ground.getX(), ground.getY()))
+        {
+            player.updateFallOnGround(ground);
+            std::cout << "col" << i << std::endl;
+            i++;
+        }
+    }
 }

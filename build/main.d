@@ -115,7 +115,8 @@ main.o: D:/HSE/Subjects/course_projects/1/game/source/main.cpp \
  D:/HSE/Subjects/course_projects/1/game/include/Player.h \
  D:/HSE/Subjects/course_projects/1/game/include/Entity.h \
  D:/HSE/Subjects/course_projects/1/game/include/Raycast.h \
- D:/HSE/Subjects/course_projects/1/game/include/Constants.h
+ D:/HSE/Subjects/course_projects/1/game/include/Constants.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Ground.h
 C:/devkitPro/libctru/include/citro2d.h:
 C:/devkitPro/libctru/include/citro3d.h:
 C:/devkitPro/libctru/include/c3d/types.h:
@@ -233,3 +234,4 @@ D:/HSE/Subjects/course_projects/1/game/include/Player.h:
 D:/HSE/Subjects/course_projects/1/game/include/Entity.h:
 D:/HSE/Subjects/course_projects/1/game/include/Raycast.h:
 D:/HSE/Subjects/course_projects/1/game/include/Constants.h:
+D:/HSE/Subjects/course_projects/1/game/include/Ground.h:
