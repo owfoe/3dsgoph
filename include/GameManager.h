@@ -24,5 +24,6 @@ public:
     void update(int &s);
     void draw();
     long long getTime();
-    void checkCollisions();
+    void collisionsManager();
+    void checkCollisions(HitBox &obj, float objX, float objY);
 };
