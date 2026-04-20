@@ -2,6 +2,8 @@
 #include <vector>
 #include <memory>
 #include "BaseObject.h"
+#include "Player.h"
+#include "Ground.h"
 #include <3ds.h>
 
 class GameManager
@@ -9,6 +11,8 @@ class GameManager
 protected:
     int a;
     std::vector<std::unique_ptr<BaseObject>> objects;
+    std::vector<Ground> grounds;
+    Player player;
 
 public:
     C3D_RenderTarget *topRight, *botLeft;
@@ -19,6 +23,6 @@ public:
     void exit();
     void update(int &s);
     void draw();
-    std::vector<std::unique_ptr<BaseObject>> &get_objects();
     long long getTime();
+    void checkCollisions();
 };

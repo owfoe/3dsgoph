@@ -8,6 +8,7 @@ protected:
     float speed;
 
 public:
+    Entity() {}
     Entity(float x, float y, float height, float width, int hp, float speed)
         : BaseObject(x, y, height, width), hp(hp), speed(speed) {};
 
@@ -16,6 +17,6 @@ public:
     void heal(int hp = 1) { this->hp += hp; };
 
     float getSpeed() const { return this->speed; }
-    void moveLeft() { changeX(-getSpeed()); }
-    void moveRight() { changeX(getSpeed()); }
+    virtual void moveLeft() { changeX(-getSpeed()); }
+    virtual void moveRight() { changeX(getSpeed()); }
 };

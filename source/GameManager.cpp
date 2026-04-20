@@ -10,26 +10,25 @@
 
 GameManager::GameManager(int state) {}
 
-void GameManager::init() {
-	// system init
+void GameManager::init()
+{
+    // system init
     gfxInitDefault();
     romfsInit();
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
     C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
     C2D_Prepare();
-
     // screen target init
     topRight = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	botLeft = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-
     // object init
     grounds.push_back(Ground(0, (Const::SCREEN_HEIGHT / 4) * 3, 30, Const::SCREEN_WIDTH / 2));
     objects.push_back(std::make_unique<LowerScreen>(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x"));
-
     player = Player(Const::SCREEN_WIDTH / 4, (Const::SCREEN_HEIGHT / 10) * 0, 30, 30);
 }
-void GameManager::exit() {
-	// system exit
+void GameManager::exit()
+{
+    // system exit
     C2D_Fini();
     C3D_Fini();
     gfxExit();
@@ -62,10 +61,9 @@ void GameManager::draw()
 	for (auto &obj : objects)
     {
         obj->draw(topRight);
-    }
-	// end
-	C3D_FrameEnd(0);
 }
+
+
 
 
 void GameManager::update(int &s)
@@ -75,16 +73,21 @@ void GameManager::update(int &s)
 
     hidScanInput();
     u32 kDown = hidKeysDown();
-
-	std::cout << "init" << std::endl;
+    u32 kHeld = hidKeysHeld();
 
     if (kDown & KEY_START)
         s = -1;
+    if (kHeld & KEY_LEFT)
+        player.moveLeft();
+    if (kHeld & KEY_RIGHT)
+        player.moveRight();
+    if (kDown & KEY_A)
+        player.jump();
+    player.update(kHeld);
+
+    checkCollisions();
 }
 
-std::vector<std::unique_ptr<BaseObject>> &GameManager::get_objects() {
-    return objects;
-}
 void GameManager::checkCollisions()
 {
     int i = 0;
@@ -101,4 +104,5 @@ void GameManager::checkCollisions()
         }
     }
 }
+
 

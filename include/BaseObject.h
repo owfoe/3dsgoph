@@ -11,6 +11,7 @@ protected:
     C2D_Image currentImage;
 
 public:
+    BaseObject() {}
     BaseObject(float x, float y, float height, float width)
         : x(x), y(y), height(height), width(width), hitbox(height, width) {}
     virtual ~BaseObject() = default;
@@ -38,5 +39,4 @@ public:
     C2D_Image* getImagePtr() { return &this->currentImage; }
     virtual void draw() = 0;
     virtual void update() {}
-
 };

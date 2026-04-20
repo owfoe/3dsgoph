@@ -85,6 +85,7 @@ Thumbs.db
 # ===== ROMFS / Assets =====
 
 romfs/*.bin
+*.t3x
 
 # ===== Misc =====
 
