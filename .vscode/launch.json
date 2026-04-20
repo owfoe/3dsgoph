@@ -15,21 +15,11 @@
       "type": "cppvsdbg",
       "request": "launch",
       "program": "cmd.exe",
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-      "args": ["/c", "3dslink -a 192.168.1.83 ${workspaceFolderBasename}.3dsx"],
-=======
       "args": [
         "/c",
         "3dslink -a 192.168.1.83 ${workspaceFolderBasename}.3dsx"
       ],
->>>>>>> Stashed changes
-=======
-      "args": [
-        "/c",
-        "3dslink -a 10.83.203.123 ${workspaceFolderBasename}.3dsx"
-      ],
->>>>>>> feature/InKLaR1TY
+
       "cwd": "${workspaceFolder}"
     },
     {

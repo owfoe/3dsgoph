@@ -22,7 +22,6 @@ void GameManager::init()
     topRight = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	botLeft = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
     // object init
-    grounds.push_back(Ground(0, (Const::SCREEN_HEIGHT / 4) * 3, 30, Const::SCREEN_WIDTH / 2));
     objects.push_back(std::make_unique<LowerScreen>(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x"));
     grounds.push_back(Ground(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 30, 10, false));
     grounds.push_back(Ground(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 30, Const::SCREEN_WIDTH / 8, true, 1, 1, 40));
@@ -66,7 +65,9 @@ void GameManager::draw()
 	C2D_SceneBegin(botLeft);
 	for (auto &obj : objects)
     {
-        obj->draw(topRight);
+        obj->draw();
+	}
+	C3D_FrameEnd(0);
 }
 
 
@@ -108,9 +109,9 @@ void GameManager::update(int &s)
         ground.update();
     }
     collisionsManager();
-    std::cout << "isFall" << player.getIsFall() << std::endl;
-    std::cout << "onGround" << player.getIsOnGround() << std::endl;
-    std::cout << "vy" << player.getVY() << std::endl;
+    //std::cout << "isFall" << player.getIsFall() << std::endl;
+    //std::cout << "onGround" << player.getIsOnGround() << std::endl;
+    //std::cout << "vy" << player.getVY() << std::endl;
     player.setNullVX();
 }
 
