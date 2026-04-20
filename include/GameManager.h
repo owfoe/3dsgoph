@@ -11,7 +11,9 @@ protected:
     std::vector<std::unique_ptr<BaseObject>> objects;
 
 public:
-	C3D_RenderTarget *topRight;
+    C3D_RenderTarget *topRight, *botLeft;
+    std::vector<std::unique_ptr<BaseObject>> &get_objects() { return objects; }
+    std::vector<Ground> &get_grounds() { return grounds; }
     GameManager(int state);
     void init();
     void exit();

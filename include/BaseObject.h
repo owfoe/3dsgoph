@@ -1,13 +1,14 @@
 #pragma once
 #include <citro2d.h>
-
 #include "HitBox.h"
-
+#include <string>
 class BaseObject
 {
 protected:
     float x, y;
     float height, width;
+    C2D_SpriteSheet sheet;
+    C2D_Image currentImage;
 
 public:
     BaseObject(float x, float y, float height, float width)
@@ -26,5 +27,16 @@ public:
     float getHeight() const { return height; }
     float getWidth() const { return width; }
 
-    virtual void draw(C3D_RenderTarget *target) = 0;
+
+    void loadSheet(std::string fileName);
+    void freeSheet();
+
+    void setImage(C2D_Image newImage);
+
+    C2D_SpriteSheet* getSheetPtr() { return &this->sheet; }
+    void setSheetPtr(C2D_SpriteSheet newSheet) { this->sheet = newSheet; }
+    C2D_Image* getImagePtr() { return &this->currentImage; }
+    virtual void draw() = 0;
+    virtual void update() {}
+
 };

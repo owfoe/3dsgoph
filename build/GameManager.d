@@ -113,6 +113,11 @@ GameManager.o: C:/Hackathon_Development/kursach/source/GameManager.cpp \
  C:/devkitPro/libctru/include/c2d/font.h \
  C:/Hackathon_Development/kursach/include/HitBox.h \
  C:/Hackathon_Development/kursach/include/Ground.h \
+ C:/Hackathon_Development/kursach/include/Player.h \
+ C:/Hackathon_Development/kursach/include/Entity.h \
+ C:/Hackathon_Development/kursach/include/Raycast.h \
+ C:/Hackathon_Development/kursach/include/Constants.h \
+ C:/Hackathon_Development/kursach/include/LowerScreen.h \
  C:/Hackathon_Development/kursach/include/Constants.h
 C:/Hackathon_Development/kursach/include/GameManager.h:
 C:/Hackathon_Development/kursach/include/BaseObject.h:
@@ -228,4 +233,9 @@ C:/devkitPro/libctru/include/c2d/text.h:
 C:/devkitPro/libctru/include/c2d/font.h:
 C:/Hackathon_Development/kursach/include/HitBox.h:
 C:/Hackathon_Development/kursach/include/Ground.h:
+C:/Hackathon_Development/kursach/include/Player.h:
+C:/Hackathon_Development/kursach/include/Entity.h:
+C:/Hackathon_Development/kursach/include/Raycast.h:
+C:/Hackathon_Development/kursach/include/Constants.h:
+C:/Hackathon_Development/kursach/include/LowerScreen.h:
 C:/Hackathon_Development/kursach/include/Constants.h:
