@@ -15,6 +15,7 @@ void Player::jump()
     }
     isJump = true;
     onGround = false;
+    isFall = false;
 }
 void Player::updateJump(bool jumpButtonDown)
 {
@@ -30,31 +31,51 @@ void Player::updateFall()
 {
     if (!onGround)
     {
+        if (!isJump)
+            vy -= gravity;
         if (vy < -maxFallSpeed)
             vy = -maxFallSpeed;
+    }
+    if (vy <= 0.0f)
+    {
+        isFall = true;
+        isJump = false;
     }
 }
 void Player::updateFallOnGround(Ground &ground)
 {
     onGround = true;
     isJump = false;
-    vy = 0;
+    vy = 0.0f;
     y = ground.getY() - height;
 }
 void Player::update(bool jumpButtonDown)
 {
     updateJump(jumpButtonDown);
     updateFall();
-    y -= vy;
+    prevY = y;
+    prevX = x;
 }
-void Player::draw() { C2D_DrawRectSolid(x, y, 0, width, height, C2D_Color32f(1, 0, 0, 1)); }
+void Player::handleConflict(float hitX, float hitY)
+{
+    if (hitX != 0.0f)
+    {
+        x = hitX;
+        vx = 0;
+    }
+    if (hitY != 0.0f)
+    {
+        y = hitY;
+        vy = 0;
+    }
+}
+
+void Player::draw() { C2D_DrawRectSolid(x, y, 1, width, height, C2D_Color32f(1, 0, 0, 1)); }
 void Player::moveLeft()
 {
-    Entity::moveLeft();
     vx = -speed;
 }
 void Player::moveRight()
 {
-    Entity::moveRight();
     vx = speed;
 }
