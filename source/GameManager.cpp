@@ -81,7 +81,7 @@ void GameManager::update(int &s)
         player.moveLeft();
     if (kHeld & KEY_RIGHT)
         player.moveRight();
-    if (kDown & KEY_A || kHeld & KEY_A)
+    if (kDown & KEY_A)
         player.jump();
     bool isJumpButtonDown = (kHeld & KEY_A) ? true : false;
     player.update(isJumpButtonDown);
@@ -92,11 +92,11 @@ void GameManager::update(int &s)
     // player.raycast.hitbox.printBorders(player.getX(), player.getY());
     // std::cout << std::endl;
 
-    player.updatePosition();
     for (Ground &ground : grounds)
     {
         ground.update();
     }
+    player.updatePosition();
     collisionsManager();
     std::cout << "isFall" << player.getIsFall() << std::endl;
     std::cout << "onGround" << player.getIsOnGround() << std::endl;
