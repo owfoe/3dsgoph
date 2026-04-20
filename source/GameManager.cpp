@@ -23,10 +23,11 @@ void GameManager::init()
     consoleInit(GFX_BOTTOM, NULL);
     // object init
     grounds.push_back(Ground(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 30, 10, false));
-    grounds.push_back(Ground(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 30, Const::SCREEN_WIDTH / 8, true));
+    grounds.push_back(Ground(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 30, Const::SCREEN_WIDTH / 8, true, 1, 1, 40));
+    grounds.push_back(Ground(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 30, Const::SCREEN_WIDTH / 8, true, 2, 1, 40));
     grounds.push_back(Ground(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false));
     grounds.push_back(Ground(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 30, Const::SCREEN_WIDTH, false));
-    player = Player(Const::SCREEN_WIDTH * 3 / 4, 50.0f, 60, 30);
+    player = Player(0, 0, 60, 30);
 }
 void GameManager::exit()
 {
@@ -91,13 +92,15 @@ void GameManager::update(int &s)
     // player.raycast.hitbox.printBorders(player.getX(), player.getY());
     // std::cout << std::endl;
 
-    if (player.getIsFall())
+    player.updatePosition();
+    for (Ground &ground : grounds)
     {
+        ground.update();
     }
     collisionsManager();
-    // std::cout << "isFall" << player.getIsFall() << std::endl;
-    // std::cout << "vy" << player.getVY() << std::endl;
-    player.updatePosition();
+    std::cout << "isFall" << player.getIsFall() << std::endl;
+    std::cout << "onGround" << player.getIsOnGround() << std::endl;
+    std::cout << "vy" << player.getVY() << std::endl;
     player.setNullVX();
 }
 
