@@ -3,9 +3,12 @@
 #include <iostream>
 #include <string>
 #include <chrono>
+#include <algorithm>
 #include "Ground.h"
 #include "Player.h"
-#include "Constants.h"
+#include "LowerScreen.h"
+#include "Core.h"
+#include "Logger.h"
 
 GameManager::GameManager(int state) {}
 
@@ -19,203 +22,208 @@ void GameManager::init()
     C2D_Prepare();
     // screen target init
     topRight = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
-    // console init
-    consoleInit(GFX_BOTTOM, NULL);
+    botLeft = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+
+    if (ProjectSettings::CONSOLE)
+        consoleInit(GFX_BOTTOM, NULL);
     // object init
-    grounds.push_back(Ground(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 30, 10, false));
-    grounds.push_back(Ground(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 30, Const::SCREEN_WIDTH / 8, true, 1, 1, 40));
-    grounds.push_back(Ground(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 30, Const::SCREEN_WIDTH / 8, true, 2, 1, 40));
+    objects.push_back(std::make_unique<LowerScreen>(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x"));
+    grounds.push_back(Ground(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false));
+    grounds.push_back(Ground(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, true, 'D', 1, 40));
+    grounds.push_back(Ground(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, 'V', 1, 40));
     grounds.push_back(Ground(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false));
-    grounds.push_back(Ground(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 30, Const::SCREEN_WIDTH, false));
+    grounds.push_back(Ground(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, Const::SCREEN_WIDTH, false));
     player = Player(0, 0, 60, 30);
 }
+
 void GameManager::exit()
 {
-    // system exit
     C2D_Fini();
     C3D_Fini();
     gfxExit();
     romfsExit();
+    for (auto &obj : objects)
+        obj->freeSheet();
 }
+
 void GameManager::draw()
 {
-    // scene preparation
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+
     C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
     C2D_SceneBegin(topRight);
-    // draw
-    player.draw();
 
-    // INFO: it can be deleted
-    // C2D_DrawRectSolid(player.getX(), player.getY() + player.getHeight() / 2 + Const::RC_diff_h, 0, player.getWidth(), player.getHeight() / 2 + Const::RC_diff_h, C2D_Color32f(0, 0, 1, 1));
-    player.raycast.hitbox.draw(player.getX(), player.getY());
+    player.draw();
+    // player.raycast.hitbox.draw(player.getX(), player.getY());
 
     for (Ground &ground : grounds)
-    {
         ground.draw();
-    }
-    for (auto &obj : objects)
+
+    if (!ProjectSettings::CONSOLE)
     {
-        obj->draw();
+        C2D_TargetClear(botLeft, C2D_Color32(0xff, 0xff, 0xff, 0xff));
+        C2D_SceneBegin(botLeft);
+        for (auto &obj : objects)
+            obj->draw();
     }
-    // end
+
     C3D_FrameEnd(0);
 }
 
 void GameManager::update(int &s)
 {
-    // gspWaitForVBlank();
-    // gfxSwapBuffers();
-
     hidScanInput();
     u32 kDown = hidKeysDown();
     u32 kHeld = hidKeysHeld();
 
     if (kDown & KEY_START)
         s = -1;
-    // if (kDown & KEY_LEFT)
-    //     player.moveLeft();
-    // if (kDown & KEY_RIGHT)
-    //     player.moveRight();
+
     if (kHeld & KEY_LEFT)
         player.moveLeft();
     if (kHeld & KEY_RIGHT)
         player.moveRight();
     if (kDown & KEY_A)
         player.jump();
+
     bool isJumpButtonDown = (kHeld & KEY_A) ? true : false;
+
     player.update(isJumpButtonDown);
-    // std::cout << "Player hitbox: ";
-    // player.hitbox.printBorders(player.getX(), player.getY());
-    // std::cout << std::endl;
-    // std::cout << "Raycast hitbox: ";
-    // player.raycast.hitbox.printBorders(player.getX(), player.getY());
-    // std::cout << std::endl;
 
     for (Ground &ground : grounds)
-    {
         ground.update();
-    }
-    player.updatePosition();
+
     collisionsManager();
-    std::cout << "isFall" << player.getIsFall() << std::endl;
-    std::cout << "onGround" << player.getIsOnGround() << std::endl;
-    std::cout << "vy" << player.getVY() << std::endl;
     player.setNullVX();
 }
 
 void GameManager::collisionsManager()
 {
-    player.setOnGround(false);
+
+    Ground *plat = player.getGroundPlatform();
+    if (plat != nullptr)
+    {
+        float platVY = plat->getVY();
+        float platVX = plat->getVX();
+        player.setY(player.getY() - platVY);
+        player.setX(player.getX() + platVX);
+    }
+
+    float prevX = player.getX();
+    player.applyVX();
+
     for (Ground &ground : grounds)
     {
-        // CollisionResult res = sweptAABB(player.raycast.hitbox, player.getX(), player.getY(), player.getVX(), player.getVY(),
-        //                                 ground.hitbox, ground.getX(), ground.getY());
-        // if (res.hit && res.normalY == -1.0f)
-        // {
-        //     player.updateFallOnGround(ground);
-        if (!player.getIsFall() && !ground.getIsBarrier())
-            continue;
-        if (AABB(player.raycast.hitbox, player.getX(), player.getY(),
-                 ground.hitbox, ground.getX(), ground.getY()))
+        if (!ground.getIsBarrier() && player.getGroundPlatform() == nullptr)
         {
-            player.updateFallOnGround(ground);
-            // std::cout << "Player hitbox: ";
-            // player.hitbox.printBorders(player.getX(), player.getY());
-            // std::cout << std::endl;
-            // std::cout << "Raycast hitbox: ";
-            // player.raycast.hitbox.printBorders(player.getX(), player.getY() + player.getHeight() / 2);
-            // std::cout << std::endl;
-
-            // std::cout << "Ground hitbox: ";
-            // ground.hitbox.printBorders(ground.getX(), ground.getY());
-            // std::cout << std::endl;
+            CollisionResult res = sweptAABB(player.hitbox, prevX, player.getY(), player.getVX(), player.getVY(),
+                                            ground.hitbox, ground.getX(), ground.getY());
+            bool collision = AABB(player.hitbox, player.getX(), player.getY(),
+                                  ground.hitbox, ground.getX(), ground.getY());
+            if (res.hit && res.normalX != 0.0f && collision)
+            {
+                resolveX(ground);
+            }
+            continue;
         }
-        // else
+
+        if (!AABB(player.hitbox, player.getX(), player.getY(),
+                  ground.hitbox, ground.getX(), ground.getY()))
+            continue;
+
+        if (isHorizontalCollisionPrimary(ground))
+            resolveX(ground);
+    }
+
+    player.resetGroundState();
+    float prevY = player.getY();
+    player.applyVY();
+
+    for (Ground &ground : grounds)
+    {
+        float vy = player.getVY();
+        // Logger::warn("vy", vy);
+        // CollisionResult res = sweptAABB(player.raycast.hitbox, player.getX(), prevY, player.getVX(), vy,
+        //                                 ground.hitbox, ground.getX(), ground.getY());
+        // bool rayCastCollision = AABB(player.raycast.hitbox, player.getX(), player.getY(),
+        //                              ground.hitbox, ground.getX(), ground.getY());
+        // Logger::info("Hit:", res.hit, rayCastCollision, res.normalY, vy);
+        // if (res.hit && res.normalY == -1.0f && rayCastCollision)
         // {
-        //     CollisionResult res = sweptAABB(player.hitbox, player.getX(), player.getY(), player.getVX(), player.getVY(),
-        //                                     ground.hitbox, ground.getX(), ground.getY());
-        //     if (res.hit)
-        //     {
-        //         std::cout << "res.hit" << res.hitY << std::endl;
-        //         player.handleConflict(ground.hitbox, ground.getX(), ground.getY(), res.hitX, res.hitY);
-        //     }
-        //     // if (AABB(player.hitbox, player.getX(), player.getY(),
-        //     //          ground.hitbox, ground.getX(), ground.getY()))
-        //     // {
-        //     //     player.setX(player.getPrevX());
-        //     //     player.setY(player.getPrevY());
-        //     // }
+        //     player.landOnGround(&ground);
+        //     Logger::warn("Stay on ground");
+        //     continue;
         // }
+
+        if (!AABB(player.hitbox, player.getX(), player.getY(),
+                  ground.hitbox, ground.getX(), ground.getY()))
+            continue;
+
+        if (vy <= 0.0f)
+        {
+            float prevBottom = prevY + player.getHeight();
+            float groundTop = ground.hitbox.topB(ground.getY());
+
+            if (prevBottom <= groundTop + 2.0f)
+            {
+                player.landOnGround(&ground);
+            }
+            else if (ground.getIsBarrier())
+            {
+                resolveY(ground);
+            }
+        }
         else
         {
-            // if (AABB(player.hitbox, player.getX(), player.getY(),
-            //          ground.hitbox, ground.getX(), ground.getY()))
-            // {
-            //     std::cout << "Ground hitbox: ";
-            //     ground.hitbox.printBorders(ground.getX(), ground.getY());
-            //     std::cout << std::endl;
-            //     if (player.getVX() > 0.0f)
-            //     {
-            //         player.setX(ground.getX() - player.getWidth());
-            //         player.setNullVX();
-            //     }
-            //     else if (player.getVX() < 0.0f)
-            //     {
-            //         player.setX(ground.getX() + ground.getWidth());
-            //         player.setNullVX();
-            //     }
-            // }
-            checkCollisions(ground.hitbox, ground.getX(), ground.getY());
+            if (ground.getIsBarrier())
+            {
+                resolveY(ground);
+            }
         }
     }
 }
 
-void GameManager::checkCollisions(HitBox &obj, float objX, float objY)
+bool GameManager::isHorizontalCollisionPrimary(Ground &ground)
 {
-    float stopX = 0.0f, stopY = 0.0f;
+    float playerLeft = player.hitbox.leftB(player.getX());
+    float playerRight = player.hitbox.rightB(player.getX());
+    float playerTop = player.hitbox.topB(player.getY());
+    float playerBottom = player.hitbox.bottomB(player.getY());
 
-    float curX = player.getX();
-    float vx = player.getVX();
-    float nextX = curX + vx;
+    float groundLeft = ground.hitbox.leftB(ground.getX());
+    float groundRight = ground.hitbox.rightB(ground.getX());
+    float groundTop = ground.hitbox.topB(ground.getY());
+    float groundBottom = ground.hitbox.bottomB(ground.getY());
 
-    // while (curX != nextX && stopX == 0.0f)
-    // {
-    //     prevX = curX;
-    //     curX += std::fabs(vx) / vx;
-    //     if (AABB(player.hitbox, curX, player.getY(),
-    //              obj, objX, objY))
-    //     {
-    //         // stopX = prevX;
-    //         stopX = (vx > 0.0f) ? obj.leftB(objX) - player.getWidth() : obj.rightB(objX);
-    //     }
-    // }
-    if (vx != 0.0f && AABB(player.hitbox, nextX, player.getY(),
-                           obj, objX, objY))
+    float overlapX = std::min(playerRight - groundLeft, groundRight - playerLeft);
+    float overlapY = std::min(playerBottom - groundTop, groundBottom - playerTop);
+
+    return overlapX <= overlapY;
+}
+
+void GameManager::resolveX(Ground &ground)
+{
+    float playerLeft = player.hitbox.leftB(player.getX());
+    float playerRight = player.hitbox.rightB(player.getX());
+    float groundLeft = ground.hitbox.leftB(ground.getX());
+    float groundRight = ground.hitbox.rightB(ground.getX());
+
+    float overlapFromRight = playerRight - groundLeft;
+    float overlapFromLeft = groundRight - playerLeft;
+
+    if (overlapFromRight < overlapFromLeft)
     {
-        // stopX = prevX;
-        stopX = (vx > 0.0f) ? obj.leftB(objX) - player.getWidth() : obj.rightB(objX);
-        player.handleConflict(stopX, 0.0f);
+        player.setX(player.getX() - overlapFromRight);
     }
-
-    float curY = player.getY();
-    float vy = player.getVY();
-    float nextY = curY - vy;
-
-    // while (curY != nextY && stopY == 0.0f)
-    // {
-    //     prevY = curY;
-    //     curY -= std::fabs(vy) / vy;
-    //     if (AABB(player.hitbox, player.getX(), curY,
-    //              obj, objX, objY))
-    //     {
-    //         stopY = prevY;
-    //     }
-    // }
-    if (AABB(player.hitbox, player.getX(), nextY,
-             obj, objX, objY))
+    else
     {
-        stopY = (vy > 0.0f) ? obj.bottomB(objY) : obj.topB(objY) - player.getHeight();
-        player.handleConflict(0.0f, stopY);
+        player.setX(player.getX() + overlapFromLeft);
     }
+    player.setNullVX();
+}
+
+void GameManager::resolveY(Ground &ground)
+{
+    player.setY(ground.hitbox.bottomB(ground.getY()) + 1.0f);
+    player.setNullVY();
 }

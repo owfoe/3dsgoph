@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "Logger.h"
 
 class HitBox
 {
@@ -35,17 +36,10 @@ inline bool AABB(HitBox &a, float ax, float ay, HitBox &b, float bx, float by)
            (a.bottomB(ay) >= b.topB(by));
 }
 
-// inline bool AABBTopAndBottom(HitBox &a, float ax, float ay, HitBox &b, float bx, float by)
-// {
-//     return (a.leftB(ax) >= b.leftB(bx)) &&
-//            (a.rightB(ax) <= b.rightB(bx)) &&
-//            (a.topB(ay) <= b.bottomB(by)) &&
-//            (a.bottomB(ay) >= b.topB(by));
-// }
-
 struct CollisionResult
 {
     bool hit = false;
+    float hitTime = 1.0f;
     float hitX = 0.0f;
     float hitY = 0.0f;
     float normalX = 0.0f;
@@ -67,9 +61,7 @@ inline CollisionResult sweptAABB(HitBox &a, float ax, float ay, float vx, float 
     float bTop = b.topB(by);
     float bBottom = b.bottomB(by);
 
-    float xEntry, yEntry;
-    float xExit, yExit;
-
+    float xEntry, xExit;
     if (vx > 0.0f)
     {
         xEntry = (bLeft - aRight) / vx;
@@ -86,15 +78,16 @@ inline CollisionResult sweptAABB(HitBox &a, float ax, float ay, float vx, float 
         xExit = INFINITY;
     }
 
-    if (vy > 0.0f)
+    float yEntry, yExit;
+    if (vy < 0.0f)
     {
-        yEntry = (bBottom - aTop) / vy;
-        yExit = (bTop - aBottom) / vy;
+        yEntry = (bTop - aBottom) / (-vy);
+        yExit = (bBottom - aTop) / (-vy);
     }
-    else if (vy < 0.0f)
+    else if (vy > 0.0f)
     {
-        yEntry = (bTop - aBottom) / vy;
-        yExit = (bBottom - aTop) / vy;
+        yEntry = (bBottom - aTop) / (-vy);
+        yExit = (bTop - aBottom) / (-vy);
     }
     else
     {
@@ -104,26 +97,38 @@ inline CollisionResult sweptAABB(HitBox &a, float ax, float ay, float vx, float 
 
     float entryTime = std::max(xEntry, yEntry);
     float exitTime = std::min(xExit, yExit);
-    // std::cout << "entryTime: " << entryTime << std::endl;
-    // std::cout << "exitTime: " << exitTime << std::endl;
-    // // std::cout << "xEntry: " << xEntry << std::endl;
-    // std::cout << "yEntry: " << yEntry << std::endl;
-    // // std::cout << "xExit: " << xExit << std::endl;
-    // std::cout << "yExit: " << yExit << std::endl;
 
-    if (entryTime > exitTime || (xEntry < 0.0f && yEntry < 0.0f) || xEntry > 1.0f || yEntry > 1.0f)
+    if (entryTime > exitTime || entryTime < 0.0f || entryTime > 1.0f)
         return result;
 
     result.hit = true;
+    result.hitTime = entryTime;
+
     if (xEntry > yEntry)
     {
-        result.hitX = (vx > 0.0f) ? bLeft - (aRight - aLeft) : bRight;
-        result.normalX = (vx > 0.0f) ? -1.0f : 1.0f;
+        if (vx > 0.0f)
+        {
+            result.normalX = -1.0f;
+            result.hitX = bLeft - (aRight - aLeft);
+        }
+        else
+        {
+            result.normalX = 1.0f;
+            result.hitX = bRight;
+        }
     }
     else
     {
-        result.hitY = (vy > 0.0f) ? bBottom : bTop - (aBottom - aTop);
-        result.normalY = (vy > 0.0f) ? 1.0f : -1.0f;
+        if (vy < 0.0f)
+        {
+            result.normalY = -1.0f;
+            result.hitY = bTop - (aBottom - aTop);
+        }
+        else
+        {
+            result.normalY = 1.0f;
+            result.hitY = bBottom;
+        }
     }
 
     return result;

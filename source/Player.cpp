@@ -2,11 +2,11 @@
 #include "Ground.h"
 
 Player::Player(float x, float y, float height, float width)
-    : Entity(x, y, height, width, PlayerSettings::hp, PlayerSettings::speed), raycast(height, width) {}
+    : Entity(x, y, height, width, PlayerSettings::HP, PlayerSettings::SPEED) {}
 
 void Player::jump()
 {
-    if (onGround)
+    if (groundPlatform != nullptr)
     {
         if (std::abs(vx) != speed)
             vy = 7.5f;
@@ -14,12 +14,14 @@ void Player::jump()
             vy = 9.5f;
     }
     isJump = true;
-    onGround = false;
+    // onGround = false;
     isFall = false;
+    groundPlatform = nullptr;
 }
+
 void Player::updateJump(bool jumpButtonDown)
 {
-    if (isJump && !onGround)
+    if (isJump && groundPlatform == nullptr)
     {
         if (jumpButtonDown && vy > 0.0f)
             vy -= gravityLow;
@@ -27,9 +29,10 @@ void Player::updateJump(bool jumpButtonDown)
             vy -= gravityHigh;
     }
 }
+
 void Player::updateFall()
 {
-    if (!onGround)
+    if (groundPlatform == nullptr)
     {
         if (!isJump)
             vy -= gravity;
@@ -39,43 +42,46 @@ void Player::updateFall()
     if (vy <= 0.0f)
     {
         isFall = true;
-        isJump = false;
     }
 }
-void Player::updateFallOnGround(Ground &ground)
+
+void Player::resetGroundState()
 {
-    onGround = true;
-    isJump = false;
-    vy = 0.0f;
-    y = ground.getY() - height;
+    // onGround = false;
+    groundPlatform = nullptr;
 }
+
+void Player::landOnGround(Ground *ground)
+{
+    // onGround = true;
+    isJump = false;
+    isFall = false;
+    vy = 0.0f;
+    y = ground->getY() - height;
+    groundPlatform = ground;
+}
+
 void Player::update(bool jumpButtonDown)
 {
     updateJump(jumpButtonDown);
     updateFall();
-    prevY = y;
-    prevX = x;
 }
+
 void Player::handleConflict(float hitX, float hitY)
 {
-    if (hitX != 0.0f)
+    if (hitX != -1.0f)
     {
         x = hitX;
-        vx = 0;
+        vx = 0.0f;
     }
-    if (hitY != 0.0f)
+    if (hitY != -1.0f)
     {
         y = hitY;
-        vy = 0;
+        vy = 0.0f;
     }
 }
 
 void Player::draw() { C2D_DrawRectSolid(x, y, 1, width, height, C2D_Color32f(1, 0, 0, 1)); }
-void Player::moveLeft()
-{
-    vx = -speed;
-}
-void Player::moveRight()
-{
-    vx = speed;
-}
+
+void Player::moveLeft() { vx = -speed; }
+void Player::moveRight() { vx = speed; }

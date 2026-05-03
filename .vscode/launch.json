@@ -17,8 +17,9 @@
       "program": "cmd.exe",
       "args": [
         "/c",
-        "3dslink -a 10.83.203.123 ${workspaceFolderBasename}.3dsx"
+        "3dslink -a 10.48.224.123 ${workspaceFolderBasename}.3dsx"
       ],
+
       "cwd": "${workspaceFolder}"
     },
     {

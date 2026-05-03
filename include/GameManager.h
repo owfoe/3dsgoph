@@ -15,15 +15,25 @@ protected:
     Player player;
 
 public:
-    C3D_RenderTarget *topRight;
+    C3D_RenderTarget *topRight, *botLeft;
+
     std::vector<std::unique_ptr<BaseObject>> &get_objects() { return objects; }
     std::vector<Ground> &get_grounds() { return grounds; }
+
     GameManager(int state);
     void init();
     void exit();
     void update(int &s);
     void draw();
     long long getTime();
+
     void collisionsManager();
-    void checkCollisions(HitBox &obj, float objX, float objY);
+
+    void resolveX(Ground &ground);
+
+    void resolveY(Ground &ground);
+
+    bool isHorizontalCollisionPrimary(Ground &ground);
+
+    void clampToScreen();
 };

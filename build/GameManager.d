@@ -113,11 +113,13 @@ GameManager.o: \
  C:/devkitPro/libctru/include/c2d/text.h \
  C:/devkitPro/libctru/include/c2d/font.h \
  D:/HSE/Subjects/course_projects/1/game/include/HitBox.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Logger.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Core.h \
  D:/HSE/Subjects/course_projects/1/game/include/Player.h \
  D:/HSE/Subjects/course_projects/1/game/include/Entity.h \
  D:/HSE/Subjects/course_projects/1/game/include/Raycast.h \
- D:/HSE/Subjects/course_projects/1/game/include/Constants.h \
- D:/HSE/Subjects/course_projects/1/game/include/Ground.h
+ D:/HSE/Subjects/course_projects/1/game/include/Ground.h \
+ D:/HSE/Subjects/course_projects/1/game/include/LowerScreen.h
 D:/HSE/Subjects/course_projects/1/game/include/GameManager.h:
 D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h:
 C:/devkitPro/libctru/include/citro2d.h:
@@ -231,8 +233,10 @@ C:/devkitPro/libctru/include/c2d/sprite.h:
 C:/devkitPro/libctru/include/c2d/text.h:
 C:/devkitPro/libctru/include/c2d/font.h:
 D:/HSE/Subjects/course_projects/1/game/include/HitBox.h:
+D:/HSE/Subjects/course_projects/1/game/include/Logger.h:
+D:/HSE/Subjects/course_projects/1/game/include/Core.h:
 D:/HSE/Subjects/course_projects/1/game/include/Player.h:
 D:/HSE/Subjects/course_projects/1/game/include/Entity.h:
 D:/HSE/Subjects/course_projects/1/game/include/Raycast.h:
-D:/HSE/Subjects/course_projects/1/game/include/Constants.h:
 D:/HSE/Subjects/course_projects/1/game/include/Ground.h:
+D:/HSE/Subjects/course_projects/1/game/include/LowerScreen.h:
