@@ -39,7 +39,6 @@ inline bool AABB(HitBox &a, float ax, float ay, HitBox &b, float bx, float by)
 struct CollisionResult
 {
     bool hit = false;
-    float hitTime = 1.0f;
     float hitX = 0.0f;
     float hitY = 0.0f;
     float normalX = 0.0f;
@@ -102,7 +101,6 @@ inline CollisionResult sweptAABB(HitBox &a, float ax, float ay, float vx, float 
         return result;
 
     result.hit = true;
-    result.hitTime = entryTime;
 
     if (xEntry > yEntry)
     {

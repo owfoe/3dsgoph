@@ -1,11 +1,16 @@
 #pragma once
 #include "BaseObject.h"
 
+class Ground;
+
 class Entity : public BaseObject
 {
 protected:
+    float vy = 0.0f;
+    float vx = 0.0f;
     int hp;
     float speed;
+    Ground *groundPlatform = nullptr;
 
 public:
     Entity() {}
@@ -19,6 +24,16 @@ public:
     float getSpeed() const { return this->speed; }
     // virtual void moveLeft() { changeX(-getSpeed()); }
     // virtual void moveRight() { changeX(getSpeed()); }
-    virtual void moveLR(float vx) { changeX(vx); }
-    virtual void moveUD(float vy) { changeY(-vy); }
+    virtual void moveLR() { changeX(vx); }
+    virtual void moveUD() { changeY(-vy); }
+
+    float getVX() { return vx; }
+    float getVY() { return vy; }
+    void setVX(float v) { vx = v; }
+    void setVY(float v) { vy = v; }
+    void setNullVX() { vx = 0.0f; }
+    void setNullVY() { vy = 0.0f; }
+
+    Ground *getGroundPlatform() { return groundPlatform; }
+    void setGroundPlatform(Ground *ground) { groundPlatform = ground; }
 };

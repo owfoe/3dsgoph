@@ -110,7 +110,7 @@ void GameManager::collisionsManager()
     }
 
     float prevX = player.getX();
-    player.applyVX();
+    player.moveLR();
 
     for (Ground &ground : grounds)
     {
@@ -137,7 +137,7 @@ void GameManager::collisionsManager()
 
     player.resetGroundState();
     float prevY = player.getY();
-    player.applyVY();
+    player.moveUD();
 
     for (Ground &ground : grounds)
     {

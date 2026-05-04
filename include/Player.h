@@ -2,13 +2,9 @@
 #include "Entity.h"
 #include "Raycast.h"
 
-class Ground;
-
 class Player : public Entity
 {
 private:
-    float vy = 0.0f;
-    float vx = 0.0f;
     // bool onGround = true;
     bool isJump = false;
     bool isFall = true;
@@ -18,8 +14,6 @@ private:
     float gravityHigh = 0.45f;
     float gravity = 0.5f;
     float maxFallSpeed = 10.0f;
-
-    Ground *groundPlatform = nullptr;
 
 public:
     Player() {}
@@ -43,30 +37,11 @@ public:
 
     void handleConflict(float hitX, float hitY);
 
-    void applyVX() { Entity::moveLR(vx); }
-    void applyVY() { Entity::moveUD(vy); }
-
-    void updatePosition()
-    {
-        Entity::moveUD(vy);
-        Entity::moveLR(vx);
-    }
-
     // void setOnGround(bool flag) { onGround = flag; }
     void setIsJump(bool flag) { isJump = flag; }
     void setIsFall(bool flag) { isFall = flag; }
 
-    float getVX() { return vx; }
-    float getVY() { return vy; }
-    void setVX(float v) { vx = v; }
-    void setVY(float v) { vy = v; }
-    void setNullVX() { vx = 0.0f; }
-    void setNullVY() { vy = 0.0f; }
-
     bool getIsFall() { return isFall; }
     // bool getIsOnGround() { return onGround; }
     bool getIsJump() { return isJump; }
-
-    Ground *getGroundPlatform() { return groundPlatform; }
-    void setGroundPlatform(Ground *ground) { groundPlatform = ground; }
 };
