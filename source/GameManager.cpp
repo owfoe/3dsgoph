@@ -33,6 +33,9 @@ void GameManager::init()
     grounds.push_back(Ground(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, 'V', 1, 40));
     grounds.push_back(Ground(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false));
     grounds.push_back(Ground(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, Const::SCREEN_WIDTH, false));
+
+    groundEnemies.push_back(GroundEnemy(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 5.0f, 'M', 1.0f, 5.0f, 'R', 5.0f));
+
     player = Player(0, 0, 60, 30);
 }
 
@@ -58,6 +61,8 @@ void GameManager::draw()
 
     for (Ground &ground : grounds)
         ground.draw();
+    for (GroundEnemy &groundEnemy : groundEnemies)
+        groundEnemy.draw();
 
     if (!ProjectSettings::CONSOLE)
     {
@@ -93,11 +98,11 @@ void GameManager::update(int &s)
     for (Ground &ground : grounds)
         ground.update();
 
-    collisionsManager();
+    PlayerGroundCollisionsManager();
     player.setNullVX();
 }
 
-void GameManager::collisionsManager()
+void GameManager::PlayerGroundCollisionsManager()
 {
 
     Ground *plat = player.getGroundPlatform();
@@ -122,7 +127,7 @@ void GameManager::collisionsManager()
                                   ground.hitbox, ground.getX(), ground.getY());
             if (res.hit && res.normalX != 0.0f && collision)
             {
-                resolveX(ground);
+                resolveX(player, ground);
             }
             continue;
         }
@@ -132,7 +137,7 @@ void GameManager::collisionsManager()
             continue;
 
         if (isHorizontalCollisionPrimary(ground))
-            resolveX(ground);
+            resolveX(player, ground);
     }
 
     player.resetGroundState();
@@ -201,10 +206,10 @@ bool GameManager::isHorizontalCollisionPrimary(Ground &ground)
     return overlapX <= overlapY;
 }
 
-void GameManager::resolveX(Ground &ground)
+void GameManager::resolveX(Entity &entity, Ground &ground)
 {
-    float playerLeft = player.hitbox.leftB(player.getX());
-    float playerRight = player.hitbox.rightB(player.getX());
+    float playerLeft = entity.hitbox.leftB(entity.getX());
+    float playerRight = entity.hitbox.rightB(entity.getX());
     float groundLeft = ground.hitbox.leftB(ground.getX());
     float groundRight = ground.hitbox.rightB(ground.getX());
 
@@ -213,13 +218,13 @@ void GameManager::resolveX(Ground &ground)
 
     if (overlapFromRight < overlapFromLeft)
     {
-        player.setX(player.getX() - overlapFromRight);
+        entity.setX(entity.getX() - overlapFromRight);
     }
     else
     {
-        player.setX(player.getX() + overlapFromLeft);
+        entity.setX(entity.getX() + overlapFromLeft);
     }
-    player.setNullVX();
+    entity.setNullVX();
 }
 
 void GameManager::resolveY(Ground &ground)

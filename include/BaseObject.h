@@ -18,10 +18,12 @@ public:
 
     HitBox hitbox;
 
-    float getX() const { return this->x; }
-    float getY() const { return this->y; }
-    void changeX(float value) { this->x += value; }
-    void changeY(float value) { this->y += value; }
+    float getX() const { return x; }
+    float getY() const { return y; }
+    float getCentreX() const { return x + width / 2; }
+    float getCentreY() const { return y + height / 2; }
+    void changeX(float value) { x += value; }
+    void changeY(float value) { y += value; }
     void setX(float x) { this->x = x; }
     void setY(float y) { this->y = y; }
 

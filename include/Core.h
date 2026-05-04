@@ -14,10 +14,15 @@ namespace PlayerSettings
     constexpr float SPEED = 5.0f;
 }
 
+namespace WorldSettings
+{
+    constexpr float GRAVITY = 0.5f;
+    constexpr float MAX_FALL_SPEED = 10.0f;
+}
+
 namespace Const
 {
     constexpr float SCREEN_WIDTH = 400.0f;
     constexpr float SCREEN_HEIGHT = 240.0f;
-    constexpr float GROUND_HEIGHT = 64.0f;
     constexpr float RC_DIFF_H = 3.0f;
 }

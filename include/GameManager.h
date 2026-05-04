@@ -4,14 +4,16 @@
 #include "BaseObject.h"
 #include "Player.h"
 #include "Ground.h"
+#include "GroundEnemy.h"
 #include <3ds.h>
 
 class GameManager
 {
-protected:
+private:
     int a;
     std::vector<std::unique_ptr<BaseObject>> objects;
     std::vector<Ground> grounds;
+    std::vector<GroundEnemy> groundEnemies;
     Player player;
 
 public:
@@ -27,9 +29,9 @@ public:
     void draw();
     long long getTime();
 
-    void collisionsManager();
+    void PlayerGroundCollisionsManager();
 
-    void resolveX(Ground &ground);
+    void resolveX(Entity &entity, Ground &ground);
 
     void resolveY(Ground &ground);
 

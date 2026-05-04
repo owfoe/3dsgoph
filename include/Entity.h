@@ -10,27 +10,26 @@ protected:
     float vx = 0.0f;
     int hp;
     float speed;
+    float damage;
     Ground *groundPlatform = nullptr;
 
 public:
     Entity() {}
-    Entity(float x, float y, float height, float width, int hp, float speed)
-        : BaseObject(x, y, height, width), hp(hp), speed(speed) {};
+    // Entity(float x, float y, float height, float width, int hp, float speed)
+    //     : BaseObject(x, y, height, width), hp(hp), speed(speed) {};
+    Entity(float x, float y, float height, float width, int hp, float speed, float damage = 0.0f)
+        : BaseObject(x, y, height, width), hp(hp), speed(speed), damage(damage) {};
 
-    int getHP() const { return this->hp; };
-    void damage(int hp = 1) { this->hp -= hp; };
-    void heal(int hp = 1) { this->hp += hp; };
+    int getHP() const { return hp; };
+    void addHP(int hp = 1) { this->hp += hp; };
+    void subHP(int hp = 1) { this->hp -= hp; };
 
-    float getSpeed() const { return this->speed; }
-    // virtual void moveLeft() { changeX(-getSpeed()); }
-    // virtual void moveRight() { changeX(getSpeed()); }
+    float getSpeed() const { return speed; }
     virtual void moveLR() { changeX(vx); }
     virtual void moveUD() { changeY(-vy); }
 
     float getVX() { return vx; }
     float getVY() { return vy; }
-    void setVX(float v) { vx = v; }
-    void setVY(float v) { vy = v; }
     void setNullVX() { vx = 0.0f; }
     void setNullVY() { vy = 0.0f; }
 
