@@ -30,35 +30,11 @@ void Player::updateJump(bool jumpButtonDown)
     }
 }
 
-void Player::landOnGround(Ground *ground)
-{
-    // onGround = true;
-    isJump = false;
-    fallLogic.setIsFall(false);
-    vy = 0.0f;
-    y = ground->getY() - height;
-    groundPlatform = ground;
-}
-
 void Player::update(bool jumpButtonDown)
 {
     updateJump(jumpButtonDown);
     bool isOnGround = (groundPlatform == nullptr) ? false : true;
     vy = fallLogic.updateFall(isOnGround, isJump, vy);
-}
-
-void Player::handleConflict(float hitX, float hitY)
-{
-    if (hitX != -1.0f)
-    {
-        x = hitX;
-        vx = 0.0f;
-    }
-    if (hitY != -1.0f)
-    {
-        y = hitY;
-        vy = 0.0f;
-    }
 }
 
 void Player::draw() { C2D_DrawRectSolid(x, y, 1, width, height, C2D_Color32f(1, 0, 0, 1)); }

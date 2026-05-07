@@ -36,6 +36,12 @@ inline bool AABB(HitBox &a, float ax, float ay, HitBox &b, float bx, float by)
            (a.bottomB(ay) >= b.topB(by));
 }
 
+inline bool LeftOrRight(HitBox &a, float ax, float ay, HitBox &b, float bx, float by)
+{
+    return (a.leftB(ax) > b.rightB(bx) - 1.0f) ||
+           (a.rightB(ax) < b.leftB(bx) + 1.0f);
+}
+
 struct CollisionResult
 {
     bool hit = false;

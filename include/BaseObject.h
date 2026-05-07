@@ -7,19 +7,23 @@ class BaseObject
 protected:
     float x, y;
     float height, width;
+    float spawnX;
+    float spawnY;
     C2D_SpriteSheet sheet;
     C2D_Image currentImage = {};
 
 public:
     BaseObject() {}
     BaseObject(float x, float y, float height, float width)
-        : x(x), y(y), height(height), width(width), hitbox(height, width) {}
+        : x(x), y(y), height(height), width(width), spawnX(x), spawnY(y), hitbox(height, width) {}
     virtual ~BaseObject() = default;
 
     HitBox hitbox;
 
     float getX() const { return x; }
     float getY() const { return y; }
+    float getSpawnX() const { return spawnX; }
+    float getSpawnY() const { return spawnY; }
     float getCentreX() const { return x + width / 2; }
     float getCentreY() const { return y + height / 2; }
     void changeX(float value) { x += value; }

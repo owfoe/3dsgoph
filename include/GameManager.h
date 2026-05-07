@@ -29,13 +29,12 @@ public:
     void draw();
     long long getTime();
 
-    void PlayerGroundCollisionsManager();
+    void CollisionsManager();
+    void EntityGroundCollisions(Entity &entity);
 
     void resolveX(Entity &entity, Ground &ground);
 
-    void resolveY(Ground &ground);
+    void resolveY(Entity &entity, Ground &ground);
 
-    bool isHorizontalCollisionPrimary(Ground &ground);
-
-    void clampToScreen();
+    bool isHorizontalCollisionPrimary(Entity &entity, Ground &ground);
 };

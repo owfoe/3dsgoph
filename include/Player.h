@@ -25,17 +25,27 @@ public:
 
     void jump();
     void draw() override;
-    void moveLeft() { vx = -speed; }
-    void moveRight() { vx = speed; }
+    void moveLeft() override
+    {
+        Entity::moveLeft();
+        view = -1;
+    }
+    void moveRight() override
+    {
+        Entity::moveRight();
+        view = 1;
+    }
 
     using BaseObject::update;
     void update(bool jumpButtonDown);
     void updateJump(bool jumpButtonDown);
 
-    void landOnGround(Ground *ground);
-    void resetGroundState() { groundPlatform = nullptr; }
-
-    void handleConflict(float hitX, float hitY);
+    void landOnGround(Ground *ground) override
+    {
+        Entity::landOnGround(ground);
+        isJump = false;
+        fallLogic.setIsFall(false);
+    }
 
     // void setOnGround(bool flag) { onGround = flag; }
     void setIsJump(bool flag) { isJump = flag; }

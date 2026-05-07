@@ -29,12 +29,13 @@ void GameManager::init()
     // object init
     objects.push_back(std::make_unique<LowerScreen>(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x"));
     grounds.push_back(Ground(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false));
-    grounds.push_back(Ground(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, true, 'D', 1, 40));
+    grounds.push_back(Ground(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, false, 'D', 1, 40));
     grounds.push_back(Ground(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, 'V', 1, 40));
+    grounds.push_back(Ground(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 2, 100, Const::SCREEN_WIDTH / 8, false));
     grounds.push_back(Ground(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false));
     grounds.push_back(Ground(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, Const::SCREEN_WIDTH, false));
 
-    groundEnemies.push_back(GroundEnemy(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 5.0f, 'M', 1.0f, 5.0f, 'R', 5.0f));
+    groundEnemies.push_back(GroundEnemy(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, 'M', 1.0f, 5.0f, 'W', 50.0f));
 
     player = Player(0, 0, 60, 30);
 }
@@ -97,138 +98,179 @@ void GameManager::update(int &s)
 
     for (Ground &ground : grounds)
         ground.update();
+    for (GroundEnemy &groundEnemy : groundEnemies)
+    {
+        groundEnemy.update();
+        // Logger::info(groundEnemy.getLastHitX(), groundEnemy.getVX());
+    }
 
-    PlayerGroundCollisionsManager();
+    CollisionsManager();
+
     player.setNullVX();
 }
 
-void GameManager::PlayerGroundCollisionsManager()
+void GameManager::CollisionsManager()
 {
+    EntityGroundCollisions(player);
+    for (GroundEnemy &groundEnemy : groundEnemies)
+        EntityGroundCollisions(groundEnemy);
+}
 
-    Ground *plat = player.getGroundPlatform();
+void GameManager::EntityGroundCollisions(Entity &entity)
+{
+    Ground *plat = entity.getGroundPlatform();
     if (plat != nullptr)
     {
         float platVY = plat->getVY();
         float platVX = plat->getVX();
-        player.setY(player.getY() - platVY);
-        player.setX(player.getX() + platVX);
+        entity.setY(entity.getY() - platVY);
+        entity.setX(entity.getX() + platVX);
     }
 
-    float prevX = player.getX();
-    player.moveLR();
+    float prevX = entity.getX();
+    entity.applyLR();
 
     for (Ground &ground : grounds)
     {
-        if (!ground.getIsBarrier() && player.getGroundPlatform() == nullptr)
+        if (!ground.getIsBarrier() && plat == nullptr)
         {
-            CollisionResult res = sweptAABB(player.hitbox, prevX, player.getY(), player.getVX(), player.getVY(),
+            CollisionResult res = sweptAABB(entity.hitbox, prevX, entity.getY(), entity.getVX(), entity.getVY(),
                                             ground.hitbox, ground.getX(), ground.getY());
-            bool collision = AABB(player.hitbox, player.getX(), player.getY(),
+            bool collision = AABB(entity.hitbox, entity.getX(), entity.getY(),
                                   ground.hitbox, ground.getX(), ground.getY());
             if (res.hit && res.normalX != 0.0f && collision)
             {
-                resolveX(player, ground);
+                resolveX(entity, ground);
             }
             continue;
         }
 
-        if (!AABB(player.hitbox, player.getX(), player.getY(),
+        if (!AABB(entity.hitbox, entity.getX(), entity.getY(),
                   ground.hitbox, ground.getX(), ground.getY()))
             continue;
 
-        if (isHorizontalCollisionPrimary(ground))
-            resolveX(player, ground);
+        if (isHorizontalCollisionPrimary(entity, ground))
+        {
+            resolveX(entity, ground);
+        }
     }
 
-    player.resetGroundState();
-    float prevY = player.getY();
-    player.moveUD();
+    entity.resetGroundPlatform();
+    float prevY = entity.getY();
+    entity.applyUD();
+    float vy = entity.getVY();
 
     for (Ground &ground : grounds)
     {
-        float vy = player.getVY();
         // Logger::warn("vy", vy);
-        // CollisionResult res = sweptAABB(player.raycast.hitbox, player.getX(), prevY, player.getVX(), vy,
+        // CollisionResult res = sweptAABB(entity.raycast.hitbox, entity.getX(), prevY, entity.getVX(), vy,
         //                                 ground.hitbox, ground.getX(), ground.getY());
-        // bool rayCastCollision = AABB(player.raycast.hitbox, player.getX(), player.getY(),
+        // bool rayCastCollision = AABB(entity.raycast.hitbox, entity.getX(), entity.getY(),
         //                              ground.hitbox, ground.getX(), ground.getY());
         // Logger::info("Hit:", res.hit, rayCastCollision, res.normalY, vy);
         // if (res.hit && res.normalY == -1.0f && rayCastCollision)
         // {
-        //     player.landOnGround(&ground);
+        //     entity.landOnGround(&ground);
         //     Logger::warn("Stay on ground");
         //     continue;
         // }
 
-        if (!AABB(player.hitbox, player.getX(), player.getY(),
+        if (!AABB(entity.hitbox, entity.getX(), entity.getY(),
                   ground.hitbox, ground.getX(), ground.getY()))
             continue;
 
         if (vy <= 0.0f)
         {
-            float prevBottom = prevY + player.getHeight();
+            float prevBottom = prevY + entity.getHeight();
             float groundTop = ground.hitbox.topB(ground.getY());
 
             if (prevBottom <= groundTop + 2.0f)
             {
-                player.landOnGround(&ground);
+                entity.landOnGround(&ground);
             }
             else if (ground.getIsBarrier())
             {
-                resolveY(ground);
+                resolveY(entity, ground);
             }
         }
         else
         {
             if (ground.getIsBarrier())
             {
-                resolveY(ground);
+                resolveY(entity, ground);
             }
         }
     }
 }
 
-bool GameManager::isHorizontalCollisionPrimary(Ground &ground)
+bool GameManager::isHorizontalCollisionPrimary(Entity &entity, Ground &ground)
 {
-    float playerLeft = player.hitbox.leftB(player.getX());
-    float playerRight = player.hitbox.rightB(player.getX());
-    float playerTop = player.hitbox.topB(player.getY());
-    float playerBottom = player.hitbox.bottomB(player.getY());
+    float entityLeft = entity.hitbox.leftB(entity.getX());
+    float entityRight = entity.hitbox.rightB(entity.getX());
+    float entityTop = entity.hitbox.topB(entity.getY());
+    float entityBottom = entity.hitbox.bottomB(entity.getY());
 
     float groundLeft = ground.hitbox.leftB(ground.getX());
     float groundRight = ground.hitbox.rightB(ground.getX());
     float groundTop = ground.hitbox.topB(ground.getY());
     float groundBottom = ground.hitbox.bottomB(ground.getY());
 
-    float overlapX = std::min(playerRight - groundLeft, groundRight - playerLeft);
-    float overlapY = std::min(playerBottom - groundTop, groundBottom - playerTop);
+    float overlapX = std::min(entityRight - groundLeft, groundRight - entityLeft);
+    float overlapY = std::min(entityBottom - groundTop, groundBottom - entityTop);
 
     return overlapX <= overlapY;
 }
 
 void GameManager::resolveX(Entity &entity, Ground &ground)
 {
-    float playerLeft = entity.hitbox.leftB(entity.getX());
-    float playerRight = entity.hitbox.rightB(entity.getX());
+    float entityLeft = entity.hitbox.leftB(entity.getX());
+    float entityRight = entity.hitbox.rightB(entity.getX());
     float groundLeft = ground.hitbox.leftB(ground.getX());
     float groundRight = ground.hitbox.rightB(ground.getX());
 
-    float overlapFromRight = playerRight - groundLeft;
-    float overlapFromLeft = groundRight - playerLeft;
+    float overlapFromRight = entityRight - groundLeft;
+    float overlapFromLeft = groundRight - entityLeft;
 
     if (overlapFromRight < overlapFromLeft)
     {
+        entity.setLastHitX(1);
         entity.setX(entity.getX() - overlapFromRight);
     }
     else
     {
+        entity.setLastHitX(-1);
         entity.setX(entity.getX() + overlapFromLeft);
     }
     entity.setNullVX();
 }
 
-void GameManager::resolveY(Ground &ground)
+void GameManager::resolveY(Entity &entity, Ground &ground)
 {
-    player.setY(ground.hitbox.bottomB(ground.getY()) + 1.0f);
-    player.setNullVY();
+    // float vy = ground.getVY();
+    // if (!LeftOrRight(entity.hitbox, entity.getX(), entity.getY(),
+    //                  ground.hitbox, ground.getX(), ground.getY()))
+    // {
+    //     entity.setY(ground.hitbox.bottomB(ground.getY()) + 1.0f);
+    //     entity.setNullVY();
+    // }
+
+    float entityTop = entity.hitbox.topB(entity.getY());
+    float entityBottom = entity.hitbox.bottomB(entity.getY());
+    float groundTop = ground.hitbox.topB(ground.getY());
+    float groundBottom = ground.hitbox.bottomB(ground.getY());
+
+    float overlapFromBottom = entityBottom - groundTop;
+    float overlapFromTop = groundBottom - entityTop;
+
+    if (overlapFromBottom < overlapFromTop)
+    {
+        entity.setLastHitY(1);
+        entity.setY(entity.getY() - overlapFromBottom);
+    }
+    else
+    {
+        entity.setLastHitY(-1);
+        entity.setY(entity.getY() + overlapFromTop + ground.getSpeed());
+    }
+    entity.setNullVY();
 }

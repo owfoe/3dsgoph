@@ -117,9 +117,9 @@ GameManager.o: \
  D:/HSE/Subjects/course_projects/1/game/include/Core.h \
  D:/HSE/Subjects/course_projects/1/game/include/Player.h \
  D:/HSE/Subjects/course_projects/1/game/include/Entity.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Ground.h \
  D:/HSE/Subjects/course_projects/1/game/include/Raycast.h \
  D:/HSE/Subjects/course_projects/1/game/include/FallLogic.h \
- D:/HSE/Subjects/course_projects/1/game/include/Ground.h \
  D:/HSE/Subjects/course_projects/1/game/include/GroundEnemy.h \
  D:/HSE/Subjects/course_projects/1/game/include/Enemy.h \
  D:/HSE/Subjects/course_projects/1/game/include/LowerScreen.h
@@ -240,9 +240,9 @@ D:/HSE/Subjects/course_projects/1/game/include/Logger.h:
 D:/HSE/Subjects/course_projects/1/game/include/Core.h:
 D:/HSE/Subjects/course_projects/1/game/include/Player.h:
 D:/HSE/Subjects/course_projects/1/game/include/Entity.h:
+D:/HSE/Subjects/course_projects/1/game/include/Ground.h:
 D:/HSE/Subjects/course_projects/1/game/include/Raycast.h:
 D:/HSE/Subjects/course_projects/1/game/include/FallLogic.h:
-D:/HSE/Subjects/course_projects/1/game/include/Ground.h:
 D:/HSE/Subjects/course_projects/1/game/include/GroundEnemy.h:
 D:/HSE/Subjects/course_projects/1/game/include/Enemy.h:
 D:/HSE/Subjects/course_projects/1/game/include/LowerScreen.h:
