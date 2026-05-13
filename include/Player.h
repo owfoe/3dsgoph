@@ -24,7 +24,7 @@ public:
     FallLogic fallLogic;
 
     void jump();
-    void draw() override;
+    void draw(float cameraPos) override;
     void moveLeft() override
     {
         Entity::moveLeft();

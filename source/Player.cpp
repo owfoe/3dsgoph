@@ -37,4 +37,4 @@ void Player::update(bool jumpButtonDown)
     vy = fallLogic.updateFall(isOnGround, isJump, vy);
 }
 
-void Player::draw() { C2D_DrawRectSolid(x, y, 1, width, height, C2D_Color32f(1, 0, 0, 1)); }
+void Player::draw(float cameraPos) { C2D_DrawRectSolid(x - cameraPos, y, 1, width, height, C2D_Color32f(1, 0, 0, 1)); }

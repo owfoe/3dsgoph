@@ -4,6 +4,7 @@
 #include "BaseObject.h"
 #include "Player.h"
 #include "Ground.h"
+#include "Camera.h"
 #include "GroundEnemy.h"
 #include <3ds.h>
 
@@ -18,7 +19,7 @@ private:
 
 public:
     C3D_RenderTarget *topRight, *botLeft;
-
+	Camera camera;
     std::vector<std::unique_ptr<BaseObject>> &get_objects() { return objects; }
     std::vector<Ground> &get_grounds() { return grounds; }
 

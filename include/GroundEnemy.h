@@ -9,7 +9,7 @@ public:
                 char type, float aggrRadius, float attackRadius, char patrolType, float patrolRadius = 0.0f);
 
     FallLogic fallLogic;
-    void draw() override;
+    void draw(float cameraPos) override;
     void update() override;
     void landOnGround(Ground *ground) override
     {
