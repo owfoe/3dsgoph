@@ -24,13 +24,13 @@ void GameManager::init()
     // screen target init
     topRight = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
     botLeft = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-    if (ProjectSettings::CONSOLE) {
+    if (ProjectSettings::CONSOLE)
+    {
         consoleInit(GFX_BOTTOM, NULL);
-	}
-	camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1);
+    }
+    camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1);
 
-
-    //if (ProjectSettings::CONSOLE)
+    // if (ProjectSettings::CONSOLE)
     consoleInit(GFX_BOTTOM, NULL);
     // object init
     objects.push_back(std::make_unique<LowerScreen>(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x"));
@@ -58,19 +58,20 @@ void GameManager::exit()
 
 void GameManager::draw()
 {
-	float cameraPos = camera.getX();
-	float playerPos = player.getX();
-	std::cout << cameraPos << " " << playerPos << std::endl;
-    if (playerPos - cameraPos >= 100.0) {
-		camera.changeX(2.0);
-	}
+    float cameraPos = camera.getX();
+    float playerPos = player.getX();
+    if (playerPos - cameraPos >= 100.0)
+    {
+        Logger::info("vx:", player.getVX());
+        camera.changeX(player.getVX());
+    }
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
     C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
     C2D_SceneBegin(topRight);
-    
+
     player.draw(cameraPos);
-	
+
     // player.raycast.hitbox.draw(player.getX(), player.getY());
 
     for (Ground &ground : grounds)
