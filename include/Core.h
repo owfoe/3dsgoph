@@ -12,6 +12,7 @@ namespace PlayerSettings
 {
     constexpr int HP = 3;
     constexpr float SPEED = 5.0f;
+    constexpr int COOLDOWN = 60;
 }
 
 namespace WorldSettings
@@ -25,4 +26,5 @@ namespace Const
     constexpr float SCREEN_WIDTH = 400.0f;
     constexpr float SCREEN_HEIGHT = 240.0f;
     constexpr float RC_DIFF_H = 3.0f;
+    constexpr int TIMER = 60 * 60;
 }

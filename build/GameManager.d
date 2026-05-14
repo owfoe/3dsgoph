@@ -1,10 +1,6 @@
 GameManager.o: \
  D:/HSE/Subjects/course_projects/1/game/source/GameManager.cpp \
  D:/HSE/Subjects/course_projects/1/game/include/GameManager.h \
- D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h \
- C:/devkitPro/libctru/include/citro2d.h \
- C:/devkitPro/libctru/include/citro3d.h \
- C:/devkitPro/libctru/include/c3d/types.h \
  C:/devkitPro/libctru/include/3ds.h \
  C:/devkitPro/libctru/include/3ds/types.h \
  C:/devkitPro/libctru/include/3ds/result.h \
@@ -91,6 +87,10 @@ GameManager.o: \
  C:/devkitPro/libctru/include/3ds/font.h \
  C:/devkitPro/libctru/include/3ds/gdbhio_dev.h \
  C:/devkitPro/libctru/include/3ds/3dslink.h \
+ D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h \
+ C:/devkitPro/libctru/include/citro2d.h \
+ C:/devkitPro/libctru/include/citro3d.h \
+ C:/devkitPro/libctru/include/c3d/types.h \
  C:/devkitPro/libctru/include/c3d/maths.h \
  C:/devkitPro/libctru/include/c3d/mtxstack.h \
  C:/devkitPro/libctru/include/c3d/uniforms.h \
@@ -118,16 +118,13 @@ GameManager.o: \
  D:/HSE/Subjects/course_projects/1/game/include/Player.h \
  D:/HSE/Subjects/course_projects/1/game/include/Entity.h \
  D:/HSE/Subjects/course_projects/1/game/include/Ground.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Projectile.h \
  D:/HSE/Subjects/course_projects/1/game/include/Raycast.h \
  D:/HSE/Subjects/course_projects/1/game/include/FallLogic.h \
  D:/HSE/Subjects/course_projects/1/game/include/GroundEnemy.h \
  D:/HSE/Subjects/course_projects/1/game/include/Enemy.h \
  D:/HSE/Subjects/course_projects/1/game/include/LowerScreen.h
 D:/HSE/Subjects/course_projects/1/game/include/GameManager.h:
-D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h:
-C:/devkitPro/libctru/include/citro2d.h:
-C:/devkitPro/libctru/include/citro3d.h:
-C:/devkitPro/libctru/include/c3d/types.h:
 C:/devkitPro/libctru/include/3ds.h:
 C:/devkitPro/libctru/include/3ds/types.h:
 C:/devkitPro/libctru/include/3ds/result.h:
@@ -214,6 +211,10 @@ C:/devkitPro/libctru/include/3ds/romfs.h:
 C:/devkitPro/libctru/include/3ds/font.h:
 C:/devkitPro/libctru/include/3ds/gdbhio_dev.h:
 C:/devkitPro/libctru/include/3ds/3dslink.h:
+D:/HSE/Subjects/course_projects/1/game/include/BaseObject.h:
+C:/devkitPro/libctru/include/citro2d.h:
+C:/devkitPro/libctru/include/citro3d.h:
+C:/devkitPro/libctru/include/c3d/types.h:
 C:/devkitPro/libctru/include/c3d/maths.h:
 C:/devkitPro/libctru/include/c3d/mtxstack.h:
 C:/devkitPro/libctru/include/c3d/uniforms.h:
@@ -241,6 +242,7 @@ D:/HSE/Subjects/course_projects/1/game/include/Core.h:
 D:/HSE/Subjects/course_projects/1/game/include/Player.h:
 D:/HSE/Subjects/course_projects/1/game/include/Entity.h:
 D:/HSE/Subjects/course_projects/1/game/include/Ground.h:
+D:/HSE/Subjects/course_projects/1/game/include/Projectile.h:
 D:/HSE/Subjects/course_projects/1/game/include/Raycast.h:
 D:/HSE/Subjects/course_projects/1/game/include/FallLogic.h:
 D:/HSE/Subjects/course_projects/1/game/include/GroundEnemy.h:

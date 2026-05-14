@@ -8,15 +8,12 @@ private:
     // S - static, H - horizontal, V - vertical, D - descent, R - rise
     char mode;
     bool isBarrier;
-    float speed;
-    float vx = 0.0f;
-    float vy = 0.0f;
 
     float radius;
 
 public:
     Ground(float x, float y, float height, float width, bool isBarrier, char mode = 'S', float speed = 0.0f, float radius = 0.0f)
-        : BaseObject(x, y, height, width), mode(mode), isBarrier(isBarrier), speed(speed), radius(radius)
+        : BaseObject(x, y, height, width, speed), mode(mode), isBarrier(isBarrier), radius(radius)
     {
         switch (mode)
         {
@@ -40,10 +37,6 @@ public:
     }
 
     char getMode() const { return mode; }
-    float getSpeed() const { return speed; }
-
-    float getVX() const { return vx; }
-    float getVY() const { return vy; }
 
     void moveLeft() { changeX(-getSpeed()); }
     void moveRight() { changeX(getSpeed()); }

@@ -18,6 +18,8 @@ int main()
 		{
 			break;
 		}
+
+		gm.updateTimer();
 	}
 
 	gm.exit();

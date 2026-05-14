@@ -7,7 +7,6 @@
 #include "Ground.h"
 #include "Player.h"
 #include "LowerScreen.h"
-#include "Core.h"
 #include "Logger.h"
 
 GameManager::GameManager(int state) {}
@@ -35,7 +34,7 @@ void GameManager::init()
     grounds.push_back(Ground(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false));
     grounds.push_back(Ground(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, Const::SCREEN_WIDTH, false));
 
-    groundEnemies.push_back(GroundEnemy(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, 'M', 1.0f, 5.0f, 'W', 50.0f));
+    groundEnemies.push_back(GroundEnemy(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, 120, 'M', 100.0f, 1000.0f, 'W', 50.0f));
 
     player = Player(0, 0, 60, 30);
 }
@@ -58,12 +57,16 @@ void GameManager::draw()
     C2D_SceneBegin(topRight);
 
     player.draw();
+    player.drawProjectiles();
     // player.raycast.hitbox.draw(player.getX(), player.getY());
 
     for (Ground &ground : grounds)
         ground.draw();
     for (GroundEnemy &groundEnemy : groundEnemies)
+    {
         groundEnemy.draw();
+        groundEnemy.drawProjectiles();
+    }
 
     if (!ProjectSettings::CONSOLE)
     {
@@ -91,32 +94,78 @@ void GameManager::update(int &s)
         player.moveRight();
     if (kDown & KEY_A)
         player.jump();
+    if (kDown & KEY_B)
+        player.attack(timer);
+    else if (kHeld & KEY_B)
+        player.charge();
 
     bool isJumpButtonDown = (kHeld & KEY_A) ? true : false;
 
     player.update(isJumpButtonDown);
+    player.updateProjectiles();
+
+    // Logger::info(player.getHP());
 
     for (Ground &ground : grounds)
         ground.update();
     for (GroundEnemy &groundEnemy : groundEnemies)
     {
-        groundEnemy.update();
+        groundEnemy.update(player.getCentreX(), player.getCentreY(), timer);
+        groundEnemy.updateProjectiles();
         // Logger::info(groundEnemy.getLastHitX(), groundEnemy.getVX());
     }
 
-    CollisionsManager();
+    collisionsManager();
+    eraseManager();
+}
 
+void GameManager::collisionsManager()
+{
+    entityGroundCollisions(player);
+    for (Projectile &p : player.projectiles)
+        projectileCollisions(p, 'P');
+
+    for (GroundEnemy &groundEnemy : groundEnemies)
+    {
+        entityGroundCollisions(groundEnemy);
+        groundEnemy.setNullVX();
+        for (Projectile &p : groundEnemy.projectiles)
+            projectileCollisions(p, 'E');
+    }
     player.setNullVX();
 }
 
-void GameManager::CollisionsManager()
+void GameManager::eraseManager()
 {
-    EntityGroundCollisions(player);
+    groundEnemies.erase(
+        std::remove_if(groundEnemies.begin(), groundEnemies.end(),
+                       [](const GroundEnemy &groundEnemy)
+                       {
+                           return groundEnemy.getIsDead();
+                       }),
+        groundEnemies.end());
+
+    player.projectiles.erase(
+        std::remove_if(player.projectiles.begin(), player.projectiles.end(),
+                       [](const Projectile &p)
+                       {
+                           return p.getIsDead();
+                       }),
+        player.projectiles.end());
+
     for (GroundEnemy &groundEnemy : groundEnemies)
-        EntityGroundCollisions(groundEnemy);
+    {
+        groundEnemy.projectiles.erase(
+            std::remove_if(groundEnemy.projectiles.begin(), groundEnemy.projectiles.end(),
+                           [](const Projectile &p)
+                           {
+                               return p.getIsDead();
+                           }),
+            groundEnemy.projectiles.end());
+    }
 }
 
-void GameManager::EntityGroundCollisions(Entity &entity)
+void GameManager::entityGroundCollisions(Entity &entity)
 {
     Ground *plat = entity.getGroundPlatform();
     if (plat != nullptr)
@@ -198,6 +247,43 @@ void GameManager::EntityGroundCollisions(Entity &entity)
             if (ground.getIsBarrier())
             {
                 resolveY(entity, ground);
+            }
+        }
+    }
+}
+
+void GameManager::projectileCollisions(Projectile &p, char from)
+{
+    for (Ground &ground : grounds)
+    {
+        if ((AABB(p.hitbox, p.getX(), p.getY(),
+                  ground.hitbox, ground.getX(), ground.getY())))
+        {
+            p.setIsDead(true);
+            return;
+        }
+    }
+
+    if (from == 'E')
+    {
+        if ((AABB(p.hitbox, p.getX(), p.getY(),
+                  player.hitbox, player.getX(), player.getY())))
+        {
+            p.setIsDead(true);
+            player.subHP();
+            return;
+        }
+    }
+    else
+    {
+        for (GroundEnemy &groundEnemy : groundEnemies)
+        {
+            if ((AABB(p.hitbox, p.getX(), p.getY(),
+                      groundEnemy.hitbox, groundEnemy.getX(), groundEnemy.getY())))
+            {
+                p.setIsDead(true);
+                groundEnemy.subHP();
+                return;
             }
         }
     }

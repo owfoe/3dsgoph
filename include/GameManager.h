@@ -1,16 +1,18 @@
 #pragma once
 #include <vector>
 #include <memory>
+#include <3ds.h>
 #include "BaseObject.h"
 #include "Player.h"
 #include "Ground.h"
 #include "GroundEnemy.h"
-#include <3ds.h>
+#include "Core.h"
 
 class GameManager
 {
 private:
     int a;
+    uint64_t timer = 0;
     std::vector<std::unique_ptr<BaseObject>> objects;
     std::vector<Ground> grounds;
     std::vector<GroundEnemy> groundEnemies;
@@ -29,12 +31,13 @@ public:
     void draw();
     long long getTime();
 
-    void CollisionsManager();
-    void EntityGroundCollisions(Entity &entity);
-
+    void collisionsManager();
+    void eraseManager();
+    void entityGroundCollisions(Entity &entity);
+    void projectileCollisions(Projectile &p, char from);
     void resolveX(Entity &entity, Ground &ground);
-
     void resolveY(Entity &entity, Ground &ground);
-
     bool isHorizontalCollisionPrimary(Entity &entity, Ground &ground);
+
+    void updateTimer() { timer++; }
 };

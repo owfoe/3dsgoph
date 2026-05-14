@@ -5,16 +5,18 @@
 class GroundEnemy : public Enemy
 {
 public:
-    GroundEnemy(float x, float y, float height, float width, int hp, float speed,
+    GroundEnemy(float x, float y, float height, float width, int hp, float speed, uint64_t cooldown,
                 char type, float aggrRadius, float attackRadius, char patrolType, float patrolRadius = 0.0f);
 
     FallLogic fallLogic;
     void draw() override;
-    void update() override;
+    void update(float playerCentreX, float playerCentreY, uint64_t timer);
     void landOnGround(Ground *ground) override
     {
         Entity::landOnGround(ground);
         fallLogic.setIsFall(false);
     }
     void patrol() override;
+    void aggr(float playerCentreX, float playerCentreY, float distToPlayer) override;
+    void attack(float objCentreX, float objCentreY, uint64_t timer) override;
 };

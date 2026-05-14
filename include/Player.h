@@ -15,6 +15,8 @@ private:
     float jumpGravityHigh = 0.45f;
     // float gravity = 0.5f;
     // float maxFallSpeed = 10.0f;
+    int charge = 0;
+    int startCharging = 0;
 
 public:
     Player() {}
@@ -51,4 +53,11 @@ public:
     void setIsJump(bool flag) { isJump = flag; }
     // bool getIsOnGround() { return onGround; }
     bool getIsJump() { return isJump; }
+
+    void attack(uint64_t timer) override;
+    void charge(uint64_t timer)
+    {
+        if (startCharging == 0)
+            startCharging = timer;
+    }
 };
