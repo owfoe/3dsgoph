@@ -11,8 +11,8 @@ int main()
 
 	while (aptMainLoop())
 	{
-		gm.draw();
 		gm.update(s);
+		gm.draw();
 
 		if (s == -1)
 		{

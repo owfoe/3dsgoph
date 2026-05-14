@@ -37,7 +37,7 @@ public:
         }
     }
 
-    void draw() override { C2D_DrawRectSolid(x, y, 1, width, height, C2D_Color32f(255, 255, 0, 1)); }
+    void draw(float cameraPos) override { C2D_DrawRectSolid(x - cameraPos, y, 1, width, height, C2D_Color32f(255, 255, 0, 1)); }
     void update() override
     {
         x += vx;

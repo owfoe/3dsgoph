@@ -5,6 +5,7 @@
 #include <chrono>
 #include <algorithm>
 #include "Ground.h"
+#include "Camera.h"
 #include "Player.h"
 #include "LowerScreen.h"
 #include "Logger.h"
@@ -22,9 +23,14 @@ void GameManager::init()
     // screen target init
     topRight = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
     botLeft = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-
     if (ProjectSettings::CONSOLE)
+    {
         consoleInit(GFX_BOTTOM, NULL);
+    }
+    camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1);
+
+    // if (ProjectSettings::CONSOLE)
+    consoleInit(GFX_BOTTOM, NULL);
     // object init
     objects.push_back(std::make_unique<LowerScreen>(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x"));
     grounds.push_back(Ground(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false));
@@ -51,21 +57,29 @@ void GameManager::exit()
 
 void GameManager::draw()
 {
+    float cameraPos = camera.getX();
+    float playerPos = player.getX();
+    float dx = playerPos - cameraPos;
+    if (playerPos - cameraPos >= 100.0)
+    {
+        camera.changeX(player.getSpeed());
+    }
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
     C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
     C2D_SceneBegin(topRight);
 
-    player.draw();
-    player.drawProjectiles();
+    player.drawProjectiles(cameraPos);
+    player.draw(cameraPos);
+
     // player.raycast.hitbox.draw(player.getX(), player.getY());
 
     for (Ground &ground : grounds)
-        ground.draw();
+        ground.draw(cameraPos);
     for (GroundEnemy &groundEnemy : groundEnemies)
     {
-        groundEnemy.draw();
-        groundEnemy.drawProjectiles();
+        groundEnemy.drawProjectiles(cameraPos);
+        groundEnemy.draw(cameraPos);
     }
 
     if (!ProjectSettings::CONSOLE)
@@ -73,7 +87,7 @@ void GameManager::draw()
         C2D_TargetClear(botLeft, C2D_Color32(0xff, 0xff, 0xff, 0xff));
         C2D_SceneBegin(botLeft);
         for (auto &obj : objects)
-            obj->draw();
+            obj->draw(cameraPos);
     }
 
     C3D_FrameEnd(0);
@@ -97,7 +111,7 @@ void GameManager::update(int &s)
     if (kDown & KEY_B)
         player.attack(timer);
     else if (kHeld & KEY_B)
-        player.charge();
+        player.chargeAttack(timer);
 
     bool isJumpButtonDown = (kHeld & KEY_A) ? true : false;
 

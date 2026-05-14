@@ -61,6 +61,6 @@ public:
     C2D_SpriteSheet *getSheetPtr() { return &this->sheet; }
     void setSheetPtr(C2D_SpriteSheet newSheet) { this->sheet = newSheet; }
     C2D_Image *getImagePtr() { return &this->currentImage; }
-    virtual void draw() = 0;
+    virtual void draw(float cameraPos) = 0;
     virtual void update() {}
 };

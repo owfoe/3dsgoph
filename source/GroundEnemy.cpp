@@ -76,4 +76,4 @@ void GroundEnemy::attack(float objCentreX, float objCentreY, uint64_t timer)
     projectiles.push_back(Projectile(projectileSpawnX, projectileSpawnY, 5.0f, 5.0f, 6.0f, timer, 'A', objCentreX, objCentreY));
 }
 
-void GroundEnemy::draw() { C2D_DrawRectSolid(x, y, 1, width, height, C2D_Color32f(0, 0, 1, 1)); }
+void GroundEnemy::draw(float cameraPos) { C2D_DrawRectSolid(x - cameraPos, y, 1, width, height, C2D_Color32f(0, 0, 1, 1)); }

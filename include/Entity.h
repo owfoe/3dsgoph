@@ -49,10 +49,10 @@ public:
         y = ground->getY() - height;
         groundPlatform = ground;
     }
-    void drawProjectiles()
+    void drawProjectiles(float cameraPos)
     {
         for (Projectile &projectile : projectiles)
-            projectile.draw();
+            projectile.draw(cameraPos);
     }
     void updateProjectiles()
     {

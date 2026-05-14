@@ -121,6 +121,7 @@ GameManager.o: \
  D:/HSE/Subjects/course_projects/1/game/include/Projectile.h \
  D:/HSE/Subjects/course_projects/1/game/include/Raycast.h \
  D:/HSE/Subjects/course_projects/1/game/include/FallLogic.h \
+ D:/HSE/Subjects/course_projects/1/game/include/Camera.h \
  D:/HSE/Subjects/course_projects/1/game/include/GroundEnemy.h \
  D:/HSE/Subjects/course_projects/1/game/include/Enemy.h \
  D:/HSE/Subjects/course_projects/1/game/include/LowerScreen.h
@@ -245,6 +246,7 @@ D:/HSE/Subjects/course_projects/1/game/include/Ground.h:
 D:/HSE/Subjects/course_projects/1/game/include/Projectile.h:
 D:/HSE/Subjects/course_projects/1/game/include/Raycast.h:
 D:/HSE/Subjects/course_projects/1/game/include/FallLogic.h:
+D:/HSE/Subjects/course_projects/1/game/include/Camera.h:
 D:/HSE/Subjects/course_projects/1/game/include/GroundEnemy.h:
 D:/HSE/Subjects/course_projects/1/game/include/Enemy.h:
 D:/HSE/Subjects/course_projects/1/game/include/LowerScreen.h:

@@ -26,7 +26,7 @@ public:
     FallLogic fallLogic;
 
     void jump();
-    void draw() override;
+    void draw(float cameraPos) override;
     void moveLeft() override
     {
         Entity::moveLeft();
@@ -55,7 +55,7 @@ public:
     bool getIsJump() { return isJump; }
 
     void attack(uint64_t timer) override;
-    void charge(uint64_t timer)
+    void chargeAttack(uint64_t timer)
     {
         if (startCharging == 0)
             startCharging = timer;

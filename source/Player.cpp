@@ -43,7 +43,7 @@ void Player::attack(uint64_t timer)
 
     float projectileSpawnX = (view == 1) ? x + width : x;
     float projectileSpawnY = y + height / 4;
-    projectiles.push_back(Projectile(projectileSpawnX, projectileSpawnY, 10.0f, 10.0f, 1.0f, timer, 'B', view, 1));
+    projectiles.push_back(Projectile(projectileSpawnX, projectileSpawnY, 10.0f, 10.0f, 1.0f, timer, 'B', view, 5));
 }
 
-void Player::draw() { C2D_DrawRectSolid(x, y, 1, width, height, C2D_Color32f(1, 0, 0, 1)); }
+void Player::draw(float cameraPos) { C2D_DrawRectSolid(x - cameraPos, y, 1, width, height, C2D_Color32f(1, 0, 0, 1)); }
