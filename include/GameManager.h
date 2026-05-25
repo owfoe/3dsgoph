@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "GroundEnemy.h"
 #include "Core.h"
+#include "Powerup.h"
 
 class GameManager
 {
@@ -17,13 +18,13 @@ private:
     std::vector<std::unique_ptr<BaseObject>> objects;
     std::vector<Ground> grounds;
     std::vector<GroundEnemy> groundEnemies;
+    std::vector<Projectile> projectiles;
+    std::vector<Powerup> powerups;
     Player player;
 
 public:
     C3D_RenderTarget *topRight, *botLeft;
-	Camera camera;
-    std::vector<std::unique_ptr<BaseObject>> &get_objects() { return objects; }
-    std::vector<Ground> &get_grounds() { return grounds; }
+    Camera camera;
 
     GameManager(int state);
     void init();
@@ -35,7 +36,8 @@ public:
     void collisionsManager();
     void eraseManager();
     void entityGroundCollisions(Entity &entity);
-    void projectileCollisions(Projectile &p, char from);
+    void projectileCollisions(Projectile &p);
+    void powerupCollisions(Powerup &pu);
     void resolveX(Entity &entity, Ground &ground);
     void resolveY(Entity &entity, Ground &ground);
     bool isHorizontalCollisionPrimary(Entity &entity, Ground &ground);

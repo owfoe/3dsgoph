@@ -27,4 +27,8 @@ namespace Const
     constexpr float SCREEN_HEIGHT = 240.0f;
     constexpr float RC_DIFF_H = 3.0f;
     constexpr int TIMER = 60 * 60;
+
+    constexpr float POWERUP_SPEED = 0.4f;
+    constexpr float POWERUP_RADIUS = 5.0f;
+    constexpr float POWERUP_SIZE = 30.0f;
 }

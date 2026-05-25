@@ -49,17 +49,20 @@ public:
         view = 1;
     }
     using BaseObject::update;
-    virtual void update(float playerCentreX, float playerCentreY, uint64_t timer)
+    virtual void update(std::vector<Projectile> &projectiles, float playerCentreX, float playerCentreY, uint64_t timer)
     {
+        checkDeath();
         float dist = distToObj(playerCentreX, playerCentreY);
         // Logger::log(timer, lastAttack, cooldown, timer - lastAttack > cooldown);
         if (dist <= attackRadius && state == State::Aggr && timer - lastAttack > cooldown)
+        {
             state = State::Attack;
+        }
         else if (dist <= aggrRadius)
             state = State::Aggr;
         else
             state = State::Patrol;
     }
     using Entity::attack;
-    virtual void attack(float objCentreX, float objCentreY, uint64_t timer);
+    virtual void attack(std::vector<Projectile> &projectiles, float objCentreX, float objCentreY, uint64_t timer);
 };

@@ -2,6 +2,7 @@
 #include "Entity.h"
 #include "Raycast.h"
 #include "FallLogic.h"
+#include "Powerup.h"
 
 class Player : public Entity
 {
@@ -17,6 +18,16 @@ private:
     // float maxFallSpeed = 10.0f;
     int charge = 0;
     int startCharging = 0;
+
+    enum class State
+    {
+        Stay,
+        Run,
+        Attack
+    };
+    State state = State::Stay;
+
+    std::vector<Powerup *> powerups;
 
 public:
     Player() {}
@@ -38,7 +49,7 @@ public:
         view = 1;
     }
 
-    using BaseObject::update;
+    using Entity::update;
     void update(bool jumpButtonDown);
     void updateJump(bool jumpButtonDown);
 
@@ -54,10 +65,16 @@ public:
     // bool getIsOnGround() { return onGround; }
     bool getIsJump() { return isJump; }
 
-    void attack(uint64_t timer) override;
+    void attack(std::vector<Projectile> &projectiles, uint64_t timer) override;
     void chargeAttack(uint64_t timer)
     {
         if (startCharging == 0)
             startCharging = timer;
+    }
+    void pickUpPowerup(Powerup *pu)
+    {
+        if (powerups.size() == 2)
+            powerups.at(1)->setIsDead(true);
+        powerups.insert(powerups.begin(), pu);
     }
 };

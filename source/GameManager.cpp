@@ -1,14 +1,9 @@
 #include "GameManager.h"
-#include <3ds.h>
 #include <iostream>
 #include <string>
 #include <chrono>
 #include <algorithm>
-#include "Ground.h"
-#include "Camera.h"
-#include "Player.h"
 #include "LowerScreen.h"
-#include "Logger.h"
 
 GameManager::GameManager(int state) {}
 
@@ -29,18 +24,18 @@ void GameManager::init()
     }
     camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1);
 
-    // if (ProjectSettings::CONSOLE)
-    consoleInit(GFX_BOTTOM, NULL);
     // object init
     objects.push_back(std::make_unique<LowerScreen>(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x"));
     grounds.push_back(Ground(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false));
     grounds.push_back(Ground(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, false, 'D', 1, 40));
-    grounds.push_back(Ground(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, 'V', 1, 40));
+    grounds.push_back(Ground(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, 'V', 2, 40));
     grounds.push_back(Ground(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 2, 100, Const::SCREEN_WIDTH / 8, false));
     grounds.push_back(Ground(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false));
     grounds.push_back(Ground(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, Const::SCREEN_WIDTH, false));
 
-    groundEnemies.push_back(GroundEnemy(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, 120, 'M', 100.0f, 1000.0f, 'W', 50.0f));
+    groundEnemies.push_back(GroundEnemy(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, 120, 'R', 100.0f, 1000.0f, 'W', 50.0f));
+
+    powerups.push_back(Powerup(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 2, Const::POWERUP_SIZE, Const::POWERUP_SIZE, 10 * 60));
 
     player = Player(0, 0, 60, 30);
 }
@@ -60,16 +55,17 @@ void GameManager::draw()
     float cameraPos = camera.getX();
     float playerPos = player.getX();
     float dx = playerPos - cameraPos;
-    if (playerPos - cameraPos >= 100.0)
+    if (dx >= 100.0)
     {
         camera.changeX(player.getSpeed());
     }
+    else if (dx <= 50)
+        camera.changeX(-player.getSpeed());
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
     C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
     C2D_SceneBegin(topRight);
 
-    player.drawProjectiles(cameraPos);
     player.draw(cameraPos);
 
     // player.raycast.hitbox.draw(player.getX(), player.getY());
@@ -78,8 +74,18 @@ void GameManager::draw()
         ground.draw(cameraPos);
     for (GroundEnemy &groundEnemy : groundEnemies)
     {
-        groundEnemy.drawProjectiles(cameraPos);
         groundEnemy.draw(cameraPos);
+    }
+    int i = 0;
+    for (Projectile &p : projectiles)
+    {
+        p.draw(cameraPos);
+        i++;
+    }
+    for (Powerup &pu : powerups)
+    {
+        if (!pu.getIsPickedUp())
+            pu.draw(cameraPos);
     }
 
     if (!ProjectSettings::CONSOLE)
@@ -109,25 +115,30 @@ void GameManager::update(int &s)
     if (kDown & KEY_A)
         player.jump();
     if (kDown & KEY_B)
-        player.attack(timer);
+        player.attack(projectiles, timer);
     else if (kHeld & KEY_B)
         player.chargeAttack(timer);
 
     bool isJumpButtonDown = (kHeld & KEY_A) ? true : false;
 
     player.update(isJumpButtonDown);
-    player.updateProjectiles();
 
     // Logger::info(player.getHP());
 
     for (Ground &ground : grounds)
-        ground.update();
+        ground.update(timer);
     for (GroundEnemy &groundEnemy : groundEnemies)
     {
-        groundEnemy.update(player.getCentreX(), player.getCentreY(), timer);
-        groundEnemy.updateProjectiles();
-        // Logger::info(groundEnemy.getLastHitX(), groundEnemy.getVX());
+        groundEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
     }
+    int i = 0;
+    for (Projectile &p : projectiles)
+    {
+        p.update();
+        i++;
+    }
+    for (Powerup &pu : powerups)
+        pu.update(timer);
 
     collisionsManager();
     eraseManager();
@@ -136,15 +147,17 @@ void GameManager::update(int &s)
 void GameManager::collisionsManager()
 {
     entityGroundCollisions(player);
-    for (Projectile &p : player.projectiles)
-        projectileCollisions(p, 'P');
+    for (Projectile &p : projectiles)
+        projectileCollisions(p);
 
     for (GroundEnemy &groundEnemy : groundEnemies)
     {
         entityGroundCollisions(groundEnemy);
         groundEnemy.setNullVX();
-        for (Projectile &p : groundEnemy.projectiles)
-            projectileCollisions(p, 'E');
+    }
+    for (Powerup &pu : powerups)
+    {
+        powerupCollisions(pu);
     }
     player.setNullVX();
 }
@@ -159,24 +172,20 @@ void GameManager::eraseManager()
                        }),
         groundEnemies.end());
 
-    player.projectiles.erase(
-        std::remove_if(player.projectiles.begin(), player.projectiles.end(),
+    projectiles.erase(
+        std::remove_if(projectiles.begin(), projectiles.end(),
                        [](const Projectile &p)
                        {
                            return p.getIsDead();
                        }),
-        player.projectiles.end());
-
-    for (GroundEnemy &groundEnemy : groundEnemies)
-    {
-        groundEnemy.projectiles.erase(
-            std::remove_if(groundEnemy.projectiles.begin(), groundEnemy.projectiles.end(),
-                           [](const Projectile &p)
-                           {
-                               return p.getIsDead();
-                           }),
-            groundEnemy.projectiles.end());
-    }
+        projectiles.end());
+    powerups.erase(
+        std::remove_if(powerups.begin(), powerups.end(),
+                       [](const Powerup &pu)
+                       {
+                           return pu.getIsDead();
+                       }),
+        powerups.end());
 }
 
 void GameManager::entityGroundCollisions(Entity &entity)
@@ -266,7 +275,7 @@ void GameManager::entityGroundCollisions(Entity &entity)
     }
 }
 
-void GameManager::projectileCollisions(Projectile &p, char from)
+void GameManager::projectileCollisions(Projectile &p)
 {
     for (Ground &ground : grounds)
     {
@@ -277,8 +286,7 @@ void GameManager::projectileCollisions(Projectile &p, char from)
             return;
         }
     }
-
-    if (from == 'E')
+    if (p.getOwner() == 'E')
     {
         if ((AABB(p.hitbox, p.getX(), p.getY(),
                   player.hitbox, player.getX(), player.getY())))
@@ -300,6 +308,16 @@ void GameManager::projectileCollisions(Projectile &p, char from)
                 return;
             }
         }
+    }
+}
+
+void GameManager::powerupCollisions(Powerup &pu)
+{
+    if ((AABB(pu.hitbox, pu.getX(), pu.getY(),
+              player.hitbox, player.getX(), player.getY())))
+    {
+        pu.pickUp();
+        player.pickUpPowerup(&pu);
     }
 }
 

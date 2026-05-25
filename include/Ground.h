@@ -46,41 +46,48 @@ public:
         C2D_DrawRectSolid(x - cameraPos, y, 0, width, height, C2D_Color32f(0, 1, 0, 1));
     }
 
-    void update() override
+    using BaseObject::update;
+    void update(uint64_t timer)
     {
+        float omega = speed / radius;
         switch (mode)
         {
         case 'H':
-            if (x >= spawnX + radius || x <= spawnX - radius)
-                vx *= -1.0f;
+            // if (x >= spawnX + radius || x <= spawnX - radius)
+            //     vx *= -1.0f;
+
+            x = spawnX + radius * std::sinf(timer * omega);
             break;
         case 'V':
-            if (y >= spawnY + radius || y <= spawnY - radius)
-                vy *= -1.0f;
+            // if (y >= spawnY + radius || y <= spawnY - radius)
+            //     vy *= -1.0f;
+            y = spawnY + radius * std::cosf(timer * omega);
             break;
         case 'D':
         {
-            float radiusXY = std::sqrt(std::pow(radius, 2) / 2);
-            if (x >= spawnX + radiusXY || x <= spawnX - radiusXY)
-                vx *= -1.0f;
-            if (y >= spawnY + radiusXY || y <= spawnY - radiusXY)
-                vy *= -1.0f;
+            // float radiusXY = std::sqrt(std::pow(radius, 2) / 2);
+            // if (x >= spawnX + radiusXY || x <= spawnX - radiusXY)
+            //     vx *= -1.0f;
+            // if (y >= spawnY + radiusXY || y <= spawnY - radiusXY)
+            //     vy *= -1.0f;
+            y = spawnY + radius * std::sinf(timer * omega);
+            x = spawnX + radius * std::sinf(timer * omega);
             break;
         }
         case 'R':
         {
-            float radiusXY = std::sqrt(std::pow(radius, 2) / 2);
-            if (x >= spawnX + radiusXY || x <= spawnX - radiusXY)
-                vx *= -1.0f;
-            if (y >= spawnY + radiusXY || y <= spawnY - radiusXY)
-                vy *= -1.0f;
+            // float radiusXY = std::sqrt(std::pow(radius, 2) / 2);
+            // if (x >= spawnX + radiusXY || x <= spawnX - radiusXY)
+            //     vx *= -1.0f;
+            // if (y >= spawnY + radiusXY || y <= spawnY - radiusXY)
+            //     vy *= -1.0f;
+            y = spawnY + radius * std::sinf(timer * omega);
+            x = spawnX - radius * std::sinf(timer * omega);
             break;
         }
         default:
             break;
         }
-        x += vx;
-        y -= vy;
     }
 
     bool getIsBarrier() { return isBarrier; }

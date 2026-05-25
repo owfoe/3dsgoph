@@ -3,6 +3,7 @@
 #include "Ground.h"
 #include "Projectile.h"
 #include <vector>
+#include <Sword.h>
 
 class Entity : public BaseObject
 {
@@ -22,13 +23,13 @@ public:
     Entity(float x, float y, float height, float width, int hp, float speed, uint64_t cooldown)
         : BaseObject(x, y, height, width, speed), hp(hp), cooldown(cooldown) {};
 
-    std::vector<Projectile> projectiles;
-
     int getHP() { return hp; };
     void addHP(int hp = 1) { this->hp += hp; };
     void subHP(int hp = 1) { this->hp -= hp; };
 
-    virtual void attack(uint64_t timer) { lastAttack = timer; }
+    void checkDeath() { isDead = (hp <= 0) ? true : false; }
+
+    virtual void attack(std::vector<Projectile> &projectiles, uint64_t timer) { lastAttack = timer; }
 
     virtual void applyLR() { changeX(vx); }
     virtual void applyUD() { changeY(-vy); }
@@ -48,15 +49,5 @@ public:
         vy = 0.0f;
         y = ground->getY() - height;
         groundPlatform = ground;
-    }
-    void drawProjectiles(float cameraPos)
-    {
-        for (Projectile &projectile : projectiles)
-            projectile.draw(cameraPos);
-    }
-    void updateProjectiles()
-    {
-        for (Projectile &projectile : projectiles)
-            projectile.update();
     }
 };

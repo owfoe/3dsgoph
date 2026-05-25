@@ -21,6 +21,8 @@ protected:
 
 public:
     BaseObject() {}
+    BaseObject(float x, float y, float height, float width)
+        : x(x), y(y), height(height), width(width), spawnX(x), spawnY(y), speed(0.0f), hitbox(height, width) {}
     BaseObject(float x, float y, float height, float width, float speed)
         : x(x), y(y), height(height), width(width), spawnX(x), spawnY(y), speed(speed), hitbox(height, width) {}
     virtual ~BaseObject() = default;

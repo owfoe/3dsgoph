@@ -5,13 +5,12 @@ GroundEnemy::GroundEnemy(float x, float y, float height, float width, int hp, fl
                          char type, float aggrRadius, float attackRadius, char patrolType, float patrolRadius)
     : Enemy(x, y, height, width, hp, speed, cooldown, type, aggrRadius, attackRadius, patrolType, patrolRadius) {}
 
-void GroundEnemy::update(float playerCentreX, float playerCentreY, uint64_t timer)
+void GroundEnemy::update(std::vector<Projectile> &projectiles, float playerCentreX, float playerCentreY, uint64_t timer)
 {
-    Enemy::update(playerCentreX, playerCentreY, timer);
+    Enemy::update(projectiles, playerCentreX, playerCentreY, timer);
     bool isOnGround = (groundPlatform == nullptr) ? false : true;
     vy = fallLogic.updateFall(isOnGround, false, vy);
 
-    float dist = distToObj(playerCentreX, playerCentreY);
     switch (state)
     {
     case State::Patrol:
@@ -20,11 +19,13 @@ void GroundEnemy::update(float playerCentreX, float playerCentreY, uint64_t time
         break;
     case State::Aggr:
         // Logger::info("Aggr");
-        aggr(playerCentreX, playerCentreY, dist);
-        break;
+        {
+            float dist = distToObj(playerCentreX, playerCentreY);
+            aggr(playerCentreX, playerCentreY, dist);
+            break;
+        }
     case State::Attack:
-        // Logger::info("Attack");
-        attack(playerCentreX, playerCentreY, timer);
+        attack(projectiles, playerCentreX, playerCentreY, timer);
         break;
 
     default:
@@ -59,7 +60,7 @@ void GroundEnemy::patrol()
 void GroundEnemy::aggr(float playerCentreX, float playerCentreY, float distToPlayer)
 {
     Enemy::aggr(playerCentreX, playerCentreY, distToPlayer);
-    if (distToPlayer >= attackRadius)
+    if (distToPlayer > attackRadius)
     {
         if (view == -1.0f)
             moveLeft();
@@ -68,12 +69,22 @@ void GroundEnemy::aggr(float playerCentreX, float playerCentreY, float distToPla
     }
 }
 
-void GroundEnemy::attack(float objCentreX, float objCentreY, uint64_t timer)
+void GroundEnemy::attack(std::vector<Projectile> &projectiles, float objCentreX, float objCentreY, uint64_t timer)
 {
-    Entity::attack(timer);
-    float projectileSpawnX = (view == 1) ? x + width : x;
-    float projectileSpawnY = y + height / 4;
-    projectiles.push_back(Projectile(projectileSpawnX, projectileSpawnY, 5.0f, 5.0f, 6.0f, timer, 'A', objCentreX, objCentreY));
+    Entity::attack(projectiles, timer);
+    switch (type)
+    {
+    case 'R':
+    {
+        float projectileSpawnX = (view == 1) ? x + width : x;
+        float projectileSpawnY = y + height / 4;
+        projectiles.push_back(Projectile(projectileSpawnX, projectileSpawnY, 5.0f, 5.0f, 6.0f, 'E', timer, 'A', objCentreX, objCentreY));
+        break;
+    }
+
+    default:
+        break;
+    }
 }
 
 void GroundEnemy::draw(float cameraPos) { C2D_DrawRectSolid(x - cameraPos, y, 1, width, height, C2D_Color32f(0, 0, 1, 1)); }

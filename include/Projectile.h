@@ -4,6 +4,8 @@
 class Projectile : public BaseObject
 {
 private:
+    // E - enemy, P - player
+    char owner;
     // B - bubble, A - accurate shot
     char type;
     float targetX = 0.0f;
@@ -14,8 +16,8 @@ private:
 
 public:
     Projectile() {}
-    Projectile(float x, float y, float height, float width, float speed, uint64_t spawnTime, char type, float targetX, float targetY)
-        : BaseObject(x, y, height, width, speed), type(type), targetX(targetX), targetY(targetY), spawnTime(spawnTime)
+    Projectile(float x, float y, float height, float width, float speed, char owner, uint64_t spawnTime, char type, float targetX, float targetY)
+        : BaseObject(x, y, height, width, speed), owner(owner), type(type), targetX(targetX), targetY(targetY), spawnTime(spawnTime)
     {
         if (type == 'A')
         {
@@ -28,15 +30,16 @@ public:
             vy = dy / len * speed;
         }
     }
-    Projectile(float x, float y, float height, float width, float speed, uint64_t spawnTime, char type, int view, int power)
+    Projectile(float x, float y, float height, float width, float speed, char owner, uint64_t spawnTime, char type, int view, int power)
         : BaseObject(x, y, height, width, speed), type(type), power(power), spawnTime(spawnTime), view(view)
     {
         if (type == 'B')
         {
-            vx = speed * (power + 1);
+            vx = speed * (power + 1) * view;
         }
     }
 
+    char getOwner() { return owner; }
     void draw(float cameraPos) override { C2D_DrawRectSolid(x - cameraPos, y, 1, width, height, C2D_Color32f(255, 255, 0, 1)); }
     void update() override
     {
