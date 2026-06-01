@@ -51,7 +51,7 @@ CFLAGS	:=	-g -Wall -O2 -mword-relocations \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -D__3DS__
-
+CFLAGS += -IC:/devkitPro/libctru/include
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11 -std=c++17
 
 ASFLAGS	:=	-g $(ARCH)

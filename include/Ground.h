@@ -41,9 +41,9 @@ public:
     void moveLeft() { changeX(-getSpeed()); }
     void moveRight() { changeX(getSpeed()); }
 
-    void draw(float cameraPos) override
+    void draw(float cameraPos, int layer) override
     {
-        C2D_DrawRectSolid(x - cameraPos, y, 0, width, height, C2D_Color32f(0, 1, 0, 1));
+        C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(0, 1, 0, 1));
     }
 
     using BaseObject::update;

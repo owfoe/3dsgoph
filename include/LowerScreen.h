@@ -14,7 +14,7 @@ public:
         this->BaseObject::setImage(C2D_SpriteSheetGetImage(spriteSheet, 0));
     };
 
-    void draw(float cameraPos)
+    void draw(float cameraPos, int layer)
     {
         C2D_Image *imgPtr = this->BaseObject::getImagePtr();
         C2D_Image image = *imgPtr;

@@ -87,4 +87,4 @@ void GroundEnemy::attack(std::vector<Projectile> &projectiles, float objCentreX,
     }
 }
 
-void GroundEnemy::draw(float cameraPos) { C2D_DrawRectSolid(x - cameraPos, y, 1, width, height, C2D_Color32f(0, 0, 1, 1)); }
+void GroundEnemy::draw(float cameraPos, int layer) { C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(0, 0, 1, 1)); }

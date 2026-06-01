@@ -4,8 +4,8 @@
 namespace ProjectSettings
 {
     const std::string NAME = "3dsGAME";
-    constexpr bool DEBUG = true;
-    constexpr bool CONSOLE = true;
+    constexpr bool DEBUG = false;
+    constexpr bool CONSOLE = false;
 }
 
 namespace PlayerSettings

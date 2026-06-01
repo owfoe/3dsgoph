@@ -3,6 +3,8 @@
 #include <string>
 #include <chrono>
 #include <algorithm>
+#include <vector>
+
 #include "LowerScreen.h"
 
 GameManager::GameManager(int state) {}
@@ -23,7 +25,7 @@ void GameManager::init()
         consoleInit(GFX_BOTTOM, NULL);
     }
     camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1);
-
+    pointer = Pointer(0, 0, 0.01, 0.01);
     // object init
     objects.push_back(std::make_unique<LowerScreen>(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x"));
     grounds.push_back(Ground(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false));
@@ -66,36 +68,44 @@ void GameManager::draw()
     C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
     C2D_SceneBegin(topRight);
 
-    player.draw(cameraPos);
+    player.draw(cameraPos, 1);
 
     // player.raycast.hitbox.draw(player.getX(), player.getY());
 
     for (Ground &ground : grounds)
-        ground.draw(cameraPos);
+        ground.draw(cameraPos, 0);
     for (GroundEnemy &groundEnemy : groundEnemies)
     {
-        groundEnemy.draw(cameraPos);
+        groundEnemy.draw(cameraPos, 1);
     }
     int i = 0;
     for (Projectile &p : projectiles)
     {
-        p.draw(cameraPos);
+        p.draw(cameraPos, 1);
         i++;
     }
     for (Powerup &pu : powerups)
     {
         if (!pu.getIsPickedUp())
-            pu.draw(cameraPos);
+            pu.draw(cameraPos, 0);
     }
 
     if (!ProjectSettings::CONSOLE)
     {
         C2D_TargetClear(botLeft, C2D_Color32(0xff, 0xff, 0xff, 0xff));
         C2D_SceneBegin(botLeft);
-        for (auto &obj : objects)
-            obj->draw(cameraPos);
-    }
+        std::vector<Powerup *> currentPowerups = player.getPowerups();
+        int s = currentPowerups.size();
+        if (s != 0) {
+            for (int i = 0; i < s; i++) {
+                currentPowerups[i]->draw(0, 1);
+            }
+        }
 
+        for (auto &obj : objects)
+            obj->draw(cameraPos, 0);
+
+    }
     C3D_FrameEnd(0);
 }
 
@@ -119,6 +129,21 @@ void GameManager::update(int &s)
     else if (kHeld & KEY_B)
         player.chargeAttack(timer);
 
+
+    if (kHeld & KEY_TOUCH)
+    {
+        hidTouchRead(&touch);
+        pointer.setX(touch.px);
+        pointer.setY(touch.py);
+        for (Powerup &pu : powerups)
+        {
+            if (AABB(pointer.hitbox, pointer.getX(), pointer.getY(),
+                pu.hitbox, pu.getX(), pu.getY())) {
+                    pu.setIsUsing(true);
+                    player.changeY(100);
+            }
+        }
+    }
     bool isJumpButtonDown = (kHeld & KEY_A) ? true : false;
 
     player.update(isJumpButtonDown);

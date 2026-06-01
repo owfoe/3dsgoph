@@ -20,7 +20,7 @@ public:
     Sword(float x, float y, float height, float width, char owner, float pivotX, float pivotY, int view, int power)
         : BaseObject(x, y, height, width, 0.0f), owner(owner), power(power), view(view), pivotX(pivotX), pivotY(pivotY) {}
 
-    void draw(float cameraPos) override { C2D_DrawRectSolid(x - cameraPos, y, 1, width, height, C2D_Color32f(255, 255, 0, 1)); }
+    void draw(float cameraPos, int layer) override { C2D_DrawRectSolid(x - cameraPos, y, 1, width, height, C2D_Color32f(255, 255, 0, 1)); }
     void update() override
     {
         angle += angleSpeed;

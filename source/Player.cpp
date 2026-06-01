@@ -51,4 +51,4 @@ void Player::attack(std::vector<Projectile> &projectiles, uint64_t timer)
     // swords.push_back(Sword(x, y - 40.0f, 40.0f, 10.0f, 'P', pivotX, pivotY, view, 5));
 }
 
-void Player::draw(float cameraPos) { C2D_DrawRectSolid(x - cameraPos, y, 1, width, height, C2D_Color32f(1, 0, 0, 1)); }
+void Player::draw(float cameraPos, int layer) { C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(1, 0, 0, 1)); }

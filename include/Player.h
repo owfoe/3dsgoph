@@ -37,7 +37,7 @@ public:
     FallLogic fallLogic;
 
     void jump();
-    void draw(float cameraPos) override;
+    void draw(float cameraPos, int layer) override;
     void moveLeft() override
     {
         Entity::moveLeft();
@@ -73,8 +73,13 @@ public:
     }
     void pickUpPowerup(Powerup *pu)
     {
-        if (powerups.size() == 2)
+        int s = powerups.size();
+        if (s == 2)
             powerups.at(1)->setIsDead(true);
+        pu->setX(95 + s * 50);
+        pu->setY(93);
         powerups.insert(powerups.begin(), pu);
     }
+
+    std::vector<Powerup *> getPowerups() { return powerups; }
 };

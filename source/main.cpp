@@ -8,7 +8,6 @@ int main()
 	GameManager gm(s);
 
 	gm.init();
-
 	while (aptMainLoop())
 	{
 		gm.update(s);

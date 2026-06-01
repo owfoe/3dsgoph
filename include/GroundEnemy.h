@@ -10,7 +10,7 @@ public:
 
     FallLogic fallLogic;
     void update(std::vector<Projectile> &projectiles, float playerCentreX, float playerCentreY, uint64_t timer) override;
-    void draw(float cameraPos) override;
+    void draw(float cameraPos, int layer) override;
     void landOnGround(Ground *ground) override
     {
         Entity::landOnGround(ground);

@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "GroundEnemy.h"
 #include "Core.h"
+#include "Pointer.h"
 #include "Powerup.h"
 
 class GameManager
@@ -25,6 +26,8 @@ private:
 public:
     C3D_RenderTarget *topRight, *botLeft;
     Camera camera;
+    touchPosition touch;
+    Pointer pointer;
 
     GameManager(int state);
     void init();
