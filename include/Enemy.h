@@ -4,27 +4,16 @@
 class Enemy : public Entity
 {
 protected:
-    // M - melee, R - ranged
-    char type;
-
-    // Ground: F - fixed, W - wall to wall, R - radius
-    // Fly: F - fixed, H - horizontal, V - vertical, C - circle shape, I - infinity shape
-    char patrolType;
+    EnemyPatrolType patrolType;
     float patrolRadius;
     float aggrRadius;
     float attackRadius;
-    enum class State
-    {
-        Patrol,
-        Aggr,
-        Attack
-    };
-    State state = State::Patrol;
+    EnemyState state = EnemyState::Patrol;
 
 public:
     Enemy(float x, float y, float height, float width, int hp, float speed, uint64_t cooldown,
-          char type, float aggrRadius, float attackRadius, char patrolType, float patrolRadius)
-        : Entity(x, y, height, width, hp, speed, cooldown), type(type), patrolType(patrolType),
+          AttackType attackType, float aggrRadius, float attackRadius, EnemyPatrolType patrolType, float patrolRadius)
+        : Entity(x, y, height, width, hp, speed, cooldown, attackType), patrolType(patrolType),
           patrolRadius(patrolRadius), aggrRadius(aggrRadius), attackRadius(attackRadius) {}
 
     virtual void patrol();
@@ -53,16 +42,25 @@ public:
     {
         checkDeath();
         float dist = distToObj(playerCentreX, playerCentreY);
-        // Logger::log(timer, lastAttack, cooldown, timer - lastAttack > cooldown);
-        if (dist <= attackRadius && state == State::Aggr && timer - lastAttack > cooldown)
+        if (dist <= attackRadius && state == EnemyState::Aggr && timer > lastAttack + cooldown)
         {
-            state = State::Attack;
+            state = EnemyState::Attack;
         }
         else if (dist <= aggrRadius)
-            state = State::Aggr;
+            state = EnemyState::Aggr;
         else
-            state = State::Patrol;
+            state = EnemyState::Patrol;
     }
-    using Entity::attack;
-    virtual void attack(std::vector<Projectile> &projectiles, float objCentreX, float objCentreY, uint64_t timer);
+    uint64_t getAttackStartup(AttackType type) override
+    {
+        switch (type)
+        {
+        case AttackType::Sword:
+            return 24;
+        case AttackType::Shot:
+            return 12;
+        default:
+            return 0;
+        }
+    }
 };

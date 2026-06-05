@@ -52,7 +52,8 @@ CFLAGS	:=	-g -Wall -O2 -mword-relocations \
 
 CFLAGS	+=	$(INCLUDE) -D__3DS__
 CFLAGS += -IC:/devkitPro/libctru/include
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11 -std=c++17
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++17 -Wno-psabi
+
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)

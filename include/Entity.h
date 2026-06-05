@@ -3,8 +3,6 @@
 #include "Ground.h"
 #include "Projectile.h"
 #include <vector>
-#include <Sword.h>
-
 class Entity : public BaseObject
 {
 protected:
@@ -14,27 +12,53 @@ protected:
     int damage = 1.0f;
     int lastHitX = 0;
     int lastHitY = 0;
-    uint64_t cooldown;
-    uint64_t lastAttack;
     Ground *groundPlatform = nullptr;
+
+    uint64_t cooldown;
+    uint64_t lastAttack = 0;
+    AttackType attackType;
+    PendingAttack pendingAttack;
+
+    EntityActionState actionState = EntityActionState::Stay;
 
 public:
     Entity() {}
-    Entity(float x, float y, float height, float width, int hp, float speed, uint64_t cooldown)
-        : BaseObject(x, y, height, width, speed), hp(hp), cooldown(cooldown) {};
+    Entity(float x, float y, float height, float width, int hp, float speed, uint64_t cooldown, AttackType attackType)
+        : BaseObject(x, y, height, width, speed), hp(hp), cooldown(cooldown), attackType(attackType) {};
 
     int getHP() { return hp; };
     void addHP(int hp = 1) { this->hp += hp; };
     void subHP(int hp = 1) { this->hp -= hp; };
 
+
+    float getProjectileSpawnX() { return (view == 1) ? x + width : x; }
+    float getProjectileSpawnY() { return y + height / 4; }
+    AttackType getAttackType() { return attackType; }
+
     void checkDeath() { isDead = (hp <= 0) ? true : false; }
+    bool isObjForward(float objCentreX) { return ((objCentreX - hitbox.rightB(x)) * view >= 0) ? true : false; }
 
-    virtual void attack(std::vector<Projectile> &projectiles, uint64_t timer) { lastAttack = timer; }
-
-    virtual void applyLR() { changeX(vx); }
+    virtual void applyLR()
+    {
+        changeX(vx);
+        actionState = EntityActionState::Run;
+    }
     virtual void applyUD() { changeY(-vy); }
-    virtual void moveLeft() { vx = -speed; }
-    virtual void moveRight() { vx = speed; }
+    virtual void moveLeft()
+    {
+        vx = -speed;
+        actionState = EntityActionState::Run;
+    }
+    virtual void moveRight()
+    {
+        vx = speed;
+        actionState = EntityActionState::Run;
+    }
+    void setNullVX() override
+    {
+        BaseObject::setNullVX();
+        actionState = EntityActionState::Stay;
+    }
 
     int getLastHitX() { return lastHitX; }
     int getLastHitY() { return lastHitY; }
@@ -49,5 +73,40 @@ public:
         vy = 0.0f;
         y = ground->getY() - height;
         groundPlatform = ground;
+    }
+
+    virtual uint64_t getAttackStartup(AttackType type);
+    bool startAttack(AttackType type, uint64_t timer, float targetX = Const::DEFAULT_X, float targetY = Const::DEFAULT_Y)
+    {
+        if (pendingAttack.active)
+            return false;
+
+        if (timer < lastAttack + cooldown)
+            return false;
+
+        pendingAttack.type = type;
+        pendingAttack.active = true;
+        pendingAttack.hitFrame = timer + getAttackStartup(type);
+        pendingAttack.view = view;
+        pendingAttack.targetX = targetX;
+        pendingAttack.targetY = targetY;
+
+        actionState = EntityActionState::Attack;
+        return true;
+    }
+
+    bool consumeReadyAttack(uint64_t timer, PendingAttack &out)
+    {
+        if (!pendingAttack.active)
+            return false;
+
+        if (timer < pendingAttack.hitFrame)
+            return false;
+
+        out = pendingAttack;
+        pendingAttack.active = false;
+        lastAttack = timer;
+
+        return true;
     }
 };

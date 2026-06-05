@@ -23,6 +23,9 @@ private:
     std::vector<Powerup> powerups;
     Player player;
 
+    float nearestEnemyX;
+    float nearestEnemyY;
+
 public:
     C3D_RenderTarget *topRight, *botLeft;
     Camera camera;
@@ -40,10 +43,15 @@ public:
     void eraseManager();
     void entityGroundCollisions(Entity &entity);
     void projectileCollisions(Projectile &p);
-    void powerupCollisions(Powerup &pu);
+    void powerupCollisions(Powerup *pu);
     void resolveX(Entity &entity, Ground &ground);
     void resolveY(Entity &entity, Ground &ground);
     bool isHorizontalCollisionPrimary(Entity &entity, Ground &ground);
+
+    void attackManager();
+    void resolveAttack(Entity &attacker, OwnerType owner, PendingAttack attack);
+    void resolveSwordAttack(Entity &attacker, OwnerType owner, int view);
+    bool isInSwordArc(Entity &attacker, Entity &target, int view);
 
     void updateTimer() { timer++; }
 };

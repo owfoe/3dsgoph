@@ -3,6 +3,7 @@
 #include "Raycast.h"
 #include "FallLogic.h"
 #include "Powerup.h"
+#include <algorithm>
 
 class Player : public Entity
 {
@@ -19,19 +20,15 @@ private:
     int charge = 0;
     int startCharging = 0;
 
-    enum class State
-    {
-        Stay,
-        Run,
-        Attack
-    };
-    State state = State::Stay;
+    EntityActionState state = EntityActionState::Stay;
 
-    std::vector<Powerup *> powerups;
+    std::vector<Powerup> powerups;
+    bool isUsingPowerup = false;
+    uint64_t endUsingPowerup;
 
 public:
     Player() {}
-    Player(float x, float y, float height, float width);
+    Player(float x, float y);
 
     // Raycast raycast;
     FallLogic fallLogic;
@@ -65,21 +62,14 @@ public:
     // bool getIsOnGround() { return onGround; }
     bool getIsJump() { return isJump; }
 
-    void attack(std::vector<Projectile> &projectiles, uint64_t timer) override;
-    void chargeAttack(uint64_t timer)
-    {
-        if (startCharging == 0)
-            startCharging = timer;
-    }
-    void pickUpPowerup(Powerup *pu)
-    {
-        int s = powerups.size();
-        if (s == 2)
-            powerups.at(1)->setIsDead(true);
-        pu->setX(95 + s * 50);
-        pu->setY(93);
-        powerups.insert(powerups.begin(), pu);
-    }
+    void attackBubble();
+    void attackShot();
+    void attackSword();
+    void pickUpPowerup(std::vector<Powerup>::iterator pu);
 
-    std::vector<Powerup *> getPowerups() { return powerups; }
+    std::vector<Powerup> &getPowerups() { return powerups; }
+    void erasePowerups();
+    void usePowerup(int index);
+    void updatePowerup(uint64_t timer);
+    uint64_t getAttackStartup(AttackType type) override;
 };

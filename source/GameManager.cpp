@@ -4,6 +4,7 @@
 #include <chrono>
 #include <algorithm>
 #include <vector>
+#include <limits>
 
 #include "LowerScreen.h"
 
@@ -27,19 +28,20 @@ void GameManager::init()
     camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1);
     pointer = Pointer(0, 0, 0.01, 0.01);
     // object init
-    objects.push_back(std::make_unique<LowerScreen>(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x"));
-    grounds.push_back(Ground(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false));
-    grounds.push_back(Ground(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, false, 'D', 1, 40));
-    grounds.push_back(Ground(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, 'V', 2, 40));
-    grounds.push_back(Ground(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 2, 100, Const::SCREEN_WIDTH / 8, false));
-    grounds.push_back(Ground(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false));
-    grounds.push_back(Ground(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, Const::SCREEN_WIDTH, false));
+    objects.emplace_back(std::make_unique<LowerScreen>(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x"));
+    grounds.emplace_back(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false, GroundMode::Static);
+    grounds.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, false, GroundMode::Descent, 40, 1);
+    grounds.emplace_back(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, GroundMode::Vertical, 40, 1);
+    grounds.emplace_back(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 2, 100, Const::SCREEN_WIDTH / 8, false, GroundMode::Static);
+    grounds.emplace_back(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false, GroundMode::Static);
+    grounds.emplace_back(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, Const::SCREEN_WIDTH, false, GroundMode::Static);
 
-    groundEnemies.push_back(GroundEnemy(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, 120, 'R', 100.0f, 1000.0f, 'W', 50.0f));
+    groundEnemies.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, ProjectSettings::FPS * 2, AttackType::Shot, 100.0f, 1000.0f, EnemyPatrolType::WallToWall, 50.0f);
 
-    powerups.push_back(Powerup(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 2, Const::POWERUP_SIZE, Const::POWERUP_SIZE, 10 * 60));
+    powerups.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 2, Const::POWERUP_SIZE, Const::POWERUP_SIZE, AttackType::Shot, 5 * ProjectSettings::FPS);
+    powerups.emplace_back(Const::SCREEN_WIDTH / 2 + 50, Const::SCREEN_HEIGHT / 2, Const::POWERUP_SIZE, Const::POWERUP_SIZE, AttackType::Sword, 10 * ProjectSettings::FPS);
 
-    player = Player(0, 0, 60, 30);
+    player = Player(0, 0);
 }
 
 void GameManager::exit()
@@ -94,17 +96,18 @@ void GameManager::draw()
     {
         C2D_TargetClear(botLeft, C2D_Color32(0xff, 0xff, 0xff, 0xff));
         C2D_SceneBegin(botLeft);
-        std::vector<Powerup *> currentPowerups = player.getPowerups();
+        std::vector<Powerup> &currentPowerups = player.getPowerups();
         int s = currentPowerups.size();
-        if (s != 0) {
-            for (int i = 0; i < s; i++) {
-                currentPowerups[i]->draw(0, 1);
+        if (s != 0)
+        {
+            for (int i = 0; i < s; i++)
+            {
+                currentPowerups[i].draw(0, 1);
             }
         }
 
         for (auto &obj : objects)
             obj->draw(cameraPos, 0);
-
     }
     C3D_FrameEnd(0);
 }
@@ -125,48 +128,153 @@ void GameManager::update(int &s)
     if (kDown & KEY_A)
         player.jump();
     if (kDown & KEY_B)
-        player.attack(projectiles, timer);
-    else if (kHeld & KEY_B)
-        player.chargeAttack(timer);
-
+        player.startAttack(player.getAttackType(), timer, nearestEnemyX, nearestEnemyY);
 
     if (kHeld & KEY_TOUCH)
     {
         hidTouchRead(&touch);
         pointer.setX(touch.px);
         pointer.setY(touch.py);
-        for (Powerup &pu : powerups)
+        std::vector<Powerup> &playerPowerups = player.getPowerups();
+
+        for (size_t i = 0; i < playerPowerups.size(); i++)
         {
+            Powerup &pu = playerPowerups[i];
+
             if (AABB(pointer.hitbox, pointer.getX(), pointer.getY(),
-                pu.hitbox, pu.getX(), pu.getY())) {
-                    pu.setIsUsing(true);
-                    player.changeY(100);
+                     pu.clickHitBox, pu.getX(), pu.getY()))
+            {
+                pu.use(timer);
+                player.usePowerup(i);
+                break;
             }
         }
     }
     bool isJumpButtonDown = (kHeld & KEY_A) ? true : false;
-
-    player.update(isJumpButtonDown);
-
-    // Logger::info(player.getHP());
-
     for (Ground &ground : grounds)
         ground.update(timer);
+
+    float minDist = std::numeric_limits<float>::max();
+    nearestEnemyX = Const::DEFAULT_X;
+    nearestEnemyY = Const::DEFAULT_Y;
     for (GroundEnemy &groundEnemy : groundEnemies)
     {
         groundEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
+        Logger::info(groundEnemy.getHP());
+        float enemyX = groundEnemy.getCentreX();
+        if (player.isObjForward(enemyX))
+        {
+            float enemyY = groundEnemy.getCentreY();
+            float dist = player.distToObj(enemyX, enemyY);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                nearestEnemyX = enemyX;
+                nearestEnemyY = enemyY;
+            }
+        }
     }
-    int i = 0;
+    attackManager();
     for (Projectile &p : projectiles)
     {
         p.update();
-        i++;
     }
     for (Powerup &pu : powerups)
         pu.update(timer);
+    for (Powerup &pu : player.getPowerups())
+        pu.update(timer);
 
+    player.updatePowerup(timer);
+    player.update(isJumpButtonDown);
     collisionsManager();
     eraseManager();
+}
+
+
+void GameManager::attackManager()
+{
+    PendingAttack attack;
+
+    if (player.consumeReadyAttack(timer, attack))
+    {
+        resolveAttack(player, OwnerType::Player, attack);
+    }
+
+    for (GroundEnemy &enemy : groundEnemies)
+    {
+        if (enemy.consumeReadyAttack(timer, attack))
+        {
+            resolveAttack(enemy, OwnerType::Enemy, attack);
+        }
+    }
+}
+
+void GameManager::resolveAttack(Entity &attacker, OwnerType owner, PendingAttack attack)
+{
+    float projectileSpawnX = (attack.view == 1) ? attacker.getX() + attacker.getWidth() : attacker.getX();
+
+    float projectileSpawnY = attacker.getY() + attacker.getHeight() / 4;
+
+    switch (attack.type)
+    {
+    case AttackType::Bubble:
+        projectileSpawnX -= Const::BUBBLE_SIZE / 2;
+        projectiles.emplace_back(projectileSpawnX, projectileSpawnY, 10.0f, 10.0f, 1.0f, owner, timer, AttackType::Bubble, attack.view, 5);
+        break;
+
+    case AttackType::Shot:
+        projectileSpawnX -= Const::SHOT_SIZE / 2;
+        if (attack.targetX == Const::DEFAULT_X && attack.targetY == Const::DEFAULT_Y && owner == OwnerType::Player)
+        {
+            attack.targetX = (attack.view == 1) ? attacker.getX() + attacker.getWidth() + Const::FIX_CONST : attacker.getX() - Const::FIX_CONST;
+            attack.targetY = attacker.getY() + attacker.getHeight() / 4;
+        }
+        projectiles.emplace_back(projectileSpawnX, projectileSpawnY, 5.0f, 5.0f, 6.0f, owner, timer, AttackType::Shot, attack.targetX, attack.targetY);
+        break;
+
+    case AttackType::Sword:
+        resolveSwordAttack(attacker, owner, attack.view);
+        break;
+    }
+}
+
+void GameManager::resolveSwordAttack(Entity &attacker, OwnerType owner, int view)
+{
+    if (owner == OwnerType::Player)
+    {
+        for (GroundEnemy &enemy : groundEnemies)
+        {
+            if (isInSwordArc(attacker, enemy, view))
+                enemy.subHP();
+        }
+    }
+    else
+    {
+        if (isInSwordArc(attacker, player, view))
+            player.subHP();
+    }
+}
+
+bool GameManager::isInSwordArc(Entity &attacker, Entity &target, int view)
+{
+    if (!attacker.isObjForward(target.getCentreX()))
+        return false;
+
+    float centreX = attacker.getCentreX();
+    float centreY = attacker.getCentreY();
+
+    float left = target.hitbox.leftB(target.getX());
+    float right = target.hitbox.rightB(target.getX());
+    float top = target.hitbox.topB(target.getY());
+    float bottom = target.hitbox.bottomB(target.getY());
+
+    float closestX = std::clamp(centreX, left, right);
+    float closestY = std::clamp(centreY, top, bottom);
+
+    float dx = closestX - centreX;
+    float dy = closestY - centreY;
+
+    return std::powf(dx, 2.0f) + std::powf(dy, 2.0f) <= std::powf(Const::SWORD_RADIUS, 2.0f);
 }
 
 void GameManager::collisionsManager()
@@ -182,7 +290,7 @@ void GameManager::collisionsManager()
     }
     for (Powerup &pu : powerups)
     {
-        powerupCollisions(pu);
+        powerupCollisions(&pu);
     }
     player.setNullVX();
 }
@@ -211,6 +319,7 @@ void GameManager::eraseManager()
                            return pu.getIsDead();
                        }),
         powerups.end());
+    player.erasePowerups();
 }
 
 void GameManager::entityGroundCollisions(Entity &entity)
@@ -259,19 +368,6 @@ void GameManager::entityGroundCollisions(Entity &entity)
 
     for (Ground &ground : grounds)
     {
-        // Logger::warn("vy", vy);
-        // CollisionResult res = sweptAABB(entity.raycast.hitbox, entity.getX(), prevY, entity.getVX(), vy,
-        //                                 ground.hitbox, ground.getX(), ground.getY());
-        // bool rayCastCollision = AABB(entity.raycast.hitbox, entity.getX(), entity.getY(),
-        //                              ground.hitbox, ground.getX(), ground.getY());
-        // Logger::info("Hit:", res.hit, rayCastCollision, res.normalY, vy);
-        // if (res.hit && res.normalY == -1.0f && rayCastCollision)
-        // {
-        //     entity.landOnGround(&ground);
-        //     Logger::warn("Stay on ground");
-        //     continue;
-        // }
-
         if (!AABB(entity.hitbox, entity.getX(), entity.getY(),
                   ground.hitbox, ground.getX(), ground.getY()))
             continue;
@@ -311,18 +407,18 @@ void GameManager::projectileCollisions(Projectile &p)
             return;
         }
     }
-    if (p.getOwner() == 'E')
+    switch (p.getOwner())
     {
+    case OwnerType::Enemy:
         if ((AABB(p.hitbox, p.getX(), p.getY(),
                   player.hitbox, player.getX(), player.getY())))
         {
             p.setIsDead(true);
             player.subHP();
-            return;
+
         }
-    }
-    else
-    {
+        break;
+    case OwnerType::Player:
         for (GroundEnemy &groundEnemy : groundEnemies)
         {
             if ((AABB(p.hitbox, p.getX(), p.getY(),
@@ -330,19 +426,25 @@ void GameManager::projectileCollisions(Projectile &p)
             {
                 p.setIsDead(true);
                 groundEnemy.subHP();
-                return;
             }
         }
+        break;
+
+    default:
+        break;
     }
 }
 
-void GameManager::powerupCollisions(Powerup &pu)
+void GameManager::powerupCollisions(Powerup *pu)
 {
-    if ((AABB(pu.hitbox, pu.getX(), pu.getY(),
+    if ((AABB(pu->hitbox, pu->getX(), pu->getY(),
               player.hitbox, player.getX(), player.getY())))
     {
-        pu.pickUp();
-        player.pickUpPowerup(&pu);
+        std::vector<Powerup>::iterator it = powerups.begin() + (pu - powerups.data());
+
+        pu->pickUp();
+        player.pickUpPowerup(it);
+        powerups.erase(it);
     }
 }
 
@@ -389,14 +491,6 @@ void GameManager::resolveX(Entity &entity, Ground &ground)
 
 void GameManager::resolveY(Entity &entity, Ground &ground)
 {
-    // float vy = ground.getVY();
-    // if (!LeftOrRight(entity.hitbox, entity.getX(), entity.getY(),
-    //                  ground.hitbox, ground.getX(), ground.getY()))
-    // {
-    //     entity.setY(ground.hitbox.bottomB(ground.getY()) + 1.0f);
-    //     entity.setNullVY();
-    // }
-
     float entityTop = entity.hitbox.topB(entity.getY());
     float entityBottom = entity.hitbox.bottomB(entity.getY());
     float groundTop = ground.hitbox.topB(ground.getY());

@@ -1,8 +1,8 @@
 #include "Player.h"
 #include "Ground.h"
 
-Player::Player(float x, float y, float height, float width)
-    : Entity(x, y, height, width, PlayerSettings::HP, PlayerSettings::SPEED, PlayerSettings::COOLDOWN) {}
+Player::Player(float x, float y)
+    : Entity(x, y, PlayerSettings::HEIGHT, PlayerSettings::WIDTH, PlayerSettings::HP, PlayerSettings::SPEED, PlayerSettings::COOLDOWN, AttackType::Sword) {}
 
 void Player::jump()
 {
@@ -38,17 +38,62 @@ void Player::update(bool jumpButtonDown)
     vy = fallLogic.updateFall(isOnGround, isJump, vy);
 }
 
-void Player::attack(std::vector<Projectile> &projectiles, uint64_t timer)
+void Player::draw(float cameraPos, int layer) { C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(1, 0, 0, 1)); }
+
+void Player::erasePowerups()
 {
-    Entity::attack(projectiles, timer);
-
-    float projectileSpawnX = (view == 1) ? x + width : x;
-    float projectileSpawnY = y + height / 4;
-    projectiles.push_back(Projectile(projectileSpawnX, projectileSpawnY, 10.0f, 10.0f, 1.0f, 'P', timer, 'B', view, 5));
-
-    // float pivotX = (view == 1) ? x + width : x;
-    // float pivotY = y + height / 2;
-    // swords.push_back(Sword(x, y - 40.0f, 40.0f, 10.0f, 'P', pivotX, pivotY, view, 5));
+    powerups.erase(
+        std::remove_if(powerups.begin(), powerups.end(),
+                       [](const Powerup &pu)
+                       {
+                           return pu.getIsDead();
+                       }),
+        powerups.end());
 }
 
-void Player::draw(float cameraPos, int layer) { C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(1, 0, 0, 1)); }
+void Player::usePowerup(int index)
+{
+    Powerup &pu = powerups[index];
+
+    attackType = pu.getType();
+    isUsingPowerup = true;
+    endUsingPowerup = pu.getEndUsing();
+
+    powerups.erase(powerups.begin() + index);
+}
+
+void Player::updatePowerup(uint64_t timer)
+{
+    if (isUsingPowerup && timer >= endUsingPowerup)
+    {
+        isUsingPowerup = false;
+        attackType = AttackType::Bubble;
+    }
+}
+
+void Player::pickUpPowerup(std::vector<Powerup>::iterator pu)
+{
+    int s = powerups.size();
+    powerups.insert(powerups.begin(), std::move(*pu));
+    while (s > 2)
+    {
+        powerups.pop_back();
+    }
+    pu->setX(95 + s * 50);
+    pu->setY(93);
+}
+
+uint64_t Player::getAttackStartup(AttackType type)
+{
+    switch (type)
+    {
+    case AttackType::Sword:
+        return 12;
+    case AttackType::Shot:
+        return 0;
+    case AttackType::Bubble:
+        return 0;
+    default:
+        return 0;
+    }
+}

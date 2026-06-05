@@ -47,7 +47,7 @@ public:
     }
     float getVX() const { return vx; }
     float getVY() const { return vy; }
-    void setNullVX() { vx = 0.0f; }
+    virtual void setNullVX() { vx = 0.0f; }
     void setNullVY() { vy = 0.0f; }
     float getSpeed() const { return speed; }
     float getHeight() const { return height; }
