@@ -1,0 +1,111 @@
+#pragma once
+#include <string>
+
+namespace ProjectSettings
+{
+    const std::string NAME = "3dsGAME";
+    constexpr bool DEBUG = true;
+    constexpr bool CONSOLE = true;
+    constexpr int FPS = 60;
+}
+
+namespace PlayerSettings
+{
+    constexpr int HP = 3;
+    constexpr float SPEED = 5.0f;
+    constexpr int COOLDOWN = ProjectSettings::FPS * 0.2f;
+    constexpr float HEIGHT = 60.0f;
+    constexpr float WIDTH = 30.0f;
+}
+
+namespace WorldSettings
+{
+    constexpr float GRAVITY = 0.5f;
+    constexpr float MAX_FALL_SPEED = 10.0f;
+}
+
+namespace Const
+{
+    constexpr float SCREEN_WIDTH = 400.0f;
+    constexpr float SCREEN_HEIGHT = 240.0f;
+    constexpr float RC_DIFF_H = 3.0f;
+    constexpr int TIMER = 60 * 60;
+
+    constexpr float POWERUP_SPEED = 0.4f;
+    constexpr float POWERUP_RADIUS = 5.0f;
+    constexpr float POWERUP_SIZE = 30.0f;
+    constexpr float POWERUP_DIFF_HITBOX = 10.0f;
+
+    constexpr float DEFAULT_X = -1000.0f;
+    constexpr float DEFAULT_Y = -1000.0f;
+
+    constexpr float FIX_CONST = 100.0f;
+
+    constexpr float BUBBLE_SIZE = 10.0f;
+    constexpr float SHOT_SIZE = 5.0f;
+
+    constexpr float SWORD_RADIUS = 70.0f;
+}
+
+enum class EnemyState
+{
+    Patrol,
+    Aggr,
+    Attack
+};
+
+enum class EnemyType
+{
+    Melee,
+    Ranged
+};
+
+enum class EnemyPatrolType
+{
+    Fixed,
+    WallToWall,
+    Radius,
+    Horizontal,
+    Vertical,
+    CircleShape,
+    InfinityShape
+};
+
+enum class EntityActionState
+{
+    Stay,
+    Run,
+    Attack
+};
+
+enum class OwnerType
+{
+    Player,
+    Enemy
+};
+
+enum class AttackType
+{
+    Bubble,
+    Shot,
+    Sword
+};
+
+enum class GroundMode
+{
+    Static,
+    Horizontal,
+    Vertical,
+    Descent,
+    Rise
+};
+
+struct PendingAttack
+{
+    AttackType type;
+    bool active = false;
+    uint64_t hitFrame = 0;
+    int view = 1;
+    float targetX = 0.0f;
+    float targetY = 0.0f;
+};

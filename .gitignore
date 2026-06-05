@@ -1,0 +1,93 @@
+# ===== Build artifacts =====
+
+build/
+bin/
+out/
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.out
+*.app
+*.dSYM/
+*.a
+*.lib
+
+# ===== CMake =====
+
+CMakeFiles/
+CMakeCache.txt
+cmake-build-*/
+compile_commands.json
+cmake_install.cmake
+
+# ===== Make =====
+
+*.d
+
+# ===== Ninja =====
+
+.ninja_deps
+.ninja_log
+
+# ===== Visual Studio =====
+
+.vs/
+*.vcxproj*
+*.sln
+*.user
+*.userosscache
+*.suo
+
+# ===== VS Code =====
+
+.vscode/
+
+# ===== CLion / JetBrains =====
+
+.idea/
+*.iml
+
+# ===== Debug / Logs =====
+
+*.log
+*.tmp
+*.temp
+
+# ===== OS files =====
+
+.DS_Store
+Thumbs.db
+
+# ===== Coverage =====
+
+*.gcda
+*.gcno
+*.gcov
+
+# ===== Sanitizers =====
+
+*.profraw
+*.profdata
+
+# ===== Cache =====
+
+.cache/
+
+# ===== 3DS / devkitPro =====
+
+*.elf
+*.3dsx
+*.cia
+*.smdh
+
+# ===== ROMFS / Assets =====
+
+romfs/*.bin
+*.t3x
+
+# ===== Misc =====
+
+*.swp
+*~
