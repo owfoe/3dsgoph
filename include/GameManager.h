@@ -29,7 +29,12 @@ private:
     float nearestEnemyY;
 
 public:
+    u32 kDown, kHeld;
+    bool isJumpButtonDown;
+    int playerHp, powerupSize;
+    float cameraPos, playerPos, dx, cameraSpeed;
     C3D_RenderTarget *topRight, *botLeft;
+    C2D_SpriteSheet hpsheet;
     C2D_Image heartImg;
     Camera camera;
     touchPosition touch;

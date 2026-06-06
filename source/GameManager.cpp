@@ -24,7 +24,8 @@ void GameManager::init()
     {
         consoleInit(GFX_BOTTOM, NULL);
     }
-    heartImg = C2D_SpriteSheetGetImage(C2D_SpriteSheetLoad("romfs:/gfx/hp.t3x"), 0);
+    hpsheet = C2D_SpriteSheetLoad("romfs:/gfx/hp.t3x");
+    heartImg = C2D_SpriteSheetGetImage(hpsheet, 0);
     camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1, 0);
     camera.setFrameSpeed(15);
     pointer = Pointer(0, 0, 0.01, 0.01);
@@ -48,19 +49,21 @@ void GameManager::init()
 
 void GameManager::exit()
 {
+    ls.freeSheet();
+    marker.freeSheet();
+    C2D_SpriteSheetFree(hpsheet);
     C2D_Fini();
     C3D_Fini();
     gfxExit();
     romfsExit();
-    ls.freeSheet();
 }
 
 void GameManager::draw()
 {
-    float cameraPos = camera.getX();
-    float playerPos = player.getX();
-    float dx = playerPos - cameraPos;
-    float cameraSpeed = 0.0f;
+    cameraPos = camera.getX();
+    playerPos = player.getX();
+    dx = playerPos - cameraPos;
+    cameraSpeed = 0.0f;
     if (dx >= 100.0)
     {
         cameraSpeed = dx / camera.getFrameSpeed();
@@ -86,11 +89,9 @@ void GameManager::draw()
     {
         groundEnemy.draw(cameraPos, 1);
     }
-    int i = 0;
     for (Projectile &p : projectiles)
     {
         p.draw(cameraPos, 1);
-        i++;
     }
     for (Powerup &pu : powerups)
     {
@@ -102,12 +103,12 @@ void GameManager::draw()
     {
         C2D_TargetClear(botLeft, C2D_Color32(0xff, 0xff, 0xff, 0xff));
         C2D_SceneBegin(botLeft);
-        int playerHp = player.getHP();
+        playerHp = player.getHP();
         std::vector<Powerup> &currentPowerups = player.getPowerups();
-        int s = currentPowerups.size();
-        if (s != 0)
+        powerupSize = currentPowerups.size();
+        if (powerupSize != 0)
         {
-            for (int i = 0; i < s; i++)
+            for (int i = 0; i < powerupSize; i++)
             {
                 currentPowerups[i].draw(0, 1);
             }
@@ -124,8 +125,8 @@ void GameManager::draw()
 void GameManager::update(int &s)
 {
     hidScanInput();
-    u32 kDown = hidKeysDown();
-    u32 kHeld = hidKeysHeld();
+    kDown = hidKeysDown();
+    kHeld = hidKeysHeld();
 
     if (kDown & KEY_START)
         s = -1;
@@ -159,7 +160,7 @@ void GameManager::update(int &s)
             }
         }
     }
-    bool isJumpButtonDown = (kHeld & KEY_A) ? true : false;
+    isJumpButtonDown = (kHeld & KEY_A) ? true : false;
     for (Ground &ground : grounds)
         ground.update(timer);
 
