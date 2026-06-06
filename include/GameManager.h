@@ -8,8 +8,10 @@
 #include "Camera.h"
 #include "GroundEnemy.h"
 #include "Core.h"
+#include "LowerScreen.h"
 #include "Pointer.h"
 #include "Powerup.h"
+#include "Marker.h"
 
 class GameManager
 {
@@ -28,9 +30,12 @@ private:
 
 public:
     C3D_RenderTarget *topRight, *botLeft;
+    C2D_Image heartImg;
     Camera camera;
     touchPosition touch;
     Pointer pointer;
+    LowerScreen ls;
+    Marker marker;
 
     GameManager(int state);
     void init();

@@ -18,6 +18,7 @@ out/
 
 CMakeFiles/
 CMakeCache.txt
+run.bat
 cmake-build-*/
 compile_commands.json
 cmake_install.cmake

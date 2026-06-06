@@ -5,8 +5,7 @@
 #include <algorithm>
 #include <vector>
 #include <limits>
-
-#include "LowerScreen.h"
+#include <citro2d.h>
 
 GameManager::GameManager(int state) {}
 
@@ -25,10 +24,13 @@ void GameManager::init()
     {
         consoleInit(GFX_BOTTOM, NULL);
     }
-    camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1);
+    heartImg = C2D_SpriteSheetGetImage(C2D_SpriteSheetLoad("romfs:/gfx/hp.t3x"), 0);
+    camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1, 0);
+    camera.setFrameSpeed(15);
     pointer = Pointer(0, 0, 0.01, 0.01);
-    // object init
-    objects.emplace_back(std::make_unique<LowerScreen>(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x"));
+    marker = Marker(34, 149, 0, 0, "romfs:/gfx/marker.t3x");
+    marker.setMaxPos(700);
+    ls = LowerScreen(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x");
     grounds.emplace_back(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false, GroundMode::Static);
     grounds.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, false, GroundMode::Descent, 40, 1);
     grounds.emplace_back(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, GroundMode::Vertical, 40, 1);
@@ -50,8 +52,7 @@ void GameManager::exit()
     C3D_Fini();
     gfxExit();
     romfsExit();
-    for (auto &obj : objects)
-        obj->freeSheet();
+    ls.freeSheet();
 }
 
 void GameManager::draw()
@@ -59,12 +60,17 @@ void GameManager::draw()
     float cameraPos = camera.getX();
     float playerPos = player.getX();
     float dx = playerPos - cameraPos;
+    float cameraSpeed = 0.0f;
     if (dx >= 100.0)
     {
-        camera.changeX(player.getSpeed());
+        cameraSpeed = dx / camera.getFrameSpeed();
+        camera.changeX(cameraSpeed);
     }
-    else if (dx <= 50)
-        camera.changeX(-player.getSpeed());
+    else if (dx <= 50) {
+        cameraSpeed = dx / camera.getFrameSpeed();
+        camera.changeX(cameraSpeed);
+    }
+
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
     C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
@@ -96,6 +102,7 @@ void GameManager::draw()
     {
         C2D_TargetClear(botLeft, C2D_Color32(0xff, 0xff, 0xff, 0xff));
         C2D_SceneBegin(botLeft);
+        int playerHp = player.getHP();
         std::vector<Powerup> &currentPowerups = player.getPowerups();
         int s = currentPowerups.size();
         if (s != 0)
@@ -105,9 +112,11 @@ void GameManager::draw()
                 currentPowerups[i].draw(0, 1);
             }
         }
-
-        for (auto &obj : objects)
-            obj->draw(cameraPos, 0);
+        ls.draw(cameraPos, 0);
+        marker.draw(cameraPos, 1);
+        for (int i = 0; i < playerHp; i++) {
+            C2D_DrawImageAt(heartImg, 182 + 40*i, 20, 0);
+        }
     }
     C3D_FrameEnd(0);
 }
@@ -183,7 +192,7 @@ void GameManager::update(int &s)
         pu.update(timer);
     for (Powerup &pu : player.getPowerups())
         pu.update(timer);
-
+    marker.update(player.getX());
     player.updatePowerup(timer);
     player.update(isJumpButtonDown);
     collisionsManager();
@@ -441,7 +450,6 @@ void GameManager::powerupCollisions(Powerup *pu)
               player.hitbox, player.getX(), player.getY())))
     {
         std::vector<Powerup>::iterator it = powerups.begin() + (pu - powerups.data());
-
         pu->pickUp();
         player.pickUpPowerup(it);
         powerups.erase(it);

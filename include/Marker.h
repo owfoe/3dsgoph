@@ -1,11 +1,13 @@
 #pragma once
 #include "BaseObject.h"
 #include <string>
-class LowerScreen : public BaseObject
+class Marker : public BaseObject
 {
+private:
+    float maxPos;
 public:
-    LowerScreen() {}
-    LowerScreen(float x, float y, float height, float width, std::string fileName)
+    Marker() {}
+    Marker(float x, float y, float height, float width, std::string fileName)
         : BaseObject(x, y, height, width)
     {
         this->BaseObject::loadSheet(fileName);
@@ -18,6 +20,17 @@ public:
     {
         C2D_Image *imgPtr = this->BaseObject::getImagePtr();
         C2D_Image image = *imgPtr;
-        C2D_DrawImageAt(image, 0, 0, 0);
+        C2D_DrawImageAt(image, x, y, layer);
+    }
+    void setMaxPos(float x) {
+        maxPos = x;
+    }
+    using BaseObject::update;
+    void update(float playerPos) {
+        double formula = 34.0 + playerPos*(240.0/maxPos);
+        if (formula <= 275) {
+            setX(34.0 + playerPos*(240.0/maxPos));
+        }
+
     }
 };
