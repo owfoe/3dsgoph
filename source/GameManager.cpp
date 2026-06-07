@@ -1,4 +1,6 @@
 #include "GameManager.h"
+#include "../include/GameManager.h"
+
 #include <iostream>
 #include <string>
 #include <chrono>
@@ -7,31 +9,47 @@
 #include <limits>
 #include <citro2d.h>
 
-GameManager::GameManager(int state) {}
+GameManager::GameManager(int s) {}
 
 void GameManager::init()
 {
     // system init
-    gfxInitDefault();
     romfsInit();
+    cfguInit();
+    gfxInitDefault();
+
+    // gfx
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
     C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
     C2D_Prepare();
+
+    // text system init
+    g_staticBuf = C2D_TextBufNew(4096);
+    customFont = C2D_FontLoad("romfs:/gfx/Nintendo-NES-Font.bcfnt");
+
     // screen target init
     topRight = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
     botLeft = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+
+    // console init
     if (ProjectSettings::CONSOLE)
     {
         consoleInit(GFX_BOTTOM, NULL);
     }
+
+    // images init
     hpsheet = C2D_SpriteSheetLoad("romfs:/gfx/hp.t3x");
     heartImg = C2D_SpriteSheetGetImage(hpsheet, 0);
+
+    // util objects init
     camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1, 0);
     camera.setFrameSpeed(15);
     pointer = Pointer(0, 0, 0.01, 0.01);
     marker = Marker(34, 149, 0, 0, "romfs:/gfx/marker.t3x");
     marker.setMaxPos(700);
     ls = LowerScreen(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x");
+
+    // grounds init
     grounds.emplace_back(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false, GroundMode::Static);
     grounds.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, false, GroundMode::Descent, 40, 1);
     grounds.emplace_back(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, GroundMode::Vertical, 40, 1);
@@ -39,12 +57,26 @@ void GameManager::init()
     grounds.emplace_back(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false, GroundMode::Static);
     grounds.emplace_back(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, Const::SCREEN_WIDTH, false, GroundMode::Static);
 
+    // enemies init
     groundEnemies.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, ProjectSettings::FPS * 2, AttackType::Shot, 100.0f, 1000.0f, EnemyPatrolType::WallToWall, 50.0f);
 
+    // powerup init
     powerups.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 2, Const::POWERUP_SIZE, Const::POWERUP_SIZE, AttackType::Shot, 5 * ProjectSettings::FPS);
     powerups.emplace_back(Const::SCREEN_WIDTH / 2 + 50, Const::SCREEN_HEIGHT / 2, Const::POWERUP_SIZE, Const::POWERUP_SIZE, AttackType::Sword, 10 * ProjectSettings::FPS);
 
+    // player init
     player = Player(0, 0);
+
+
+    // text init!! a lot of stuff
+    C2D_TextFontParse(&g_staticText[0], customFont, g_staticBuf, "START GAME");
+    C2D_TextFontParse(&g_staticText[1], customFont, g_staticBuf, "EXIT");
+    C2D_TextFontParse(&g_staticText[2], customFont, g_staticBuf, "#");
+
+    C2D_TextOptimize(&g_staticText[0]);
+    C2D_TextOptimize(&g_staticText[1]);
+
+    menuSelect = 1;
 }
 
 void GameManager::exit()
@@ -52,74 +84,88 @@ void GameManager::exit()
     ls.freeSheet();
     marker.freeSheet();
     C2D_SpriteSheetFree(hpsheet);
+    C2D_TextBufDelete(g_staticBuf);
+    C2D_FontFree(customFont);
     C2D_Fini();
     C3D_Fini();
-    gfxExit();
     romfsExit();
+    cfguExit();
+    gfxExit();
 }
 
 void GameManager::draw()
 {
-    cameraPos = camera.getX();
-    playerPos = player.getX();
-    dx = playerPos - cameraPos;
-    cameraSpeed = 0.0f;
-    if (dx >= 100.0)
-    {
-        cameraSpeed = dx / camera.getFrameSpeed();
-        camera.changeX(cameraSpeed);
+    if (getState() == GameManagerState::Title) {
+        C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+        C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
+        C2D_SceneBegin(topRight);
+        C2D_DrawText(&g_staticText[0], C2D_WithColor + C2D_AlignCenter, 200.0f, 160.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+        C2D_DrawText(&g_staticText[1], C2D_WithColor + C2D_AlignCenter, 200.0f, 190.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+        C2D_DrawText(&g_staticText[2], C2D_WithColor, 100.0f, 160.0f + (menuSelect - 1) * 30, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+        C3D_FrameEnd(0);
     }
-    else if (dx <= 50) {
-        cameraSpeed = dx / camera.getFrameSpeed();
-        camera.changeX(cameraSpeed);
-    }
-
-    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-
-    C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
-    C2D_SceneBegin(topRight);
-
-    player.draw(cameraPos, 1);
-
-    // player.raycast.hitbox.draw(player.getX(), player.getY());
-
-    for (Ground &ground : grounds)
-        ground.draw(cameraPos, 0);
-    for (GroundEnemy &groundEnemy : groundEnemies)
-    {
-        groundEnemy.draw(cameraPos, 1);
-    }
-    for (Projectile &p : projectiles)
-    {
-        p.draw(cameraPos, 1);
-    }
-    for (Powerup &pu : powerups)
-    {
-        if (!pu.getIsPickedUp())
-            pu.draw(cameraPos, 0);
-    }
-
-    if (!ProjectSettings::CONSOLE)
-    {
-        C2D_TargetClear(botLeft, C2D_Color32(0xff, 0xff, 0xff, 0xff));
-        C2D_SceneBegin(botLeft);
-        playerHp = player.getHP();
-        std::vector<Powerup> &currentPowerups = player.getPowerups();
-        powerupSize = currentPowerups.size();
-        if (powerupSize != 0)
+    else if (getState() == GameManagerState::Game) {
+        cameraPos = camera.getX();
+        playerPos = player.getX();
+        dx = playerPos - cameraPos;
+        cameraSpeed = 0.0f;
+        if (dx >= 100.0)
         {
-            for (int i = 0; i < powerupSize; i++)
+            cameraSpeed = dx / camera.getFrameSpeed();
+            camera.changeX(cameraSpeed);
+        }
+        else if (dx <= 50) {
+            cameraSpeed = dx / camera.getFrameSpeed();
+            camera.changeX(cameraSpeed);
+        }
+
+        C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+
+        C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
+        C2D_SceneBegin(topRight);
+
+        player.draw(cameraPos, 1);
+
+        // player.raycast.hitbox.draw(player.getX(), player.getY());
+
+        for (Ground &ground : grounds)
+            ground.draw(cameraPos, 0);
+        for (GroundEnemy &groundEnemy : groundEnemies)
+        {
+            groundEnemy.draw(cameraPos, 1);
+        }
+        for (Projectile &p : projectiles)
+        {
+            p.draw(cameraPos, 1);
+        }
+        for (Powerup &pu : powerups)
+        {
+            if (!pu.getIsPickedUp())
+                pu.draw(cameraPos, 0);
+        }
+
+        if (!ProjectSettings::CONSOLE)
+        {
+            C2D_TargetClear(botLeft, C2D_Color32(0xff, 0xff, 0xff, 0xff));
+            C2D_SceneBegin(botLeft);
+            playerHp = player.getHP();
+            std::vector<Powerup> &currentPowerups = player.getPowerups();
+            powerupSize = currentPowerups.size();
+            if (powerupSize != 0)
             {
-                currentPowerups[i].draw(0, 1);
+                for (int i = 0; i < powerupSize; i++)
+                {
+                    currentPowerups[i].draw(0, 1);
+                }
+            }
+            ls.draw(cameraPos, 0);
+            marker.draw(cameraPos, 1);
+            for (int i = 0; i < playerHp; i++) {
+                C2D_DrawImageAt(heartImg, 182 + 40*i, 20, 0);
             }
         }
-        ls.draw(cameraPos, 0);
-        marker.draw(cameraPos, 1);
-        for (int i = 0; i < playerHp; i++) {
-            C2D_DrawImageAt(heartImg, 182 + 40*i, 20, 0);
-        }
+        C3D_FrameEnd(0);
     }
-    C3D_FrameEnd(0);
 }
 
 void GameManager::update(int &s)
@@ -127,77 +173,100 @@ void GameManager::update(int &s)
     hidScanInput();
     kDown = hidKeysDown();
     kHeld = hidKeysHeld();
-
     if (kDown & KEY_START)
         s = -1;
+    if (getState() == GameManagerState::Title) {
+        if (kDown & KEY_DOWN) {
+            menuSelect += 1;
+        }
+        else if (kDown & KEY_UP) {
+            menuSelect -= 1;
+        }
 
-    if (kHeld & KEY_LEFT)
-        player.moveLeft();
-    if (kHeld & KEY_RIGHT)
-        player.moveRight();
-    if (kDown & KEY_A)
-        player.jump();
-    if (kDown & KEY_B)
-        player.startAttack(player.getAttackType(), timer, nearestEnemyX, nearestEnemyY);
+        if (menuSelect > maxSelect) {
+            menuSelect = 1;
+        }
+        else if (menuSelect == 0) {
+            menuSelect = maxSelect;
+        }
 
-    if (kHeld & KEY_TOUCH)
-    {
-        hidTouchRead(&touch);
-        pointer.setX(touch.px);
-        pointer.setY(touch.py);
-        std::vector<Powerup> &playerPowerups = player.getPowerups();
-
-        for (size_t i = 0; i < playerPowerups.size(); i++)
-        {
-            Powerup &pu = playerPowerups[i];
-
-            if (AABB(pointer.hitbox, pointer.getX(), pointer.getY(),
-                     pu.clickHitBox, pu.getX(), pu.getY()))
-            {
-                pu.use(timer);
-                player.usePowerup(i);
-                break;
-            }
+        if (kDown & KEY_A && menuSelect == 1) {
+            setState(GameManagerState::Game);
+        }
+        else if (kDown & KEY_A && menuSelect == 2) {
+            s = -1;
         }
     }
-    isJumpButtonDown = (kHeld & KEY_A) ? true : false;
-    for (Ground &ground : grounds)
-        ground.update(timer);
+    else if (getState() == GameManagerState::Game) {
+        if (kHeld & KEY_LEFT)
+            player.moveLeft();
+        if (kHeld & KEY_RIGHT)
+            player.moveRight();
+        if (kDown & KEY_A)
+            player.jump();
+        if (kDown & KEY_B)
+            player.startAttack(player.getAttackType(), timer, nearestEnemyX, nearestEnemyY);
 
-    float minDist = std::numeric_limits<float>::max();
-    nearestEnemyX = Const::DEFAULT_X;
-    nearestEnemyY = Const::DEFAULT_Y;
-    for (GroundEnemy &groundEnemy : groundEnemies)
-    {
-        groundEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
-        Logger::info(groundEnemy.getHP());
-        float enemyX = groundEnemy.getCentreX();
-        if (player.isObjForward(enemyX))
+        if (kHeld & KEY_TOUCH)
         {
-            float enemyY = groundEnemy.getCentreY();
-            float dist = player.distToObj(enemyX, enemyY);
-            if (dist < minDist)
+            hidTouchRead(&touch);
+            pointer.setX(touch.px);
+            pointer.setY(touch.py);
+            std::vector<Powerup> &playerPowerups = player.getPowerups();
+
+            for (size_t i = 0; i < playerPowerups.size(); i++)
             {
-                minDist = dist;
-                nearestEnemyX = enemyX;
-                nearestEnemyY = enemyY;
+                Powerup &pu = playerPowerups[i];
+
+                if (AABB(pointer.hitbox, pointer.getX(), pointer.getY(),
+                         pu.clickHitBox, pu.getX(), pu.getY()))
+                {
+                    pu.use(timer);
+                    player.usePowerup(i);
+                    break;
+                }
             }
         }
+        isJumpButtonDown = (kHeld & KEY_A) ? true : false;
+        for (Ground &ground : grounds)
+            ground.update(timer);
+
+        float minDist = std::numeric_limits<float>::max();
+        nearestEnemyX = Const::DEFAULT_X;
+        nearestEnemyY = Const::DEFAULT_Y;
+        for (GroundEnemy &groundEnemy : groundEnemies)
+        {
+            groundEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
+            Logger::info(groundEnemy.getHP());
+            float enemyX = groundEnemy.getCentreX();
+            if (player.isObjForward(enemyX))
+            {
+                float enemyY = groundEnemy.getCentreY();
+                float dist = player.distToObj(enemyX, enemyY);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    nearestEnemyX = enemyX;
+                    nearestEnemyY = enemyY;
+                }
+            }
+        }
+        attackManager();
+        for (Projectile &p : projectiles)
+        {
+            p.update();
+        }
+        for (Powerup &pu : powerups)
+            pu.update(timer);
+        for (Powerup &pu : player.getPowerups())
+            pu.update(timer);
+        marker.update(player.getX());
+        player.updatePowerup(timer);
+        player.update(isJumpButtonDown);
+        collisionsManager();
+        eraseManager();
     }
-    attackManager();
-    for (Projectile &p : projectiles)
-    {
-        p.update();
-    }
-    for (Powerup &pu : powerups)
-        pu.update(timer);
-    for (Powerup &pu : player.getPowerups())
-        pu.update(timer);
-    marker.update(player.getX());
-    player.updatePowerup(timer);
-    player.update(isJumpButtonDown);
-    collisionsManager();
-    eraseManager();
+
 }
 
 

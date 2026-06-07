@@ -13,10 +13,12 @@
 #include "Powerup.h"
 #include "Marker.h"
 
+enum class GameManagerState;
+
 class GameManager
 {
 private:
-    int a;
+    GameManagerState state;
     uint64_t timer = 0;
     std::vector<std::unique_ptr<BaseObject>> objects;
     std::vector<Ground> grounds;
@@ -31,18 +33,21 @@ private:
 public:
     u32 kDown, kHeld;
     bool isJumpButtonDown;
-    int playerHp, powerupSize;
+    int playerHp, powerupSize, menuSelect, maxSelect = 2;
     float cameraPos, playerPos, dx, cameraSpeed;
     C3D_RenderTarget *topRight, *botLeft;
     C2D_SpriteSheet hpsheet;
     C2D_Image heartImg;
+    C2D_TextBuf g_staticBuf;
+    C2D_Font customFont;
+    C2D_Text g_staticText[3];
     Camera camera;
     touchPosition touch;
     Pointer pointer;
     LowerScreen ls;
     Marker marker;
 
-    GameManager(int state);
+    GameManager(int s);
     void init();
     void exit();
     void update(int &s);
@@ -64,4 +69,13 @@ public:
     bool isInSwordArc(Entity &attacker, Entity &target, int view);
 
     void updateTimer() { timer++; }
+    GameManagerState getState() { return state; }
+    void setState(GameManagerState s) { this->state = s; }
+};
+
+enum class GameManagerState
+{
+    Title,
+    Game,
+    GameOver
 };
