@@ -36,11 +36,11 @@ public:
     int playerHp, powerupSize, menuSelect, maxSelect = 2;
     float cameraPos, playerPos, dx, cameraSpeed;
     C3D_RenderTarget *topRight, *botLeft;
-    C2D_SpriteSheet hpsheet;
-    C2D_Image heartImg;
+    C2D_SpriteSheet hpSheet, gameOverSheet;
+    C2D_Image heartImg, gameOverImg;
     C2D_TextBuf g_staticBuf;
     C2D_Font customFont;
-    C2D_Text g_staticText[3];
+    C2D_Text g_staticText[10];
     Camera camera;
     touchPosition touch;
     Pointer pointer;

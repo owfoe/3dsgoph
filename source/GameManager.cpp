@@ -37,9 +37,13 @@ void GameManager::init()
         consoleInit(GFX_BOTTOM, NULL);
     }
 
+    // sheets init
+    hpSheet = C2D_SpriteSheetLoad("romfs:/gfx/hp.t3x");
+    gameOverSheet = C2D_SpriteSheetLoad("romfs:/gfx/gameover.t3x");
+
     // images init
-    hpsheet = C2D_SpriteSheetLoad("romfs:/gfx/hp.t3x");
-    heartImg = C2D_SpriteSheetGetImage(hpsheet, 0);
+    heartImg = C2D_SpriteSheetGetImage(hpSheet, 0);
+    gameOverImg = C2D_SpriteSheetGetImage(gameOverSheet, 0);
 
     // util objects init
     camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1, 0);
@@ -72,9 +76,16 @@ void GameManager::init()
     C2D_TextFontParse(&g_staticText[0], customFont, g_staticBuf, "START GAME");
     C2D_TextFontParse(&g_staticText[1], customFont, g_staticBuf, "EXIT");
     C2D_TextFontParse(&g_staticText[2], customFont, g_staticBuf, "#");
+    C2D_TextFontParse(&g_staticText[3], customFont, g_staticBuf, "GAME OVER!");
+    C2D_TextFontParse(&g_staticText[4], customFont, g_staticBuf, "PRESS ANY KEY");
+    C2D_TextFontParse(&g_staticText[5], customFont, g_staticBuf, "TO START AGAIN");
 
     C2D_TextOptimize(&g_staticText[0]);
     C2D_TextOptimize(&g_staticText[1]);
+    C2D_TextOptimize(&g_staticText[2]);
+    C2D_TextOptimize(&g_staticText[3]);
+    C2D_TextOptimize(&g_staticText[4]);
+    C2D_TextOptimize(&g_staticText[5]);
 
     menuSelect = 1;
 }
@@ -83,7 +94,8 @@ void GameManager::exit()
 {
     ls.freeSheet();
     marker.freeSheet();
-    C2D_SpriteSheetFree(hpsheet);
+    C2D_SpriteSheetFree(hpSheet);
+    C2D_SpriteSheetFree(gameOverSheet);
     C2D_TextBufDelete(g_staticBuf);
     C2D_FontFree(customFont);
     C2D_Fini();
@@ -97,18 +109,34 @@ void GameManager::draw()
 {
     if (getState() == GameManagerState::Title) {
         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+
+        C2D_TargetClear(botLeft, C2D_Color32(0, 0, 0, 255));
+        C2D_SceneBegin(botLeft);
+
         C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(topRight);
         C2D_DrawText(&g_staticText[0], C2D_WithColor + C2D_AlignCenter, 200.0f, 160.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
         C2D_DrawText(&g_staticText[1], C2D_WithColor + C2D_AlignCenter, 200.0f, 190.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
         C2D_DrawText(&g_staticText[2], C2D_WithColor, 100.0f, 160.0f + (menuSelect - 1) * 30, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+
+        C3D_FrameEnd(0);
+    }
+    else if (getState() == GameManagerState::GameOver) {
+        C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+
+        C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
+        C2D_SceneBegin(topRight);
+        C2D_DrawImageAt(gameOverImg, 0, 0, 0);
+
+        C2D_TargetClear(botLeft, C2D_Color32(0, 0, 0, 255));
+        C2D_SceneBegin(botLeft);
+        C2D_DrawText(&g_staticText[3], C2D_WithColor + C2D_AlignCenter, 160.0f, 90.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+        C2D_DrawText(&g_staticText[4], C2D_WithColor + C2D_AlignCenter, 160.0f, 120.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+        C2D_DrawText(&g_staticText[5], C2D_WithColor + C2D_AlignCenter, 160.0f, 150.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+
         C3D_FrameEnd(0);
     }
     else if (getState() == GameManagerState::Game) {
-        cameraPos = camera.getX();
-        playerPos = player.getX();
-        dx = playerPos - cameraPos;
-        cameraSpeed = 0.0f;
         if (dx >= 100.0)
         {
             cameraSpeed = dx / camera.getFrameSpeed();
@@ -118,6 +146,9 @@ void GameManager::draw()
             cameraSpeed = dx / camera.getFrameSpeed();
             camera.changeX(cameraSpeed);
         }
+        else {
+            cameraSpeed = 0.0f;
+        }
 
         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
@@ -125,8 +156,6 @@ void GameManager::draw()
         C2D_SceneBegin(topRight);
 
         player.draw(cameraPos, 1);
-
-        // player.raycast.hitbox.draw(player.getX(), player.getY());
 
         for (Ground &ground : grounds)
             ground.draw(cameraPos, 0);
@@ -148,9 +177,9 @@ void GameManager::draw()
         {
             C2D_TargetClear(botLeft, C2D_Color32(0xff, 0xff, 0xff, 0xff));
             C2D_SceneBegin(botLeft);
-            playerHp = player.getHP();
             std::vector<Powerup> &currentPowerups = player.getPowerups();
             powerupSize = currentPowerups.size();
+
             if (powerupSize != 0)
             {
                 for (int i = 0; i < powerupSize; i++)
@@ -197,7 +226,24 @@ void GameManager::update(int &s)
             s = -1;
         }
     }
+    else if (getState() == GameManagerState::GameOver) {
+        if (kDown & KEY_DOWN || kDown & KEY_UP || kDown & KEY_LEFT || kDown & KEY_RIGHT
+            || kDown & KEY_A || kDown & KEY_B || kDown & KEY_X || kDown & KEY_Y
+            || kDown & KEY_R || kDown & KEY_L || kDown & KEY_ZL || kDown & KEY_ZR
+            || kDown & KEY_CSTICK_RIGHT || kDown & KEY_CSTICK_LEFT || kDown & KEY_CSTICK_UP || kDown & KEY_CSTICK_DOWN
+            || kDown & KEY_TOUCH) {
+            setState(GameManagerState::Title);
+        }
+    }
     else if (getState() == GameManagerState::Game) {
+        playerHp = player.getHP();
+
+        if (playerHp == 0) setState(GameManagerState::GameOver);
+
+        cameraPos = camera.getX();
+        playerPos = player.getX();
+        dx = playerPos - cameraPos;
+
         if (kHeld & KEY_LEFT)
             player.moveLeft();
         if (kHeld & KEY_RIGHT)

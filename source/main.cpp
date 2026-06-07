@@ -8,7 +8,7 @@ int main()
 	GameManager gm(s);
 
 	gm.init();
-	gm.setState(GameManagerState::Title);
+	gm.setState(GameManagerState::GameOver);
 	while (aptMainLoop())
 	{
 		gm.update(s);
