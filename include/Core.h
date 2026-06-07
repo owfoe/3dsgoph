@@ -127,6 +127,7 @@ struct PendingAttack
     int view = 1;
     float targetX = 0.0f;
     float targetY = 0.0f;
+    float power = 0.0f;
 };
 
 enum class GameManagerState

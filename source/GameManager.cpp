@@ -76,12 +76,16 @@ void GameManager::init()
     C2D_TextOptimize(&g_staticText[4]);
     C2D_TextOptimize(&g_staticText[5]);
     C2D_TextOptimize(&g_staticText[6]);
+
+    microphoneReady = microphone.init();
 }
 
 void GameManager::exit()
 {
     ls.freeSheet();
     marker.freeSheet();
+    if (microphoneReady)
+        microphone.exit();
     C2D_SpriteSheetFree(hpSheet);
     C2D_SpriteSheetFree(gameOverSheet);
     C2D_TextBufDelete(g_staticBuf);
@@ -325,8 +329,24 @@ void GameManager::update(int &s)
             player.moveRight();
         if (kDown & KEY_A)
             player.jump();
-        if (kDown & KEY_B)
-            player.startAttack(player.getAttackType(), timer, nearestEnemyX, nearestEnemyY);
+        // if (kDown & KEY_B)
+        //     player.startAttack(player.getAttackType(), timer, nearestEnemyX, nearestEnemyY);
+        if (microphoneReady)
+        {
+            microphone.update();
+
+            if (microphone.consumeBlow())
+            {
+                float strength = microphone.getLevel();
+
+                player.startAttack(
+                    player.getAttackType(),
+                    timer,
+                    nearestEnemyX,
+                    nearestEnemyY,
+                    strength);
+            }
+        }
 
         if (kHeld & KEY_TOUCH)
         {
@@ -537,7 +557,7 @@ void GameManager::resolveAttack(Entity &attacker, OwnerType owner, PendingAttack
     {
     case AttackType::Bubble:
         projectileSpawnX -= Const::BUBBLE_SIZE / 2;
-        projectiles.emplace_back(projectileSpawnX, projectileSpawnY, 10.0f, 10.0f, 1.0f, owner, timer, AttackType::Bubble, attack.view, 5);
+        projectiles.emplace_back(projectileSpawnX, projectileSpawnY, 10.0f, 10.0f, 1.0f, owner, timer, AttackType::Bubble, attack.view, attack.power);
         break;
 
     case AttackType::Shot:
