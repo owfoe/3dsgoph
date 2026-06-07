@@ -7,6 +7,7 @@
 #include "Ground.h"
 #include "Camera.h"
 #include "GroundEnemy.h"
+#include "FlyEnemy.h"
 #include "Core.h"
 #include "Pointer.h"
 #include "Powerup.h"
@@ -19,6 +20,7 @@ private:
     std::vector<std::unique_ptr<BaseObject>> objects;
     std::vector<Ground> grounds;
     std::vector<GroundEnemy> groundEnemies;
+    std::vector<FlyEnemy> flyEnemies;
     std::vector<Projectile> projectiles;
     std::vector<Powerup> powerups;
     Player player;

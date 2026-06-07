@@ -29,14 +29,15 @@ void GameManager::init()
     pointer = Pointer(0, 0, 0.01, 0.01);
     // object init
     objects.emplace_back(std::make_unique<LowerScreen>(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x"));
-    grounds.emplace_back(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false, GroundMode::Static);
-    grounds.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, false, GroundMode::Descent, 40, 1);
+    // grounds.emplace_back(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false, GroundMode::Static);
+    // grounds.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, false, GroundMode::Descent, 40, 1);
     grounds.emplace_back(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, GroundMode::Vertical, 40, 1);
     grounds.emplace_back(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 2, 100, Const::SCREEN_WIDTH / 8, false, GroundMode::Static);
     grounds.emplace_back(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false, GroundMode::Static);
     grounds.emplace_back(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, Const::SCREEN_WIDTH, false, GroundMode::Static);
 
     groundEnemies.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, ProjectSettings::FPS * 2, AttackType::Shot, 100.0f, 1000.0f, EnemyPatrolType::WallToWall, 50.0f);
+    flyEnemies.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 30, 30, 3, 1.0f, ProjectSettings::FPS * 2, AttackType::Shot, 150.0f, 100.0f, EnemyPatrolType::Vertical, 50.0f);
 
     powerups.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 2, Const::POWERUP_SIZE, Const::POWERUP_SIZE, AttackType::Shot, 5 * ProjectSettings::FPS);
     powerups.emplace_back(Const::SCREEN_WIDTH / 2 + 50, Const::SCREEN_HEIGHT / 2, Const::POWERUP_SIZE, Const::POWERUP_SIZE, AttackType::Sword, 10 * ProjectSettings::FPS);
@@ -79,6 +80,10 @@ void GameManager::draw()
     for (GroundEnemy &groundEnemy : groundEnemies)
     {
         groundEnemy.draw(cameraPos, 1);
+    }
+    for (FlyEnemy &flyEnemy : flyEnemies)
+    {
+        flyEnemy.draw(cameraPos, 1);
     }
     int i = 0;
     for (Projectile &p : projectiles)
@@ -160,11 +165,26 @@ void GameManager::update(int &s)
     for (GroundEnemy &groundEnemy : groundEnemies)
     {
         groundEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
-        Logger::info(groundEnemy.getHP());
         float enemyX = groundEnemy.getCentreX();
         if (player.isObjForward(enemyX))
         {
             float enemyY = groundEnemy.getCentreY();
+            float dist = player.distToObj(enemyX, enemyY);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                nearestEnemyX = enemyX;
+                nearestEnemyY = enemyY;
+            }
+        }
+    }
+    for (FlyEnemy &flyEnemy : flyEnemies)
+    {
+        flyEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
+        float enemyX = flyEnemy.getCentreX();
+        if (player.isObjForward(enemyX))
+        {
+            float enemyY = flyEnemy.getCentreY();
             float dist = player.distToObj(enemyX, enemyY);
             if (dist < minDist)
             {
@@ -201,6 +221,13 @@ void GameManager::attackManager()
     }
 
     for (GroundEnemy &enemy : groundEnemies)
+    {
+        if (enemy.consumeReadyAttack(timer, attack))
+        {
+            resolveAttack(enemy, OwnerType::Enemy, attack);
+        }
+    }
+    for (FlyEnemy &enemy : flyEnemies)
     {
         if (enemy.consumeReadyAttack(timer, attack))
         {
@@ -247,6 +274,11 @@ void GameManager::resolveSwordAttack(Entity &attacker, OwnerType owner, int view
             if (isInSwordArc(attacker, enemy, view))
                 enemy.subHP();
         }
+        for (FlyEnemy &enemy : flyEnemies)
+        {
+            if (isInSwordArc(attacker, enemy, view))
+                enemy.subHP();
+        }
     }
     else
     {
@@ -288,6 +320,12 @@ void GameManager::collisionsManager()
         entityGroundCollisions(groundEnemy);
         groundEnemy.setNullVX();
     }
+    for (FlyEnemy &flyEnemy : flyEnemies)
+    {
+        entityGroundCollisions(flyEnemy);
+        flyEnemy.setNullVX();
+        flyEnemy.setNullVY();
+    }
     for (Powerup &pu : powerups)
     {
         powerupCollisions(&pu);
@@ -304,6 +342,13 @@ void GameManager::eraseManager()
                            return groundEnemy.getIsDead();
                        }),
         groundEnemies.end());
+    flyEnemies.erase(
+        std::remove_if(flyEnemies.begin(), flyEnemies.end(),
+                       [](const FlyEnemy &flyEnemy)
+                       {
+                           return flyEnemy.getIsDead();
+                       }),
+        flyEnemies.end());
 
     projectiles.erase(
         std::remove_if(projectiles.begin(), projectiles.end(),
@@ -425,6 +470,15 @@ void GameManager::projectileCollisions(Projectile &p)
             {
                 p.setIsDead(true);
                 groundEnemy.subHP();
+            }
+        }
+        for (FlyEnemy &flyEnemy : flyEnemies)
+        {
+            if ((AABB(p.hitbox, p.getX(), p.getY(),
+                      flyEnemy.hitbox, flyEnemy.getX(), flyEnemy.getY())))
+            {
+                p.setIsDead(true);
+                flyEnemy.subHP();
             }
         }
         break;

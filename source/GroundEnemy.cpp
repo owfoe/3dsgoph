@@ -13,16 +13,14 @@ void GroundEnemy::update(std::vector<Projectile> &projectiles, float playerCentr
     switch (state)
     {
     case EnemyState::Patrol:
-        // Logger::info("Patrol");
         patrol();
         break;
     case EnemyState::Aggr:
-        // Logger::info("Aggr");
-        {
-            float dist = distToObj(playerCentreX, playerCentreY);
-            aggr(playerCentreX, playerCentreY, dist);
-            break;
-        }
+    {
+        float dist = distToObj(playerCentreX, playerCentreY);
+        aggr(playerCentreX, playerCentreY, dist);
+        break;
+    }
     case EnemyState::Attack:
         startAttack(attackType, timer, playerCentreX, playerCentreY);
         break;
@@ -59,13 +57,13 @@ void GroundEnemy::patrol()
 void GroundEnemy::aggr(float playerCentreX, float playerCentreY, float distToPlayer)
 {
     Enemy::aggr(playerCentreX, playerCentreY, distToPlayer);
-    if (distToPlayer > attackRadius)
-    {
-        if (view == -1.0f)
-            moveLeft();
-        else
-            moveRight();
-    }
+    if (distToPlayer <= attackRadius)
+        return;
+
+    if (view == -1.0f)
+        moveLeft();
+    else
+        moveRight();
 }
 
 void GroundEnemy::draw(float cameraPos, int layer) { C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(0, 0, 1, 1)); }

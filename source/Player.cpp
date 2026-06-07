@@ -79,8 +79,8 @@ void Player::pickUpPowerup(std::vector<Powerup>::iterator pu)
     {
         powerups.pop_back();
     }
-    pu->setX(95 + s * 50);
-    pu->setY(93);
+    powerups.front().setX(95 + s * 50);
+    powerups.front().setY(93);
 }
 
 uint64_t Player::getAttackStartup(AttackType type)

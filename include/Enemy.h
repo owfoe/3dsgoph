@@ -27,16 +27,6 @@ public:
         view = (playerCentreX >= getCentreX()) ? 1 : -1;
     }
 
-    void moveLeft() override
-    {
-        Entity::moveLeft();
-        view = -1;
-    }
-    void moveRight() override
-    {
-        Entity::moveRight();
-        view = 1;
-    }
     using BaseObject::update;
     virtual void update(std::vector<Projectile> &projectiles, float playerCentreX, float playerCentreY, uint64_t timer)
     {

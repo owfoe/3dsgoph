@@ -5,7 +5,7 @@ namespace ProjectSettings
 {
     const std::string NAME = "3dsGAME";
     constexpr bool DEBUG = true;
-    constexpr bool CONSOLE = true;
+    constexpr bool CONSOLE = false;
     constexpr int FPS = 60;
 }
 
@@ -45,6 +45,8 @@ namespace Const
     constexpr float SHOT_SIZE = 5.0f;
 
     constexpr float SWORD_RADIUS = 70.0f;
+
+    constexpr float ENEMY_SPAWN_AREA_RADIUS = 5.0f;
 }
 
 enum class EnemyState
@@ -104,7 +106,7 @@ struct PendingAttack
 {
     AttackType type;
     bool active = false;
-    uint64_t hitFrame = 0;
+    uint64_t attackTime = 0;
     int view = 1;
     float targetX = 0.0f;
     float targetY = 0.0f;

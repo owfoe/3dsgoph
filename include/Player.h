@@ -35,16 +35,6 @@ public:
 
     void jump();
     void draw(float cameraPos, int layer) override;
-    void moveLeft() override
-    {
-        Entity::moveLeft();
-        view = -1;
-    }
-    void moveRight() override
-    {
-        Entity::moveRight();
-        view = 1;
-    }
 
     using Entity::update;
     void update(bool jumpButtonDown);
@@ -57,9 +47,7 @@ public:
         fallLogic.setIsFall(false);
     }
 
-    // void setOnGround(bool flag) { onGround = flag; }
     void setIsJump(bool flag) { isJump = flag; }
-    // bool getIsOnGround() { return onGround; }
     bool getIsJump() { return isJump; }
 
     void attackBubble();
