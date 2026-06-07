@@ -18,7 +18,7 @@ public:
           clickHitBox(-Const::POWERUP_DIFF_HITBOX, -Const::POWERUP_DIFF_HITBOX, height + 2 * Const::POWERUP_DIFF_HITBOX, width + 2 * Const::POWERUP_DIFF_HITBOX) {}
 
     HitBox clickHitBox;
-
+    bool getIsPickedUp() { return isPickedUp; }
     bool getIsUsing() { return isUsing; }
     uint64_t getEndUsing() { return endUsing; }
     AttackType getType() { return type; }

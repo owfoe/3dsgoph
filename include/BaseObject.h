@@ -2,8 +2,8 @@
 #include <citro2d.h>
 #include <math.h>
 #include "HitBox.h"
-#include "Core.h"
 #include <string>
+#include "Core.h"
 
 class BaseObject
 {

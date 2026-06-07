@@ -3,7 +3,6 @@
 #include "Ground.h"
 #include "Projectile.h"
 #include <vector>
-
 class Entity : public BaseObject
 {
 protected:
@@ -30,6 +29,7 @@ public:
     int getHP() { return hp; };
     void addHP(int hp = 1) { this->hp += hp; };
     void subHP(int hp = 1) { this->hp -= hp; };
+
 
     float getProjectileSpawnX() { return (view == 1) ? x + width : x; }
     float getProjectileSpawnY() { return y + height / 4; }

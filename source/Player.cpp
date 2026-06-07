@@ -2,7 +2,7 @@
 #include "Ground.h"
 
 Player::Player(float x, float y)
-    : Entity(x, y, PlayerSettings::HEIGHT, PlayerSettings::WIDTH, PlayerSettings::HP, PlayerSettings::SPEED, PlayerSettings::COOLDOWN, AttackType::Sword) {}
+    : Entity(x, y, PlayerSettings::HEIGHT, PlayerSettings::WIDTH, PlayerSettings::HP, PlayerSettings::SPEED, PlayerSettings::COOLDOWN, AttackType::Bubble) {}
 
 void Player::jump()
 {
@@ -79,7 +79,7 @@ void Player::pickUpPowerup(std::vector<Powerup>::iterator pu)
     {
         powerups.pop_back();
     }
-    powerups.front().setX(95 + s * 50);
+    powerups.front().setX(95 + s * 100);
     powerups.front().setY(93);
 }
 

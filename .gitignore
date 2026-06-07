@@ -18,6 +18,7 @@ out/
 
 CMakeFiles/
 CMakeCache.txt
+run.bat
 cmake-build-*/
 compile_commands.json
 cmake_install.cmake
@@ -85,6 +86,7 @@ Thumbs.db
 # ===== ROMFS / Assets =====
 
 romfs/*.bin
+*.bcfnt
 *.t3x
 
 # ===== Misc =====
