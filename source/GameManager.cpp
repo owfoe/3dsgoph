@@ -7,6 +7,7 @@
 #include <vector>
 #include <limits>
 #include <citro2d.h>
+#include <dirent.h>
 
 GameManager::GameManager(int s) {}
 
@@ -24,7 +25,8 @@ void GameManager::init()
 
     // text system init
     g_staticBuf = C2D_TextBufNew(4096);
-    customFont = C2D_FontLoad("romfs:/gfx/Nintendo-NES-Font.bcfnt");
+    customFont = C2D_FontLoad(Path::CUSTOM_FONT);
+    mapTextBuf = C2D_TextBufNew(4096);
 
     // screen target init
     topRight = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
@@ -37,8 +39,8 @@ void GameManager::init()
     }
 
     // sheets init
-    hpSheet = C2D_SpriteSheetLoad("romfs:/gfx/hp.t3x");
-    gameOverSheet = C2D_SpriteSheetLoad("romfs:/gfx/gameover.t3x");
+    hpSheet = C2D_SpriteSheetLoad(Path::HP_SHEET);
+    gameOverSheet = C2D_SpriteSheetLoad(Path::GAME_OVER_SHEET);
 
     // images init
     heartImg = C2D_SpriteSheetGetImage(hpSheet, 0);
@@ -48,28 +50,15 @@ void GameManager::init()
     camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1, 0.15f);
     camera.setFrameSpeed(15);
     pointer = Pointer(0, 0, 0.01, 0.01);
-    marker = Marker(34, 149, 0, 0, "romfs:/gfx/marker.t3x");
-    marker.setMaxPos(700);
-    ls = LowerScreen(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x");
+    marker = Marker(Const::MARKER_START_X, 149, 0, 0, Path::MARKER);
+    // marker.setMaxPos(700);
+    ls = LowerScreen(0, 0, 320, 240, Path::LOWER_SCREEN);
 
-    // grounds init
-    // grounds.emplace_back(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false, GroundMode::Static);
-    // grounds.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, false, GroundMode::Descent, 40, 1);
-    grounds.emplace_back(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, GroundMode::Vertical, 40, 1);
-    grounds.emplace_back(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 2, 100, Const::SCREEN_WIDTH / 8, false, GroundMode::Static);
-    grounds.emplace_back(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false, GroundMode::Static);
-    grounds.emplace_back(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, 1000, false, GroundMode::Static);
-
-    // enemies init
-    groundEnemies.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, ProjectSettings::FPS * 2, AttackType::Shot, 100.0f, 1000.0f, EnemyPatrolType::WallToWall, 50.0f);
-    flyEnemies.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 30, 30, 3, 1.0f, ProjectSettings::FPS * 2, AttackType::Shot, 150.0f, 100.0f, EnemyPatrolType::Vertical, 50.0f);
-
-    // powerup init
-    powerups.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 2, Const::POWERUP_SIZE, Const::POWERUP_SIZE, AttackType::Shot, 5 * ProjectSettings::FPS);
-    powerups.emplace_back(Const::SCREEN_WIDTH / 2 + 50, Const::SCREEN_HEIGHT / 2, Const::POWERUP_SIZE, Const::POWERUP_SIZE, AttackType::Sword, 10 * ProjectSettings::FPS);
-
-    // player init
-    player = Player(0, 0);
+    mapNames = getFiles(Path::MAPS);
+    for (std::string &fileName : mapNames)
+        loadMap(fileName);
+    createMap();
+    mapCount = maps.size();
 
     // text init!! a lot of stuff
     C2D_TextFontParse(&g_staticText[0], customFont, g_staticBuf, "START GAME");
@@ -78,6 +67,7 @@ void GameManager::init()
     C2D_TextFontParse(&g_staticText[3], customFont, g_staticBuf, "GAME OVER!");
     C2D_TextFontParse(&g_staticText[4], customFont, g_staticBuf, "PRESS ANY KEY");
     C2D_TextFontParse(&g_staticText[5], customFont, g_staticBuf, "TO START AGAIN");
+    C2D_TextFontParse(&g_staticText[6], customFont, g_staticBuf, "MAPS");
 
     C2D_TextOptimize(&g_staticText[0]);
     C2D_TextOptimize(&g_staticText[1]);
@@ -85,8 +75,7 @@ void GameManager::init()
     C2D_TextOptimize(&g_staticText[3]);
     C2D_TextOptimize(&g_staticText[4]);
     C2D_TextOptimize(&g_staticText[5]);
-
-    menuSelect = 1;
+    C2D_TextOptimize(&g_staticText[6]);
 }
 
 void GameManager::exit()
@@ -96,6 +85,7 @@ void GameManager::exit()
     C2D_SpriteSheetFree(hpSheet);
     C2D_SpriteSheetFree(gameOverSheet);
     C2D_TextBufDelete(g_staticBuf);
+    C2D_TextBufDelete(mapTextBuf);
     C2D_FontFree(customFont);
     C2D_Fini();
     C3D_Fini();
@@ -115,9 +105,36 @@ void GameManager::draw()
 
         C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(topRight);
-        C2D_DrawText(&g_staticText[0], C2D_WithColor + C2D_AlignCenter, 200.0f, 160.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
-        C2D_DrawText(&g_staticText[1], C2D_WithColor + C2D_AlignCenter, 200.0f, 190.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
-        C2D_DrawText(&g_staticText[2], C2D_WithColor, 100.0f, 160.0f + (menuSelect - 1) * 30, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+        C2D_DrawText(&g_staticText[0], C2D_WithColor + C2D_AlignCenter, 200.0f, 140.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+        C2D_DrawText(&g_staticText[6], C2D_WithColor + C2D_AlignCenter, 200.0f, 170.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+        C2D_DrawText(&g_staticText[1], C2D_WithColor + C2D_AlignCenter, 200.0f, 200.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+        C2D_DrawText(&g_staticText[2], C2D_WithColor, 100.0f, 140.0f + (menuSelect - 1) * 30, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+
+        C3D_FrameEnd(0);
+    }
+    else if (getState() == GameManagerState::Maps)
+    {
+        C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+
+        C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
+        C2D_SceneBegin(topRight);
+
+        C2D_DrawText(&g_staticText[6], C2D_WithColor + C2D_AlignCenter, 200.0f, 30.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+
+        C2D_TextBufClear(mapTextBuf);
+        int end = std::min(mapScroll + visibleMapCount, static_cast<int>(mapNames.size()));
+        for (int i = mapScroll; i < end; i++)
+        {
+            C2D_Text text;
+            C2D_TextFontParse(&text, customFont, mapTextBuf, mapNames[i].c_str());
+            C2D_TextOptimize(&text);
+
+            C2D_DrawText(&text, C2D_WithColor + C2D_AlignCenter, 200.0f, 60.0f + (i - mapScroll) * 28.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+        }
+        C2D_DrawText(&g_staticText[2], C2D_WithColor, 100.0f, 60.0f + (mapSelect) * 28.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+
+        C2D_TargetClear(botLeft, C2D_Color32(0, 0, 0, 255));
+        C2D_SceneBegin(botLeft);
 
         C3D_FrameEnd(0);
     }
@@ -139,21 +156,6 @@ void GameManager::draw()
     }
     else if (getState() == GameManagerState::Game)
     {
-        // if (dx >= 100.0)
-        // {
-        //     cameraSpeed = dx / camera.getFrameSpeed();
-        //     camera.changeX(cameraSpeed);
-        // }
-        // else if (dx <= 50)
-        // {
-        //     cameraSpeed = dx / camera.getFrameSpeed();
-        //     camera.changeX(cameraSpeed);
-        // }
-        // else
-        // {
-        //     cameraSpeed = 0.0f;
-        // }
-
         cameraPos = camera.getX();
 
         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
@@ -213,6 +215,8 @@ void GameManager::update(int &s)
     hidScanInput();
     kDown = hidKeysDown();
     kHeld = hidKeysHeld();
+    if (kDown & KEY_SELECT)
+        setState(GameManagerState::Title);
     if (kDown & KEY_START)
         s = -1;
     if (getState() == GameManagerState::Title)
@@ -235,13 +239,25 @@ void GameManager::update(int &s)
             menuSelect = maxSelect;
         }
 
-        if (kDown & KEY_A && menuSelect == 1)
+        if (kDown & KEY_A)
         {
-            setState(GameManagerState::Game);
-        }
-        else if (kDown & KEY_A && menuSelect == 2)
-        {
-            s = -1;
+            switch (menuSelect)
+            {
+            case 1:
+                createMap();
+                setState(GameManagerState::Game);
+                break;
+
+            case 2:
+                mapSelect = 0;
+                mapScroll = 0;
+                setState(GameManagerState::Maps);
+                break;
+
+            case 3:
+                s = -1;
+                break;
+            }
         }
     }
     else if (getState() == GameManagerState::GameOver)
@@ -250,7 +266,42 @@ void GameManager::update(int &s)
         if (kDown)
         {
             setState(GameManagerState::Title);
-            player.resetHP();
+        }
+    }
+    else if (getState() == GameManagerState::Maps)
+    {
+        if (mapCount > 0)
+        {
+            if (kDown & KEY_DOWN)
+            {
+                mapSelect++;
+
+                if (mapSelect >= mapCount)
+                    mapSelect = 0;
+            }
+            else if (kDown & KEY_UP)
+            {
+                mapSelect--;
+
+                if (mapSelect < 0)
+                    mapSelect = mapCount - 1;
+            }
+
+            if (mapSelect < mapScroll)
+            {
+                mapScroll = mapSelect;
+            }
+            else if (mapSelect >= mapScroll + visibleMapCount)
+            {
+                mapScroll = mapSelect - visibleMapCount + 1;
+            }
+
+            if (kDown & KEY_A)
+            {
+                currentMap = mapNames[mapSelect];
+                createMap();
+                setState(GameManagerState::Title);
+            }
         }
     }
     else if (getState() == GameManagerState::Game)
@@ -361,8 +412,88 @@ void GameManager::updateCamera()
     else if (playerX > Const::CAMERA_RIGHT_BORDER)
         cameraX = player.getCentreX() - Const::CAMERA_RIGHT_BORDER;
 
+    float maxCameraX = std::max(0.0f, mapWidth - Const::SCREEN_WIDTH);
+    cameraX = std::clamp(cameraX, 0.0f, maxCameraX);
     float difference = cameraX - camera.getX();
     camera.changeX(difference * camera.getSmoothing());
+    camera.setX(std::clamp(camera.getX(), 0.0f, maxCameraX));
+}
+
+void GameManager::loadMap(std::string fileName)
+{
+    if (maps.find(fileName) == maps.end())
+    {
+        MapData map;
+        if (!MapLoader::load(Path::MAPS + fileName, map))
+            return;
+        maps.emplace(fileName, std::move(map));
+    }
+    currentMap = fileName;
+}
+
+void GameManager::createMap()
+{
+    if (currentMap.empty())
+        return;
+
+    MapData &map = maps.at(currentMap);
+
+    grounds.clear();
+    groundEnemies.clear();
+    flyEnemies.clear();
+    projectiles.clear();
+    powerups.clear();
+
+    grounds.reserve(map.grounds.size());
+    groundEnemies.reserve(map.groundEnemies.size());
+    flyEnemies.reserve(map.flyEnemies.size());
+    powerups.reserve(map.powerups.size());
+
+    for (GroundData &data : map.grounds)
+        grounds.emplace_back(data.x, data.y, data.height, data.width, data.isBarrier, data.mode, data.radius, data.speed);
+
+    for (EnemyData &data : map.groundEnemies)
+        groundEnemies.emplace_back(data.x, data.y, data.height, data.width, data.hp, data.speed, data.cooldown, data.attackType,
+                                   data.aggrRadius, data.attackRadius, data.patrolType, data.patrolRadius);
+
+    for (EnemyData &data : map.flyEnemies)
+        flyEnemies.emplace_back(data.x, data.y, data.height, data.width, data.hp, data.speed, data.cooldown, data.attackType,
+                                data.aggrRadius, data.attackRadius, data.patrolType, data.patrolRadius);
+
+    for (PowerupData &data : map.powerups)
+        powerups.emplace_back(data.x, data.y, data.height, data.width, data.attackType, data.duration);
+
+    player = Player(map.player.x, map.player.y);
+    mapWidth = map.width;
+    timer = 0;
+    playerHp = player.getHP();
+    nearestEnemyX = Const::DEFAULT_X;
+    nearestEnemyY = Const::DEFAULT_Y;
+    isJumpButtonDown = false;
+    camera.setX(0.0f);
+    marker.setX(Const::MARKER_START_X);
+    marker.setMaxPos(mapWidth);
+}
+
+std::vector<std::string> GameManager::getFiles(const std::string &folder)
+{
+    std::vector<std::string> files;
+
+    DIR *dir = opendir(folder.c_str());
+    if (!dir)
+        return files;
+
+    dirent *entry;
+    while ((entry = readdir(dir)) != nullptr)
+    {
+        std::string name = entry->d_name;
+
+        if (name != "." && name != "..")
+            files.push_back(name);
+    }
+
+    closedir(dir);
+    return files;
 }
 
 void GameManager::attackManager()
@@ -559,6 +690,9 @@ void GameManager::entityGroundCollisions(Entity &entity)
             resolveX(entity, ground);
         }
     }
+
+    float maxEntityX = mapWidth - entity.getWidth();
+    entity.setX(std::clamp(entity.getX(), 0.0f, maxEntityX));
 
     entity.resetGroundPlatform();
     float prevY = entity.getY();

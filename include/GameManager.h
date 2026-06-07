@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
-#include <memory>
+#include <string>
+#include <unordered_map>
 #include <3ds.h>
 #include "BaseObject.h"
 #include "Player.h"
@@ -13,29 +14,32 @@
 #include "Pointer.h"
 #include "Powerup.h"
 #include "Marker.h"
-
-enum class GameManagerState;
+#include "MapLoader.h"
 
 class GameManager
 {
 private:
     GameManagerState state;
     uint64_t timer = 0;
-    std::vector<std::unique_ptr<BaseObject>> objects;
     std::vector<Ground> grounds;
     std::vector<GroundEnemy> groundEnemies;
     std::vector<FlyEnemy> flyEnemies;
     std::vector<Projectile> projectiles;
     std::vector<Powerup> powerups;
     Player player;
+    std::unordered_map<std::string, MapData> maps;
+    std::string currentMap;
+    std::vector<std::string> mapNames;
+    float mapWidth = Const::SCREEN_WIDTH;
+    C2D_TextBuf mapTextBuf;
+    int mapSelect = 0, mapScroll = 0, mapCount, visibleMapCount = ProjectSettings::VISIBLE_MAP_COUNT;
 
     float nearestEnemyX;
     float nearestEnemyY;
 
-public:
     u32 kDown, kHeld;
     bool isJumpButtonDown;
-    int playerHp, powerupSize, menuSelect, maxSelect = 2;
+    int playerHp, powerupSize, menuSelect = 1, maxSelect = ProjectSettings::MENUS_COUNT;
     float cameraPos, playerPos, dx, cameraSpeed;
     C3D_RenderTarget *topRight, *botLeft;
     C2D_SpriteSheet hpSheet, gameOverSheet;
@@ -49,6 +53,7 @@ public:
     LowerScreen ls;
     Marker marker;
 
+public:
     GameManager(int s);
     void init();
     void exit();
@@ -75,5 +80,7 @@ public:
     void setState(GameManagerState s) { this->state = s; }
     void updateCamera();
 
+    void loadMap(std::string fileName);
     void createMap();
+    std::vector<std::string> getFiles(const std::string &folder);
 };

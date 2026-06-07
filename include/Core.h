@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 
 namespace ProjectSettings
 {
@@ -7,6 +8,8 @@ namespace ProjectSettings
     constexpr bool DEBUG = true;
     constexpr bool CONSOLE = false;
     constexpr int FPS = 60;
+    constexpr int MENUS_COUNT = 3;
+    constexpr int VISIBLE_MAP_COUNT = 6;
 }
 
 namespace PlayerSettings
@@ -50,6 +53,19 @@ namespace Const
 
     constexpr float CAMERA_LEFT_BORDER = 70.0f;
     constexpr float CAMERA_RIGHT_BORDER = 150.0f;
+
+    constexpr float MARKER_START_X = 34.0f;
+    constexpr float MARKER_FORMULA_CONST = 240.0f;
+}
+
+namespace Path
+{
+    constexpr const char *CUSTOM_FONT = "romfs:/gfx/Nintendo-NES-Font.bcfnt";
+    constexpr const char *HP_SHEET = "romfs:/gfx/hp.t3x";
+    constexpr const char *GAME_OVER_SHEET = "romfs:/gfx/gameover.t3x";
+    const std::string MARKER = "romfs:/gfx/marker.t3x";
+    const std::string LOWER_SCREEN = "romfs:/gfx/lower_screen.t3x";
+    const std::string MAPS = "romfs:/maps/";
 }
 
 enum class EnemyState
@@ -71,9 +87,7 @@ enum class EnemyPatrolType
     WallToWall,
     Radius,
     Horizontal,
-    Vertical,
-    CircleShape,
-    InfinityShape
+    Vertical
 };
 
 enum class EntityActionState
@@ -119,5 +133,53 @@ enum class GameManagerState
 {
     Title,
     Game,
-    GameOver
+    GameOver,
+    Maps
+};
+
+struct GroundData
+{
+    float x, y;
+    float height, width;
+    bool isBarrier;
+    GroundMode mode;
+    float radius;
+    float speed;
+};
+
+struct EnemyData
+{
+    float x, y;
+    float height, width;
+    int hp;
+    float speed;
+    uint64_t cooldown;
+    AttackType attackType;
+    float aggrRadius;
+    float attackRadius;
+    EnemyPatrolType patrolType;
+    float patrolRadius;
+};
+
+struct PowerupData
+{
+    float x, y;
+    float height, width;
+    AttackType attackType;
+    uint64_t duration;
+};
+
+struct PlayerData
+{
+    float x, y;
+};
+
+struct MapData
+{
+    float width;
+    PlayerData player;
+    std::vector<GroundData> grounds;
+    std::vector<EnemyData> groundEnemies;
+    std::vector<EnemyData> flyEnemies;
+    std::vector<PowerupData> powerups;
 };

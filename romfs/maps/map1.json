@@ -1,0 +1,101 @@
+{
+  "map_size": {
+    "width": 1000
+  },
+  "player": {
+    "x": 500,
+    "y": 0
+  },
+  "grounds": [
+    {
+      "x": 300,
+      "y": 60,
+      "height": 2,
+      "width": 50,
+      "is_barrier": true,
+      "mode": "vertical",
+      "radius": 40,
+      "speed": 1
+    },
+    {
+      "x": 300,
+      "y": 120,
+      "height": 100,
+      "width": 50,
+      "is_barrier": false,
+      "mode": "static",
+      "radius": 0,
+      "speed": 0
+    },
+    {
+      "x": 0,
+      "y": 120,
+      "height": 30,
+      "width": 100,
+      "is_barrier": false,
+      "mode": "static",
+      "radius": 0,
+      "speed": 0
+    },
+    {
+      "x": 0,
+      "y": 180,
+      "height": 10,
+      "width": 1000,
+      "is_barrier": false,
+      "mode": "static",
+      "radius": 0,
+      "speed": 0
+    }
+  ],
+  "ground_enemies": [
+    {
+      "x": 200,
+      "y": 60,
+      "height": 60,
+      "width": 30,
+      "hp": 3,
+      "speed": 1,
+      "cooldown": 120,
+      "attack_type": "shot",
+      "aggr_radius": 100,
+      "attack_radius": 1000,
+      "patrol_type": "wall_to_wall",
+      "patrol_radius": 50
+    }
+  ],
+  "fly_enemies": [
+    {
+      "x": 200,
+      "y": 60,
+      "height": 30,
+      "width": 30,
+      "hp": 3,
+      "speed": 1,
+      "cooldown": 120,
+      "attack_type": "shot",
+      "aggr_radius": 150,
+      "attack_radius": 100,
+      "patrol_type": "vertical",
+      "patrol_radius": 50
+    }
+  ],
+  "powerups": [
+    {
+      "x": 200,
+      "y": 120,
+      "height": 30,
+      "width": 30,
+      "attack_type": "shot",
+      "duration": 300
+    },
+    {
+      "x": 250,
+      "y": 120,
+      "height": 30,
+      "width": 30,
+      "attack_type": "sword",
+      "duration": 600
+    }
+  ]
+}

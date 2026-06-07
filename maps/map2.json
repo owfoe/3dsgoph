@@ -1,0 +1,293 @@
+{
+  "map_size": {
+    "width": 2400
+  },
+  "player": {
+    "x": 40,
+    "y": 100
+  },
+  "grounds": [
+    {
+      "x": 0,
+      "y": 220,
+      "height": 20,
+      "width": 2400,
+      "is_barrier": false,
+      "mode": "static",
+      "radius": 0,
+      "speed": 0
+    },
+    {
+      "x": 180,
+      "y": 165,
+      "height": 10,
+      "width": 140,
+      "is_barrier": false,
+      "mode": "static",
+      "radius": 0,
+      "speed": 0
+    },
+    {
+      "x": 430,
+      "y": 125,
+      "height": 10,
+      "width": 110,
+      "is_barrier": false,
+      "mode": "static",
+      "radius": 0,
+      "speed": 0
+    },
+    {
+      "x": 650,
+      "y": 175,
+      "height": 45,
+      "width": 60,
+      "is_barrier": true,
+      "mode": "static",
+      "radius": 0,
+      "speed": 0
+    },
+    {
+      "x": 820,
+      "y": 145,
+      "height": 10,
+      "width": 120,
+      "is_barrier": false,
+      "mode": "vertical",
+      "radius": 35,
+      "speed": 0.6
+    },
+    {
+      "x": 1070,
+      "y": 170,
+      "height": 10,
+      "width": 160,
+      "is_barrier": false,
+      "mode": "static",
+      "radius": 0,
+      "speed": 0
+    },
+    {
+      "x": 1320,
+      "y": 110,
+      "height": 10,
+      "width": 120,
+      "is_barrier": false,
+      "mode": "horizontal",
+      "radius": 80,
+      "speed": 0.8
+    },
+    {
+      "x": 1550,
+      "y": 180,
+      "height": 40,
+      "width": 70,
+      "is_barrier": true,
+      "mode": "static",
+      "radius": 0,
+      "speed": 0
+    },
+    {
+      "x": 1730,
+      "y": 145,
+      "height": 10,
+      "width": 150,
+      "is_barrier": false,
+      "mode": "static",
+      "radius": 0,
+      "speed": 0
+    },
+    {
+      "x": 1990,
+      "y": 105,
+      "height": 10,
+      "width": 130,
+      "is_barrier": false,
+      "mode": "vertical",
+      "radius": 30,
+      "speed": 0.5
+    },
+    {
+      "x": 2220,
+      "y": 165,
+      "height": 10,
+      "width": 140,
+      "is_barrier": false,
+      "mode": "static",
+      "radius": 0,
+      "speed": 0
+    }
+  ],
+  "ground_enemies": [
+    {
+      "x": 350,
+      "y": 160,
+      "height": 60,
+      "width": 30,
+      "hp": 3,
+      "speed": 1,
+      "cooldown": 120,
+      "attack_type": "shot",
+      "aggr_radius": 220,
+      "attack_radius": 100,
+      "patrol_type": "radius",
+      "patrol_radius": 70
+    },
+    {
+      "x": 760,
+      "y": 160,
+      "height": 60,
+      "width": 30,
+      "hp": 4,
+      "speed": 1.2,
+      "cooldown": 90,
+      "attack_type": "sword",
+      "aggr_radius": 180,
+      "attack_radius": 65,
+      "patrol_type": "radius",
+      "patrol_radius": 55
+    },
+    {
+      "x": 1250,
+      "y": 160,
+      "height": 60,
+      "width": 30,
+      "hp": 3,
+      "speed": 1,
+      "cooldown": 150,
+      "attack_type": "shot",
+      "aggr_radius": 250,
+      "attack_radius": 120,
+      "patrol_type": "radius",
+      "patrol_radius": 90
+    },
+    {
+      "x": 1660,
+      "y": 160,
+      "height": 60,
+      "width": 30,
+      "hp": 5,
+      "speed": 1.3,
+      "cooldown": 100,
+      "attack_type": "sword",
+      "aggr_radius": 200,
+      "attack_radius": 65,
+      "patrol_type": "radius",
+      "patrol_radius": 60
+    },
+    {
+      "x": 2160,
+      "y": 160,
+      "height": 60,
+      "width": 30,
+      "hp": 4,
+      "speed": 1.1,
+      "cooldown": 120,
+      "attack_type": "shot",
+      "aggr_radius": 260,
+      "attack_radius": 110,
+      "patrol_type": "radius",
+      "patrol_radius": 80
+    }
+  ],
+  "fly_enemies": [
+    {
+      "x": 560,
+      "y": 70,
+      "height": 30,
+      "width": 30,
+      "hp": 2,
+      "speed": 1,
+      "cooldown": 150,
+      "attack_type": "shot",
+      "aggr_radius": 230,
+      "attack_radius": 130,
+      "patrol_type": "vertical",
+      "patrol_radius": 35
+    },
+    {
+      "x": 1000,
+      "y": 90,
+      "height": 30,
+      "width": 30,
+      "hp": 3,
+      "speed": 1.2,
+      "cooldown": 120,
+      "attack_type": "shot",
+      "aggr_radius": 260,
+      "attack_radius": 140,
+      "patrol_type": "horizontal",
+      "patrol_radius": 80
+    },
+    {
+      "x": 1480,
+      "y": 65,
+      "height": 30,
+      "width": 30,
+      "hp": 3,
+      "speed": 1.1,
+      "cooldown": 120,
+      "attack_type": "shot",
+      "aggr_radius": 240,
+      "attack_radius": 120,
+      "patrol_type": "vertical",
+      "patrol_radius": 40
+    },
+    {
+      "x": 1930,
+      "y": 85,
+      "height": 30,
+      "width": 30,
+      "hp": 4,
+      "speed": 1.3,
+      "cooldown": 100,
+      "attack_type": "shot",
+      "aggr_radius": 280,
+      "attack_radius": 150,
+      "patrol_type": "horizontal",
+      "patrol_radius": 100
+    }
+  ],
+  "powerups": [
+    {
+      "x": 225,
+      "y": 130,
+      "height": 30,
+      "width": 30,
+      "attack_type": "shot",
+      "duration": 360
+    },
+    {
+      "x": 470,
+      "y": 90,
+      "height": 30,
+      "width": 30,
+      "attack_type": "sword",
+      "duration": 480
+    },
+    {
+      "x": 1125,
+      "y": 135,
+      "height": 30,
+      "width": 30,
+      "attack_type": "shot",
+      "duration": 420
+    },
+    {
+      "x": 1785,
+      "y": 110,
+      "height": 30,
+      "width": 30,
+      "attack_type": "sword",
+      "duration": 540
+    },
+    {
+      "x": 2275,
+      "y": 130,
+      "height": 30,
+      "width": 30,
+      "attack_type": "shot",
+      "duration": 600
+    }
+  ]
+}

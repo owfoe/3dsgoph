@@ -6,6 +6,9 @@ ifeq ($(strip $(DEVKITARM)),)
 $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
 endif
 
+DEVKITPRO := $(subst \,/,$(DEVKITPRO))
+DEVKITARM := $(subst \,/,$(DEVKITARM))
+
 TOPDIR ?= $(CURDIR)
 include $(DEVKITARM)/3ds_rules
 
@@ -35,10 +38,12 @@ TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	source
 DATA		:=	data
-INCLUDES	:=	include
+MAPS		:=	maps
+INCLUDES	:=	include nlohmann
 GRAPHICS	:=	gfx
 GFXBUILD	:=	$(BUILD)
 ROMFS		:=	romfs
+ROMFSMAPS	:=	$(ROMFS)/maps
 GFXBUILD	:=	$(ROMFS)/gfx
 
 #---------------------------------------------------------------------------------
@@ -91,6 +96,8 @@ SHLISTFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.shlist)))
 GFXFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.t3s)))
 FONTFILES := $(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.ttf)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+MAPFILES	:=	$(foreach dir,$(MAPS),$(notdir $(wildcard $(dir)/*.json)))
+ROMFSMAPFILES	:=	$(patsubst %,$(ROMFSMAPS)/%,$(MAPFILES))
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -165,7 +172,7 @@ endif
 .PHONY: all clean
 
 #---------------------------------------------------------------------------------
-all: $(BUILD) $(GFXBUILD) $(DEPSDIR) $(ROMFS_T3XFILES) $(ROMFS_FONTFILES) $(T3XHFILES)
+all: $(BUILD) $(GFXBUILD) $(ROMFSMAPS) $(DEPSDIR) $(ROMFS_T3XFILES) $(ROMFS_FONTFILES) $(ROMFSMAPFILES) $(T3XHFILES)
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 $(BUILD):
@@ -176,6 +183,12 @@ $(GFXBUILD):
 	@mkdir -p $@
 endif
 
+$(ROMFSMAPS):
+	@mkdir -p $@
+
+$(ROMFSMAPS)/%.json: $(MAPS)/%.json | $(ROMFSMAPS)
+	@cp $< $@
+
 ifneq ($(DEPSDIR),$(BUILD))
 $(DEPSDIR):
 	@mkdir -p $@
@@ -184,7 +197,7 @@ endif
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(GFXBUILD)
+	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(GFXBUILD) $(ROMFSMAPS)
 
 #---------------------------------------------------------------------------------
 $(GFXBUILD)/%.t3x	$(BUILD)/%.h	:	%.t3s
