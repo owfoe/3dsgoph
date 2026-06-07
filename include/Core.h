@@ -6,7 +6,7 @@ namespace ProjectSettings
 {
     const std::string NAME = "3dsGAME";
     constexpr bool DEBUG = true;
-    constexpr bool CONSOLE = false;
+    constexpr bool CONSOLE = true;
     constexpr int FPS = 60;
     constexpr int MENUS_COUNT = 3;
     constexpr int VISIBLE_MAP_COUNT = 6;
@@ -128,6 +128,7 @@ struct PendingAttack
     float targetX = 0.0f;
     float targetY = 0.0f;
     float power = 0.0f;
+    bool heavyBubble = false;
 };
 
 enum class GameManagerState

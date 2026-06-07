@@ -82,7 +82,7 @@ public:
     }
 
     virtual uint64_t getAttackStartup(AttackType type);
-    bool startAttack(AttackType type, uint64_t timer, float targetX = Const::DEFAULT_X, float targetY = Const::DEFAULT_Y, float strength = 0.0f)
+    bool startAttack(AttackType type, uint64_t timer, float targetX = Const::DEFAULT_X, float targetY = Const::DEFAULT_Y, bool heavyBubble = false, float strength = 0.0f)
     {
         if (pendingAttack.active)
             return false;
@@ -96,7 +96,9 @@ public:
         pendingAttack.view = view;
         pendingAttack.targetX = targetX;
         pendingAttack.targetY = targetY;
-        pendingAttack.power = std::clamp(strength * 10.0f, 0.5f, 5.0f);
+        pendingAttack.power = std::clamp(strength * 30.0f, 0.5f, 5.0f);
+        // Logger::info(std::clamp(strength * 30.0f, 0.5f, 6.0f));
+        pendingAttack.heavyBubble = heavyBubble;
 
         actionState = EntityActionState::Attack;
         return true;
