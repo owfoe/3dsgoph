@@ -557,7 +557,7 @@ void GameManager::resolveAttack(Entity &attacker, OwnerType owner, PendingAttack
     {
     case AttackType::Bubble:
         projectileSpawnX -= Const::BUBBLE_SIZE / 2;
-        projectiles.emplace_back(projectileSpawnX, projectileSpawnY, 10.0f, 10.0f, 1.0f, owner, timer, AttackType::Bubble, attack.view, 6.0f);
+        projectiles.emplace_back(projectileSpawnX, projectileSpawnY, 10.0f, 10.0f, 1.0f, owner, timer, AttackType::Bubble, attack.view, attack.power);
         break;
 
     case AttackType::Shot:

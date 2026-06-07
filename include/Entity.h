@@ -96,7 +96,7 @@ public:
         pendingAttack.view = view;
         pendingAttack.targetX = targetX;
         pendingAttack.targetY = targetY;
-        pendingAttack.power = std::clamp(strength * 10.0f, 0.5f, 5.0f);
+        pendingAttack.power = std::clamp(strength * 30.0f, 0.5f, 5.0f);
 
         actionState = EntityActionState::Attack;
         return true;
