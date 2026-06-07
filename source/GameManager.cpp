@@ -227,11 +227,7 @@ void GameManager::update(int &s)
         }
     }
     else if (getState() == GameManagerState::GameOver) {
-        if (kDown & KEY_DOWN || kDown & KEY_UP || kDown & KEY_LEFT || kDown & KEY_RIGHT
-            || kDown & KEY_A || kDown & KEY_B || kDown & KEY_X || kDown & KEY_Y
-            || kDown & KEY_R || kDown & KEY_L || kDown & KEY_ZL || kDown & KEY_ZR
-            || kDown & KEY_CSTICK_RIGHT || kDown & KEY_CSTICK_LEFT || kDown & KEY_CSTICK_UP || kDown & KEY_CSTICK_DOWN
-            || kDown & KEY_TOUCH) {
+        if (kDown & 111111111) {
             setState(GameManagerState::Title);
         }
     }
