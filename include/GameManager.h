@@ -31,7 +31,7 @@ private:
     std::unordered_map<std::string, MapData> maps;
     std::string currentMap;
     int currentMapInd;
-    std::vector<std::string> mapNames;
+    std::vector<std::string> mapTitles;
     float mapWidth = Const::SCREEN_WIDTH;
     C2D_TextBuf mapTextBuf;
     int mapSelect = 0, mapScroll = 0, mapCount, visibleMapCount = ProjectSettings::VISIBLE_MAP_COUNT;

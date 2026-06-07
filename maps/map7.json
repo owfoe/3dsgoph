@@ -1,7 +1,7 @@
 {
-  "map_size": {
+  "map_params": {
     "width": 700,
-    "height": 240
+    "title": "ANAL7"
   },
   "player": {
     "x": 40,

@@ -1,7 +1,7 @@
 {
-  "map_size": {
+  "map_params": {
     "width": 500,
-    "height": 240
+    "title": "ANAL3"
   },
   "player": {
     "x": 40,

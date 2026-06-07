@@ -73,14 +73,18 @@ void Player::updatePowerup(uint64_t timer)
 
 void Player::pickUpPowerup(std::vector<Powerup>::iterator pu)
 {
-    int s = powerups.size();
     powerups.insert(powerups.begin(), std::move(*pu));
+    int s = powerups.size();
     while (s > 2)
     {
         powerups.pop_back();
+        s -= 1;
     }
-    powerups.front().setX(95 + s * 100);
-    powerups.front().setY(93);
+    for (int i = 0; i < s; i++)
+    {
+        powerups.at(i).setX(95 + i * 100);
+        powerups.at(i).setY(93);
+    }
 }
 
 uint64_t Player::getAttackStartup(AttackType type)

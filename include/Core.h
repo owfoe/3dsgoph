@@ -6,7 +6,7 @@ namespace ProjectSettings
 {
     const std::string NAME = "3dsGAME";
     constexpr bool DEBUG = true;
-    constexpr bool CONSOLE = true;
+    constexpr bool CONSOLE = false;
     constexpr int FPS = 60;
     constexpr int MENUS_COUNT = 3;
     constexpr int VISIBLE_MAP_COUNT = 6;
@@ -16,7 +16,7 @@ namespace PlayerSettings
 {
     constexpr int HP = 3;
     constexpr float SPEED = 5.0f;
-    constexpr int COOLDOWN = ProjectSettings::FPS * 0.2f;
+    constexpr int COOLDOWN = ProjectSettings::FPS * 0.3f;
     constexpr float HEIGHT = 60.0f;
     constexpr float WIDTH = 30.0f;
 }
@@ -178,6 +178,7 @@ struct PlayerData
 
 struct MapData
 {
+    std::string title;
     float width;
     PlayerData player;
     std::vector<GroundData> grounds;

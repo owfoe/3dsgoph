@@ -96,8 +96,7 @@ public:
         pendingAttack.view = view;
         pendingAttack.targetX = targetX;
         pendingAttack.targetY = targetY;
-        pendingAttack.power = std::clamp(strength * 30.0f, 0.5f, 5.0f);
-        // Logger::info(std::clamp(strength * 30.0f, 0.5f, 6.0f));
+        pendingAttack.power = std::clamp(strength * 30.0f, 0.5f, 6.0f);
         pendingAttack.heavyBubble = heavyBubble;
 
         actionState = EntityActionState::Attack;

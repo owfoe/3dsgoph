@@ -54,11 +54,12 @@ void GameManager::init()
     // marker.setMaxPos(700);
     ls = LowerScreen(0, 0, 320, 240, Path::LOWER_SCREEN);
 
-    mapNames = getFiles(Path::MAPS);
-    for (std::string &fileName : mapNames)
+    for (std::string &fileName : getFiles(Path::MAPS))
         loadMap(fileName);
-    createMap();
+    currentMap = mapTitles[0];
+    currentMapInd = 0;
     mapCount = maps.size();
+    createMap();
 
     // text init!! a lot of stuff
     C2D_TextFontParse(&g_staticText[0], customFont, g_staticBuf, "START GAME");
@@ -126,11 +127,11 @@ void GameManager::draw()
         C2D_DrawText(&g_staticText[6], C2D_WithColor + C2D_AlignCenter, 200.0f, 30.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
 
         C2D_TextBufClear(mapTextBuf);
-        int end = std::min(mapScroll + visibleMapCount, static_cast<int>(mapNames.size()));
+        int end = std::min(mapScroll + visibleMapCount, static_cast<int>(mapTitles.size()));
         for (int i = mapScroll; i < end; i++)
         {
             C2D_Text text;
-            C2D_TextFontParse(&text, customFont, mapTextBuf, mapNames[i].c_str());
+            C2D_TextFontParse(&text, customFont, mapTextBuf, mapTitles[i].c_str());
             C2D_TextOptimize(&text);
             u32 color = (i == currentMapInd) ? C2D_Color32(255, 255, 0, 255) : C2D_Color32(255, 255, 255, 255);
             C2D_DrawText(&text, C2D_WithColor + C2D_AlignCenter, 200.0f, 60.0f + (i - mapScroll) * 28.0f, 0.0f, 0.5f, 0.5f, color);
@@ -304,10 +305,11 @@ void GameManager::update(int &s)
 
             if (kDown & KEY_A)
             {
-                currentMap = mapNames[mapSelect];
-                std::vector<std::string>::iterator it = std::find(mapNames.begin(), mapNames.end(), currentMap);
-                currentMapInd = it - mapNames.begin();
+                currentMap = mapTitles[mapSelect];
+                std::vector<std::string>::iterator it = std::find(mapTitles.begin(), mapTitles.end(), currentMap);
+                currentMapInd = it - mapTitles.begin();
                 createMap();
+                menuSelect = 1;
                 setState(GameManagerState::Title);
             }
         }
@@ -338,7 +340,7 @@ void GameManager::update(int &s)
             if (microphone.consumeBlow())
             {
                 float strength = microphone.getLevel();
-                bool isKDown = (kDown & KEY_DOWN);
+                bool isKDown = (kHeld & KEY_DOWN);
 
                 player.startAttack(
                     player.getAttackType(),
@@ -452,11 +454,10 @@ void GameManager::loadMap(std::string fileName)
         MapData map;
         if (!MapLoader::load(Path::MAPS + fileName, map))
             return;
-        maps.emplace(fileName, std::move(map));
+        std::string title = map.title;
+        mapTitles.emplace_back(title);
+        maps.emplace(title, std::move(map));
     }
-    currentMap = fileName;
-    std::vector<std::string>::iterator it = std::find(mapNames.begin(), mapNames.end(), currentMap);
-    currentMapInd = it - mapNames.begin();
 }
 
 void GameManager::createMap()
@@ -559,7 +560,7 @@ void GameManager::resolveAttack(Entity &attacker, OwnerType owner, PendingAttack
     {
     case AttackType::Bubble:
         projectileSpawnX -= Const::BUBBLE_SIZE / 2;
-        projectiles.emplace_back(projectileSpawnX, projectileSpawnY, 10.0f, 10.0f, 1.0f, owner, timer, AttackType::Bubble, attack.view, attack.power);
+        projectiles.emplace_back(projectileSpawnX, projectileSpawnY, 10.0f, 10.0f, 1.0f, owner, timer, AttackType::Bubble, attack.view, attack.power, attack.heavyBubble);
         break;
 
     case AttackType::Shot:

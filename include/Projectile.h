@@ -11,6 +11,7 @@ private:
     float power = 0.0f;
     uint64_t spawnTime;
     int view = 0;
+    bool isHeavy;
 
 public:
     Projectile() {}
@@ -28,8 +29,8 @@ public:
             vy = dy / len * speed;
         }
     }
-    Projectile(float x, float y, float height, float width, float speed, OwnerType owner, uint64_t spawnTime, AttackType type, int view, float power)
-        : BaseObject(x, y, height, width, speed), owner(owner), type(type), power(power), spawnTime(spawnTime), view(view)
+    Projectile(float x, float y, float height, float width, float speed, OwnerType owner, uint64_t spawnTime, AttackType type, int view, float power, bool isHeavy)
+        : BaseObject(x, y, (isHeavy) ? height * 1.5f : height, (isHeavy) ? width * 1.5f : width, speed), owner(owner), type(type), power(power), spawnTime(spawnTime), view(view), isHeavy(isHeavy)
     {
         if (type == AttackType::Bubble)
         {
@@ -43,7 +44,12 @@ public:
     {
         x += vx;
         y += vy;
+        int k = 1;
         if (type == AttackType::Bubble)
-            vy -= 0.1f * 1.5f;
+        {
+            if (isHeavy)
+                k *= -1;
+            vy -= (0.1f * 1.5f) * k;
+        }
     }
 };

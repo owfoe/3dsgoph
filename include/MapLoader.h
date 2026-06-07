@@ -20,7 +20,8 @@ public:
             return false;
 
         MapData newMap;
-        newMap.width = data["map_size"]["width"].get<float>();
+        newMap.title = data["map_params"]["title"].get<std::string>();
+        newMap.width = data["map_params"]["width"].get<float>();
         newMap.player.x = data["player"]["x"].get<float>();
         newMap.player.y = data["player"]["y"].get<float>();
 
