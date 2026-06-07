@@ -8,7 +8,7 @@ private:
     AttackType type;
     float targetX = 0.0f;
     float targetY = 0.0f;
-    int power = 0;
+    float power = 0.0f;
     uint64_t spawnTime;
     int view = 0;
 
@@ -28,7 +28,7 @@ public:
             vy = dy / len * speed;
         }
     }
-    Projectile(float x, float y, float height, float width, float speed, OwnerType owner, uint64_t spawnTime, AttackType type, int view, int power)
+    Projectile(float x, float y, float height, float width, float speed, OwnerType owner, uint64_t spawnTime, AttackType type, int view, float power)
         : BaseObject(x, y, height, width, speed), owner(owner), type(type), power(power), spawnTime(spawnTime), view(view)
     {
         if (type == AttackType::Bubble)

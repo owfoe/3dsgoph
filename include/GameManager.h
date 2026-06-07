@@ -15,6 +15,7 @@
 #include "Powerup.h"
 #include "Marker.h"
 #include "MapLoader.h"
+#include "MicrophoneInput.h"
 
 class GameManager
 {
@@ -55,6 +56,9 @@ private:
     Pointer pointer;
     LowerScreen ls;
     Marker marker;
+
+    MicrophoneInput microphone;
+    bool microphoneReady = false;
 
 public:
     GameManager(int s);
