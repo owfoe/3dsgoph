@@ -210,7 +210,7 @@ void GameManager::update(int &s)
         s = -1;
     }
     if (getState() == GameManagerState::Load) {
-        if (getTime() - switchTimer > 120) {
+        if (timer - switchTimer > 120) {
         switch (lastState) {
                 case GameManagerState::Game:
                     setState(GameManagerState::GameOver);
@@ -248,9 +248,7 @@ void GameManager::update(int &s)
 
         if (kDown & KEY_A && menuSelect == 1)
         {
-            setState(GameManagerState::Load);
-            switchTimer = getTime();
-            lastState = GameManagerState::Title;
+            loadSwitch(GameManagerState::Title);
         }
         else if (kDown & KEY_A && menuSelect == 2)
         {
@@ -261,9 +259,7 @@ void GameManager::update(int &s)
     {
         if (kDown)
         {
-            setState(GameManagerState::Load);
-            switchTimer = getTime();
-            lastState = GameManagerState::GameOver;
+            loadSwitch(GameManagerState::GameOver);
         }
     }
     else if (getState() == GameManagerState::Game)
@@ -271,9 +267,7 @@ void GameManager::update(int &s)
         playerHp = player.getHP();
 
         if (playerHp == 0) {
-            setState(GameManagerState::Load);
-            switchTimer = getTime();
-            lastState = GameManagerState::Game;
+            loadSwitch(GameManagerState::Game);
         }
 
         if (kHeld & KEY_LEFT)
@@ -730,4 +724,10 @@ void GameManager::resolveY(Entity &entity, Ground &ground)
         entity.setY(entity.getY() + overlapFromTop + ground.getSpeed());
     }
     entity.setNullVY();
+}
+
+void GameManager::loadSwitch(GameManagerState previousState) {
+    setState(GameManagerState::Load);
+    switchTimer = timer;
+    lastState = previousState;
 }
