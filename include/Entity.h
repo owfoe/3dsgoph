@@ -47,11 +47,13 @@ public:
     virtual void moveLeft()
     {
         vx = -speed;
+        view = -1;
         actionState = EntityActionState::Run;
     }
     virtual void moveRight()
     {
         vx = speed;
+        view = 1;
         actionState = EntityActionState::Run;
     }
     void setNullVX() override
@@ -70,7 +72,7 @@ public:
     void resetGroundPlatform() { groundPlatform = nullptr; }
     virtual void landOnGround(Ground *ground)
     {
-        vy = 0.0f;
+        setNullVY();
         y = ground->getY() - height;
         groundPlatform = ground;
     }
@@ -86,7 +88,7 @@ public:
 
         pendingAttack.type = type;
         pendingAttack.active = true;
-        pendingAttack.hitFrame = timer + getAttackStartup(type);
+        pendingAttack.attackTime = timer + getAttackStartup(type);
         pendingAttack.view = view;
         pendingAttack.targetX = targetX;
         pendingAttack.targetY = targetY;
@@ -100,7 +102,7 @@ public:
         if (!pendingAttack.active)
             return false;
 
-        if (timer < pendingAttack.hitFrame)
+        if (timer < pendingAttack.attackTime)
             return false;
 
         out = pendingAttack;

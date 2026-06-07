@@ -45,6 +45,11 @@ namespace Const
     constexpr float SHOT_SIZE = 5.0f;
 
     constexpr float SWORD_RADIUS = 70.0f;
+
+    constexpr float ENEMY_SPAWN_AREA_RADIUS = 5.0f;
+
+    constexpr float CAMERA_LEFT_BORDER = 70.0f;
+    constexpr float CAMERA_RIGHT_BORDER = 150.0f;
 }
 
 enum class EnemyState
@@ -104,8 +109,16 @@ struct PendingAttack
 {
     AttackType type;
     bool active = false;
-    uint64_t hitFrame = 0;
+    uint64_t attackTime = 0;
     int view = 1;
     float targetX = 0.0f;
     float targetY = 0.0f;
+};
+
+enum class GameManagerState
+{
+    Title,
+    Game,
+    GameOver,
+    Load
 };

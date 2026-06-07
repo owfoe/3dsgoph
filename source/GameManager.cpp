@@ -1,4 +1,3 @@
-#include "GameManager.h"
 #include "../include/GameManager.h"
 
 #include <iostream>
@@ -46,23 +45,24 @@ void GameManager::init()
     gameOverImg = C2D_SpriteSheetGetImage(gameOverSheet, 0);
 
     // util objects init
-    camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1, 0);
+    camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1, 0.15f);
     camera.setFrameSpeed(15);
     pointer = Pointer(0, 0, 0.01, 0.01);
     marker = Marker(34, 149, 0, 0, "romfs:/gfx/marker.t3x");
-    marker.setMaxPos(700);
+    marker.setMaxPos(1000);
     ls = LowerScreen(0, 0, 320, 240, "romfs:/gfx/lower_screen.t3x");
 
     // grounds init
-    grounds.emplace_back(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false, GroundMode::Static);
+    // grounds.emplace_back(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false, GroundMode::Static);
     grounds.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, false, GroundMode::Descent, 40, 1);
     grounds.emplace_back(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, GroundMode::Vertical, 40, 1);
     grounds.emplace_back(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 2, 100, Const::SCREEN_WIDTH / 8, false, GroundMode::Static);
     grounds.emplace_back(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false, GroundMode::Static);
-    grounds.emplace_back(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, Const::SCREEN_WIDTH, false, GroundMode::Static);
+    grounds.emplace_back(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, 1000, false, GroundMode::Static);
 
     // enemies init
     groundEnemies.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, ProjectSettings::FPS * 2, AttackType::Shot, 100.0f, 1000.0f, EnemyPatrolType::WallToWall, 50.0f);
+    flyEnemies.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 30, 30, 3, 1.0f, ProjectSettings::FPS * 2, AttackType::Shot, 150.0f, 100.0f, EnemyPatrolType::Vertical, 50.0f);
 
     // powerup init
     powerups.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 2, Const::POWERUP_SIZE, Const::POWERUP_SIZE, AttackType::Shot, 5 * ProjectSettings::FPS);
@@ -70,7 +70,6 @@ void GameManager::init()
 
     // player init
     player = Player(0, 0);
-
 
     // text init!! a lot of stuff
     C2D_TextFontParse(&g_staticText[0], customFont, g_staticBuf, "START GAME");
@@ -107,7 +106,18 @@ void GameManager::exit()
 
 void GameManager::draw()
 {
-    if (getState() == GameManagerState::Title) {
+    if (getState() == GameManagerState::Load) {
+        C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+        C2D_TargetClear(botLeft, C2D_Color32(0, 0, 0, 255));
+        C2D_SceneBegin(botLeft);
+
+        C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
+        C2D_SceneBegin(topRight);
+
+        C3D_FrameEnd(0);
+    }
+    else if (getState() == GameManagerState::Title)
+    {
         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
         C2D_TargetClear(botLeft, C2D_Color32(0, 0, 0, 255));
@@ -121,7 +131,8 @@ void GameManager::draw()
 
         C3D_FrameEnd(0);
     }
-    else if (getState() == GameManagerState::GameOver) {
+    else if (getState() == GameManagerState::GameOver)
+    {
         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
         C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
@@ -136,20 +147,8 @@ void GameManager::draw()
 
         C3D_FrameEnd(0);
     }
-    else if (getState() == GameManagerState::Game) {
-        if (dx >= 100.0)
-        {
-            cameraSpeed = dx / camera.getFrameSpeed();
-            camera.changeX(cameraSpeed);
-        }
-        else if (dx <= 50) {
-            cameraSpeed = dx / camera.getFrameSpeed();
-            camera.changeX(cameraSpeed);
-        }
-        else {
-            cameraSpeed = 0.0f;
-        }
-
+    else if (getState() == GameManagerState::Game)
+    {
         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
         C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
@@ -162,6 +161,10 @@ void GameManager::draw()
         for (GroundEnemy &groundEnemy : groundEnemies)
         {
             groundEnemy.draw(cameraPos, 1);
+        }
+        for (FlyEnemy &flyEnemy : flyEnemies)
+        {
+            flyEnemy.draw(cameraPos, 1);
         }
         for (Projectile &p : projectiles)
         {
@@ -189,8 +192,9 @@ void GameManager::draw()
             }
             ls.draw(cameraPos, 0);
             marker.draw(cameraPos, 1);
-            for (int i = 0; i < playerHp; i++) {
-                C2D_DrawImageAt(heartImg, 182 + 40*i, 20, 0);
+            for (int i = 0; i < playerHp; i++)
+            {
+                C2D_DrawImageAt(heartImg, 182 + 40 * i, 20, 0);
             }
         }
         C3D_FrameEnd(0);
@@ -202,43 +206,75 @@ void GameManager::update(int &s)
     hidScanInput();
     kDown = hidKeysDown();
     kHeld = hidKeysHeld();
-    if (kDown & KEY_START)
+    if (kDown & KEY_START) {
         s = -1;
-    if (getState() == GameManagerState::Title) {
-        if (kDown & KEY_DOWN) {
+    }
+    if (getState() == GameManagerState::Load) {
+        if (getTime() - switchTimer > 120) {
+        switch (lastState) {
+                case GameManagerState::Game:
+                    setState(GameManagerState::GameOver);
+                    break;
+                case GameManagerState::GameOver:
+                    setState(GameManagerState::Title);
+                    break;
+                case GameManagerState::Title:
+                    setState(GameManagerState::Game);
+                    break;
+                default:
+                    s = -1;
+            }
+        }
+    }
+    else if (getState() == GameManagerState::Title)
+    {
+        if (kDown & KEY_DOWN)
+        {
             menuSelect += 1;
         }
-        else if (kDown & KEY_UP) {
+        else if (kDown & KEY_UP)
+        {
             menuSelect -= 1;
         }
 
-        if (menuSelect > maxSelect) {
+        if (menuSelect > maxSelect)
+        {
             menuSelect = 1;
         }
-        else if (menuSelect == 0) {
+        else if (menuSelect == 0)
+        {
             menuSelect = maxSelect;
         }
 
-        if (kDown & KEY_A && menuSelect == 1) {
-            setState(GameManagerState::Game);
+        if (kDown & KEY_A && menuSelect == 1)
+        {
+            setState(GameManagerState::Load);
+            switchTimer = getTime();
+            lastState = GameManagerState::Title;
         }
-        else if (kDown & KEY_A && menuSelect == 2) {
+        else if (kDown & KEY_A && menuSelect == 2)
+        {
             s = -1;
         }
     }
-    else if (getState() == GameManagerState::GameOver) {
-        if (kDown & 111111111) {
-            setState(GameManagerState::Title);
+    else if (getState() == GameManagerState::GameOver)
+    {
+        if (kDown)
+        {
+            setState(GameManagerState::Load);
+            switchTimer = getTime();
+            lastState = GameManagerState::GameOver;
         }
     }
-    else if (getState() == GameManagerState::Game) {
+    else if (getState() == GameManagerState::Game)
+    {
         playerHp = player.getHP();
 
-        if (playerHp == 0) setState(GameManagerState::GameOver);
-
-        cameraPos = camera.getX();
-        playerPos = player.getX();
-        dx = playerPos - cameraPos;
+        if (playerHp == 0) {
+            setState(GameManagerState::Load);
+            switchTimer = getTime();
+            lastState = GameManagerState::Game;
+        }
 
         if (kHeld & KEY_LEFT)
             player.moveLeft();
@@ -293,6 +329,22 @@ void GameManager::update(int &s)
                 }
             }
         }
+        for (FlyEnemy &flyEnemy : flyEnemies)
+        {
+            flyEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
+            float enemyX = flyEnemy.getCentreX();
+            if (player.isObjForward(enemyX))
+            {
+                float enemyY = flyEnemy.getCentreY();
+                float dist = player.distToObj(enemyX, enemyY);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    nearestEnemyX = enemyX;
+                    nearestEnemyY = enemyY;
+                }
+            }
+        }
         attackManager();
         for (Projectile &p : projectiles)
         {
@@ -307,10 +359,25 @@ void GameManager::update(int &s)
         player.update(isJumpButtonDown);
         collisionsManager();
         eraseManager();
+        updateCamera();
+        cameraPos = camera.getX();
     }
-
 }
 
+void GameManager::updateCamera()
+{
+    float playerX = player.getCentreX() - camera.getX();
+    float cameraX = camera.getX();
+
+    if (playerX < Const::CAMERA_LEFT_BORDER)
+        cameraX = player.getCentreX() - Const::CAMERA_LEFT_BORDER;
+
+    else if (playerX > Const::CAMERA_RIGHT_BORDER)
+        cameraX = player.getCentreX() - Const::CAMERA_RIGHT_BORDER;
+
+    float difference = cameraX - camera.getX();
+    camera.changeX(difference * camera.getSmoothing());
+}
 
 void GameManager::attackManager()
 {
@@ -322,6 +389,13 @@ void GameManager::attackManager()
     }
 
     for (GroundEnemy &enemy : groundEnemies)
+    {
+        if (enemy.consumeReadyAttack(timer, attack))
+        {
+            resolveAttack(enemy, OwnerType::Enemy, attack);
+        }
+    }
+    for (FlyEnemy &enemy : flyEnemies)
     {
         if (enemy.consumeReadyAttack(timer, attack))
         {
@@ -368,6 +442,11 @@ void GameManager::resolveSwordAttack(Entity &attacker, OwnerType owner, int view
             if (isInSwordArc(attacker, enemy, view))
                 enemy.subHP();
         }
+        for (FlyEnemy &enemy : flyEnemies)
+        {
+            if (isInSwordArc(attacker, enemy, view))
+                enemy.subHP();
+        }
     }
     else
     {
@@ -409,6 +488,12 @@ void GameManager::collisionsManager()
         entityGroundCollisions(groundEnemy);
         groundEnemy.setNullVX();
     }
+    for (FlyEnemy &flyEnemy : flyEnemies)
+    {
+        entityGroundCollisions(flyEnemy);
+        flyEnemy.setNullVX();
+        flyEnemy.setNullVY();
+    }
     for (Powerup &pu : powerups)
     {
         powerupCollisions(&pu);
@@ -425,6 +510,13 @@ void GameManager::eraseManager()
                            return groundEnemy.getIsDead();
                        }),
         groundEnemies.end());
+    flyEnemies.erase(
+        std::remove_if(flyEnemies.begin(), flyEnemies.end(),
+                       [](const FlyEnemy &flyEnemy)
+                       {
+                           return flyEnemy.getIsDead();
+                       }),
+        flyEnemies.end());
 
     projectiles.erase(
         std::remove_if(projectiles.begin(), projectiles.end(),
@@ -536,7 +628,6 @@ void GameManager::projectileCollisions(Projectile &p)
         {
             p.setIsDead(true);
             player.subHP();
-
         }
         break;
     case OwnerType::Player:
@@ -547,6 +638,15 @@ void GameManager::projectileCollisions(Projectile &p)
             {
                 p.setIsDead(true);
                 groundEnemy.subHP();
+            }
+        }
+        for (FlyEnemy &flyEnemy : flyEnemies)
+        {
+            if ((AABB(p.hitbox, p.getX(), p.getY(),
+                      flyEnemy.hitbox, flyEnemy.getX(), flyEnemy.getY())))
+            {
+                p.setIsDead(true);
+                flyEnemy.subHP();
             }
         }
         break;

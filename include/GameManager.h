@@ -7,6 +7,7 @@
 #include "Ground.h"
 #include "Camera.h"
 #include "GroundEnemy.h"
+#include "FlyEnemy.h"
 #include "Core.h"
 #include "LowerScreen.h"
 #include "Pointer.h"
@@ -23,6 +24,7 @@ private:
     std::vector<std::unique_ptr<BaseObject>> objects;
     std::vector<Ground> grounds;
     std::vector<GroundEnemy> groundEnemies;
+    std::vector<FlyEnemy> flyEnemies;
     std::vector<Projectile> projectiles;
     std::vector<Powerup> powerups;
     Player player;
@@ -32,6 +34,8 @@ private:
 
 public:
     u32 kDown, kHeld;
+    long long switchTimer;
+    GameManagerState lastState;
     bool isJumpButtonDown;
     int playerHp, powerupSize, menuSelect, maxSelect = 2;
     float cameraPos, playerPos, dx, cameraSpeed;
@@ -52,7 +56,7 @@ public:
     void exit();
     void update(int &s);
     void draw();
-    long long getTime();
+    long long getTime() { return timer; }
 
     void collisionsManager();
     void eraseManager();
@@ -71,11 +75,5 @@ public:
     void updateTimer() { timer++; }
     GameManagerState getState() { return state; }
     void setState(GameManagerState s) { this->state = s; }
-};
-
-enum class GameManagerState
-{
-    Title,
-    Game,
-    GameOver
+    void updateCamera();
 };
