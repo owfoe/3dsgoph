@@ -16,7 +16,7 @@ namespace PlayerSettings
 {
     constexpr int HP = 3;
     constexpr float SPEED = 5.0f;
-    constexpr int COOLDOWN = ProjectSettings::FPS * 0.2f;
+    constexpr int COOLDOWN = ProjectSettings::FPS * 0.3f;
     constexpr float HEIGHT = 60.0f;
     constexpr float WIDTH = 30.0f;
 }
@@ -128,6 +128,7 @@ struct PendingAttack
     float targetX = 0.0f;
     float targetY = 0.0f;
     float power = 0.0f;
+    bool heavyBubble = false;
 };
 
 enum class GameManagerState
@@ -178,6 +179,7 @@ struct PlayerData
 
 struct MapData
 {
+    std::string title;
     float width;
     PlayerData player;
     std::vector<GroundData> grounds;

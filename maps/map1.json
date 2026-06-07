@@ -1,6 +1,7 @@
 {
-  "map_size": {
-    "width": 1000
+  "map_params": {
+    "width": 1000,
+    "title": "ANAL1"
   },
   "player": {
     "x": 500,

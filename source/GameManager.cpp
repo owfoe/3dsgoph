@@ -54,11 +54,12 @@ void GameManager::init()
 
     ls = LowerScreen(0, 0, 320, 240, Path::LOWER_SCREEN);
 
-    mapNames = getFiles(Path::MAPS);
-    for (std::string &fileName : mapNames)
+    for (std::string &fileName : getFiles(Path::MAPS))
         loadMap(fileName);
-    createMap();
+    currentMap = mapTitles[0];
+    currentMapInd = 0;
     mapCount = maps.size();
+    createMap();
 
     // text init!! a lot of stuff
     C2D_TextFontParse(&g_staticText[0], customFont, g_staticBuf, "START GAME");
@@ -176,11 +177,10 @@ void GameManager::loadMap(std::string fileName)
         MapData map;
         if (!MapLoader::load(Path::MAPS + fileName, map))
             return;
-        maps.emplace(fileName, std::move(map));
+        std::string title = map.title;
+        mapTitles.emplace_back(title);
+        maps.emplace(title, std::move(map));
     }
-    currentMap = fileName;
-    std::vector<std::string>::iterator it = std::find(mapNames.begin(), mapNames.end(), currentMap);
-    currentMapInd = it - mapNames.begin();
 }
 
 void GameManager::createMap()
@@ -283,7 +283,7 @@ void GameManager::resolveAttack(Entity &attacker, OwnerType owner, PendingAttack
     {
     case AttackType::Bubble:
         projectileSpawnX -= Const::BUBBLE_SIZE / 2;
-        projectiles.emplace_back(projectileSpawnX, projectileSpawnY, 10.0f, 10.0f, 1.0f, owner, timer, AttackType::Bubble, attack.view, attack.power);
+        projectiles.emplace_back(projectileSpawnX, projectileSpawnY, 10.0f, 10.0f, 1.0f, owner, timer, AttackType::Bubble, attack.view, attack.power, attack.heavyBubble);
         break;
 
     case AttackType::Shot:
@@ -646,11 +646,11 @@ void GameManager::mapsDraw() {
     C2D_DrawText(&g_staticText[6], C2D_WithColor + C2D_AlignCenter, 200.0f, 30.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
 
     C2D_TextBufClear(mapTextBuf);
-    int end = std::min(mapScroll + visibleMapCount, static_cast<int>(mapNames.size()));
+    int end = std::min(mapScroll + visibleMapCount, static_cast<int>(mapTitles.size()));
     for (int i = mapScroll; i < end; i++)
     {
         C2D_Text text;
-        C2D_TextFontParse(&text, customFont, mapTextBuf, mapNames[i].c_str());
+        C2D_TextFontParse(&text, customFont, mapTextBuf, mapTitles[i].c_str());
         C2D_TextOptimize(&text);
         u32 color = (i == currentMapInd) ? C2D_Color32(255, 255, 0, 255) : C2D_Color32(255, 255, 255, 255);
         C2D_DrawText(&text, C2D_WithColor + C2D_AlignCenter, 200.0f, 60.0f + (i - mapScroll) * 28.0f, 0.0f, 0.5f, 0.5f, color);
@@ -825,119 +825,120 @@ void GameManager::mapsUpdate() {
 
         if (kDown & KEY_A)
         {
-            currentMap = mapNames[mapSelect];
-            std::vector<std::string>::iterator it = std::find(mapNames.begin(), mapNames.end(), currentMap);
-            currentMapInd = it - mapNames.begin();
+            currentMap = mapTitles[mapSelect];
+            std::vector<std::string>::iterator it = std::find(mapTitles.begin(), mapTitles.end(), currentMap);
+            currentMapInd = it - mapTitles.begin();
             createMap();
-            loadSwitch(GameManagerState::Game);
+            menuSelect = 1;
+            setState(GameManagerState::Title);
         }
     }
 }
 
 void GameManager::gameUpdate() {
     playerHp = player.getHP();
-        cameraPos = camera.getX();
+    cameraPos = camera.getX();
 
-        if (playerHp == 0) {
-            loadSwitch(GameManagerState::GameOver);
-        }
+    if (playerHp == 0) {
+        loadSwitch(GameManagerState::GameOver);
+    }
 
-        if (kHeld & KEY_LEFT)
-            player.moveLeft();
-        if (kHeld & KEY_RIGHT)
-            player.moveRight();
-        if (kDown & KEY_A)
-            player.jump();
-        if (microphoneReady)
+    if (kHeld & KEY_LEFT)
+        player.moveLeft();
+    if (kHeld & KEY_RIGHT)
+        player.moveRight();
+    if (kDown & KEY_A)
+        player.jump();
+    if (microphoneReady)
+    {
+        microphone.update();
+
+        if (microphone.consumeBlow())
         {
-            microphone.update();
+            float strength = microphone.getLevel();
+            bool isKDown = (kHeld & KEY_DOWN);
 
-            if (microphone.consumeBlow())
+            player.startAttack(
+                player.getAttackType(),
+                timer,
+                nearestEnemyX,
+                nearestEnemyY,
+                isKDown,
+                strength);
+        }
+    }
+
+    if (kHeld & KEY_TOUCH)
+    {
+        hidTouchRead(&touch);
+        pointer.setX(touch.px);
+        pointer.setY(touch.py);
+        std::vector<Powerup> &playerPowerups = player.getPowerups();
+        for (size_t i = 0; i < playerPowerups.size(); i++)
+        {
+            Powerup &pu = playerPowerups[i];
+            if (AABB(pointer.hitbox, pointer.getX(), pointer.getY(),
+                     pu.clickHitBox, pu.getX(), pu.getY()))
             {
-                float strength = microphone.getLevel();
-
-                player.startAttack(
-                    player.getAttackType(),
-                    timer,
-                    nearestEnemyX,
-                    nearestEnemyY,
-                    strength);
+                pu.use(timer);
+                player.usePowerup(i);
+                break;
             }
         }
+    }
+    isJumpButtonDown = (kHeld & KEY_A) ? true : false;
+    for (Ground &ground : grounds)
+       ground.update(timer);
 
-        if (kHeld & KEY_TOUCH)
+    float minDist = std::numeric_limits<float>::max();
+    nearestEnemyX = Const::DEFAULT_X;
+    nearestEnemyY = Const::DEFAULT_Y;
+    for (GroundEnemy &groundEnemy : groundEnemies)
+    {
+        groundEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
+        float enemyX = groundEnemy.getCentreX();
+        if (player.isObjForward(enemyX))
         {
-            hidTouchRead(&touch);
-            pointer.setX(touch.px);
-            pointer.setY(touch.py);
-            std::vector<Powerup> &playerPowerups = player.getPowerups();
-
-            for (size_t i = 0; i < playerPowerups.size(); i++)
+            float enemyY = groundEnemy.getCentreY();
+            float dist = player.distToObj(enemyX, enemyY);
+            if (dist < minDist)
             {
-                Powerup &pu = playerPowerups[i];
-
-                if (AABB(pointer.hitbox, pointer.getX(), pointer.getY(),
-                         pu.clickHitBox, pu.getX(), pu.getY()))
-                {
-                    pu.use(timer);
-                    player.usePowerup(i);
-                    break;
-                }
+                minDist = dist;
+                nearestEnemyX = enemyX;
+                nearestEnemyY = enemyY;
             }
         }
-        isJumpButtonDown = (kHeld & KEY_A) ? true : false;
-        for (Ground &ground : grounds)
-            ground.update(timer);
-
-        float minDist = std::numeric_limits<float>::max();
-        nearestEnemyX = Const::DEFAULT_X;
-        nearestEnemyY = Const::DEFAULT_Y;
-        for (GroundEnemy &groundEnemy : groundEnemies)
+    }
+    for (FlyEnemy &flyEnemy : flyEnemies)
+    {
+        flyEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
+        float enemyX = flyEnemy.getCentreX();
+        if (player.isObjForward(enemyX))
         {
-            groundEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
-            float enemyX = groundEnemy.getCentreX();
-            if (player.isObjForward(enemyX))
+            float enemyY = flyEnemy.getCentreY();
+            float dist = player.distToObj(enemyX, enemyY);
+            if (dist < minDist)
             {
-                float enemyY = groundEnemy.getCentreY();
-                float dist = player.distToObj(enemyX, enemyY);
-                if (dist < minDist)
-                {
-                    minDist = dist;
-                    nearestEnemyX = enemyX;
-                    nearestEnemyY = enemyY;
-                }
+                minDist = dist;
+                nearestEnemyX = enemyX;
+                nearestEnemyY = enemyY;
             }
         }
-        for (FlyEnemy &flyEnemy : flyEnemies)
-        {
-            flyEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
-            float enemyX = flyEnemy.getCentreX();
-            if (player.isObjForward(enemyX))
-            {
-                float enemyY = flyEnemy.getCentreY();
-                float dist = player.distToObj(enemyX, enemyY);
-                if (dist < minDist)
-                {
-                    minDist = dist;
-                    nearestEnemyX = enemyX;
-                    nearestEnemyY = enemyY;
-                }
-            }
-        }
-        attackManager();
-        for (Projectile &p : projectiles)
-        {
-            p.update();
-        }
-        for (Powerup &pu : powerups)
-            pu.update(timer);
-        for (Powerup &pu : player.getPowerups())
-            pu.update(timer);
-        marker.update(player.getX());
-        player.updatePowerup(timer);
-        player.update(isJumpButtonDown);
-        collisionsManager();
-        eraseManager();
-        updateCamera();
-        cameraPos = camera.getX();
+    }
+    attackManager();
+    for (Projectile &p : projectiles)
+    {
+        p.update();
+    }
+    for (Powerup &pu : powerups)
+        pu.update(timer);
+    for (Powerup &pu : player.getPowerups())
+        pu.update(timer);
+    marker.update(player.getX());
+    player.updatePowerup(timer);
+    player.update(isJumpButtonDown);
+    collisionsManager();
+    eraseManager();
+    updateCamera();
+    cameraPos = camera.getX();
 }
