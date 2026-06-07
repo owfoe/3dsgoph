@@ -54,7 +54,6 @@ void FlyEnemy::patrol()
             moveRight();
         break;
     case EnemyPatrolType::Vertical:
-        Logger::info("x", x, spawnX, std::clamp(x, spawnX - Const::ENEMY_SPAWN_AREA_RADIUS, spawnX + Const::ENEMY_SPAWN_AREA_RADIUS));
         if (std::clamp(x, spawnX - Const::ENEMY_SPAWN_AREA_RADIUS, spawnX + Const::ENEMY_SPAWN_AREA_RADIUS) != x)
             goToSpawn();
         if (vy == 0.0f)
