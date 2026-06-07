@@ -1,4 +1,4 @@
-#include "../include/GameManager.h"
+#include "GameManager.h"
 
 #include <iostream>
 #include <string>
@@ -54,15 +54,15 @@ void GameManager::init()
 
     // grounds init
     // grounds.emplace_back(Const::SCREEN_WIDTH / 3, Const::SCREEN_HEIGHT / 4, 5, 10, false, GroundMode::Static);
-    grounds.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, false, GroundMode::Descent, 40, 1);
+    // grounds.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 15, Const::SCREEN_WIDTH / 8, false, GroundMode::Descent, 40, 1);
     grounds.emplace_back(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 4, 2, Const::SCREEN_WIDTH / 8, true, GroundMode::Vertical, 40, 1);
     grounds.emplace_back(Const::SCREEN_WIDTH * 3 / 4, Const::SCREEN_HEIGHT / 2, 100, Const::SCREEN_WIDTH / 8, false, GroundMode::Static);
     grounds.emplace_back(0.0f, Const::SCREEN_HEIGHT / 2, 30, Const::SCREEN_WIDTH / 4, false, GroundMode::Static);
     grounds.emplace_back(0.0f, (Const::SCREEN_HEIGHT / 4) * 3, 10, 1000, false, GroundMode::Static);
 
     // enemies init
-    // groundEnemies.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, ProjectSettings::FPS * 2, AttackType::Shot, 100.0f, 1000.0f, EnemyPatrolType::WallToWall, 50.0f);
-    // flyEnemies.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 30, 30, 3, 1.0f, ProjectSettings::FPS * 2, AttackType::Shot, 150.0f, 100.0f, EnemyPatrolType::Vertical, 50.0f);
+    groundEnemies.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 60, 30, 3, 1.0f, ProjectSettings::FPS * 2, AttackType::Shot, 100.0f, 1000.0f, EnemyPatrolType::WallToWall, 50.0f);
+    flyEnemies.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 4, 30, 30, 3, 1.0f, ProjectSettings::FPS * 2, AttackType::Shot, 150.0f, 100.0f, EnemyPatrolType::Vertical, 50.0f);
 
     // powerup init
     powerups.emplace_back(Const::SCREEN_WIDTH / 2, Const::SCREEN_HEIGHT / 2, Const::POWERUP_SIZE, Const::POWERUP_SIZE, AttackType::Shot, 5 * ProjectSettings::FPS);
@@ -250,6 +250,7 @@ void GameManager::update(int &s)
         if (kDown)
         {
             setState(GameManagerState::Title);
+            player.resetHP();
         }
     }
     else if (getState() == GameManagerState::Game)
@@ -302,7 +303,6 @@ void GameManager::update(int &s)
         for (GroundEnemy &groundEnemy : groundEnemies)
         {
             groundEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
-            Logger::info(groundEnemy.getHP());
             float enemyX = groundEnemy.getCentreX();
             if (player.isObjForward(enemyX))
             {

@@ -74,4 +74,6 @@ public:
     GameManagerState getState() { return state; }
     void setState(GameManagerState s) { this->state = s; }
     void updateCamera();
+
+    void createMap();
 };

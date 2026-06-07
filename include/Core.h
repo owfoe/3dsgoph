@@ -5,7 +5,7 @@ namespace ProjectSettings
 {
     const std::string NAME = "3dsGAME";
     constexpr bool DEBUG = true;
-    constexpr bool CONSOLE = true;
+    constexpr bool CONSOLE = false;
     constexpr int FPS = 60;
 }
 

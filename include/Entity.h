@@ -9,6 +9,7 @@ protected:
     int view = 1;
 
     int hp;
+    int maxHP;
     int damage = 1.0f;
     int lastHitX = 0;
     int lastHitY = 0;
@@ -24,12 +25,13 @@ protected:
 public:
     Entity() {}
     Entity(float x, float y, float height, float width, int hp, float speed, uint64_t cooldown, AttackType attackType)
-        : BaseObject(x, y, height, width, speed), hp(hp), cooldown(cooldown), attackType(attackType) {};
+        : BaseObject(x, y, height, width, speed), hp(hp), maxHP(hp), cooldown(cooldown), attackType(attackType) {};
 
-    int getHP() { return hp; };
-    void addHP(int hp = 1) { this->hp += hp; };
-    void subHP(int hp = 1) { this->hp -= hp; };
-
+    int getHP() { return hp; }
+    void addHP(int hp = 1) { this->hp += hp; }
+    void subHP(int hp = 1) { this->hp -= hp; }
+    void setHP(int hp) { this->hp = hp; }
+    void resetHP() { setHP(maxHP); }
 
     float getProjectileSpawnX() { return (view == 1) ? x + width : x; }
     float getProjectileSpawnY() { return y + height / 4; }
