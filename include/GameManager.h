@@ -29,6 +29,7 @@ private:
     Player player;
     std::unordered_map<std::string, MapData> maps;
     std::string currentMap;
+    int currentMapInd;
     std::vector<std::string> mapNames;
     float mapWidth = Const::SCREEN_WIDTH;
     C2D_TextBuf mapTextBuf;

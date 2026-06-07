@@ -1,0 +1,35 @@
+{
+  "map_size": {
+    "width": 700,
+    "height": 240
+  },
+  "player": {
+    "x": 40,
+    "y": 160
+  },
+  "grounds": [
+    {
+      "x": 0,
+      "y": 220,
+      "height": 20,
+      "width": 700,
+      "is_barrier": false,
+      "mode": "static",
+      "radius": 0,
+      "speed": 0
+    },
+    {
+      "x": 280,
+      "y": 160,
+      "height": 10,
+      "width": 120,
+      "is_barrier": false,
+      "mode": "vertical",
+      "radius": 30,
+      "speed": 0.5
+    }
+  ],
+  "ground_enemies": [],
+  "fly_enemies": [],
+  "powerups": []
+}

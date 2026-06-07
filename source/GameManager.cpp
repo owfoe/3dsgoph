@@ -128,10 +128,12 @@ void GameManager::draw()
             C2D_Text text;
             C2D_TextFontParse(&text, customFont, mapTextBuf, mapNames[i].c_str());
             C2D_TextOptimize(&text);
+            u32 color = (i == currentMapInd) ? C2D_Color32(255, 255, 0, 255) : C2D_Color32(255, 255, 255, 255);
+            C2D_DrawText(&text, C2D_WithColor + C2D_AlignCenter, 200.0f, 60.0f + (i - mapScroll) * 28.0f, 0.0f, 0.5f, 0.5f, color);
 
-            C2D_DrawText(&text, C2D_WithColor + C2D_AlignCenter, 200.0f, 60.0f + (i - mapScroll) * 28.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+            if (i == mapSelect)
+                C2D_DrawText(&g_staticText[2], C2D_WithColor, 100.0f, 60.0f + (i - mapScroll) * 28.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
         }
-        C2D_DrawText(&g_staticText[2], C2D_WithColor, 100.0f, 60.0f + (mapSelect) * 28.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
 
         C2D_TargetClear(botLeft, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(botLeft);
@@ -299,6 +301,8 @@ void GameManager::update(int &s)
             if (kDown & KEY_A)
             {
                 currentMap = mapNames[mapSelect];
+                std::vector<std::string>::iterator it = std::find(mapNames.begin(), mapNames.end(), currentMap);
+                currentMapInd = it - mapNames.begin();
                 createMap();
                 setState(GameManagerState::Title);
             }
@@ -429,6 +433,8 @@ void GameManager::loadMap(std::string fileName)
         maps.emplace(fileName, std::move(map));
     }
     currentMap = fileName;
+    std::vector<std::string>::iterator it = std::find(mapNames.begin(), mapNames.end(), currentMap);
+    currentMapInd = it - mapNames.begin();
 }
 
 void GameManager::createMap()
