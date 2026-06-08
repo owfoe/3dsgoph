@@ -4,9 +4,9 @@
 GroundEnemy::GroundEnemy(float x, float y, float height, float width, int hp, float speed, uint64_t cooldown, AttackType attackType, float aggrRadius, float attackRadius, EnemyPatrolType patrolType, float patrolRadius)
     : Enemy(x, y, height, width, hp, speed, cooldown, attackType, aggrRadius, attackRadius, patrolType, patrolRadius) {}
 
-void GroundEnemy::update(std::vector<Projectile> &projectiles, float playerCentreX, float playerCentreY, uint64_t timer)
+void GroundEnemy::update(float playerCentreX, float playerCentreY, uint64_t timer)
 {
-    Enemy::update(projectiles, playerCentreX, playerCentreY, timer);
+    Enemy::update(playerCentreX, playerCentreY, timer);
     bool isOnGround = (groundPlatform == nullptr) ? false : true;
     vy = fallLogic.updateFall(isOnGround, false, vy);
 

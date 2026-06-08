@@ -15,6 +15,7 @@ protected:
     int damage = 1.0f;
     int lastHitX = 0;
     int lastHitY = 0;
+    float scaleX;
     Ground *groundPlatform = nullptr;
 
     uint64_t cooldown;
@@ -65,7 +66,9 @@ public:
         BaseObject::setNullVX();
         actionState = EntityActionState::Stay;
     }
-
+    EntityActionState getState() { return actionState; }
+    void setScaleX(float scale) { scaleX = scale; }
+    float getScaleX() { return scaleX; }
     int getLastHitX() { return lastHitX; }
     int getLastHitY() { return lastHitY; }
     void setLastHitX(int normalX) { lastHitX = normalX; }

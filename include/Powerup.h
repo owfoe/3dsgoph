@@ -23,7 +23,6 @@ public:
             fileName = Path::PWUP_SWD_SHEET;
         }
         this->BaseObject::loadSheet(fileName);
-        frameCount = 0;
         this->BaseObject::setImage(C2D_SpriteSheetGetImage(sheet, 0));
 
     }

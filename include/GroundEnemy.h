@@ -9,7 +9,7 @@ public:
                 AttackType attackType, float aggrRadius, float attackRadius, EnemyPatrolType patrolType, float patrolRadius = 0.0f);
 
     FallLogic fallLogic;
-    void update(std::vector<Projectile> &projectiles, float playerCentreX, float playerCentreY, uint64_t timer) override;
+    void update(float playerCentreX, float playerCentreY, uint64_t timer) override;
     void draw(float cameraPos, int layer) override;
     void landOnGround(Ground *ground) override
     {

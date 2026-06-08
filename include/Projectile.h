@@ -4,8 +4,6 @@
 class Projectile : public BaseObject
 {
 private:
-    C2D_SpriteSheet *spriteSheetPtr;
-    C2D_SpriteSheet spriteSheet;
     OwnerType owner;
     AttackType type;
     float targetX = 0.0f;
@@ -22,9 +20,8 @@ public:
     {
         if (type == AttackType::Shot)
         {
-            fileName = Path::NUT_SHEET;
-            this->BaseObject::loadSheet(fileName);
-            frameCount = 0;
+            animator.add("shot", C2D_SpriteSheetLoad(Path::NUT_SHEET), 1, LOOP);
+            animator.play("shot");
             float dx = getDXtoObj(targetX);
             float dy = getDYtoObj(targetY);
             float len = distToObj(targetX, targetY);
@@ -39,32 +36,24 @@ public:
     {
         if (type == AttackType::Bubble)
         {
-            fileName = Path::BUBBLE_SHEET;
-            if (isHeavy) {
-                fileName = Path::HEAVY_BUBBLE_SHEET;
-            }
-            this->BaseObject::loadSheet(fileName);
-            frameCount = C2D_SpriteSheetCount(sheet);
+            sheet = C2D_SpriteSheetLoad(isHeavy ? Path::HEAVY_BUBBLE_SHEET : Path::BUBBLE_SHEET);
+            animator.add("bubble", sheet, 6, LOOP);
+            animator.play("bubble");
             vx = speed * (power + 1) * view;
         }
     }
 
     OwnerType getOwner() { return owner; }
     void draw(float cameraPos, int layer) override {
-        this->BaseObject::setImage(C2D_SpriteSheetGetImage(sheet, animFrame));
-
         // C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(255, 255, 0, 1));
+        currentImage = animator.getImage();
 
         if (type == AttackType::Shot) C2D_DrawImageAt(currentImage, x - cameraPos, y, layer);
-
-        else {
-            if (!isHeavy) C2D_DrawImageAt(currentImage, x - (cameraPos + 2), y - 2, layer, nullptr, 0.5f, 0.5f);
-            else if (isHeavy) C2D_DrawImageAt(currentImage, x - (cameraPos + 2), y - 2, layer, nullptr, 0.5f, 0.5f);
-            animContinue();
-        }
+        else C2D_DrawImageAt(currentImage, x - (cameraPos + 2), y - 2, layer, nullptr, 0.5f, 0.5f);
     }
     void update() override
     {
+        animator.update();
         x += vx;
         y += vy;
         int k = 1;

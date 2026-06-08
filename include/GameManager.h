@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <memory>
 #include <3ds.h>
 #include "BaseObject.h"
 #include "Player.h"
@@ -25,7 +26,7 @@ private:
     std::vector<Ground> grounds;
     std::vector<GroundEnemy> groundEnemies;
     std::vector<FlyEnemy> flyEnemies;
-    std::vector<Projectile> projectiles;
+    std::vector<std::unique_ptr<Projectile>> projectiles;
     std::vector<Powerup> powerups;
     Player player;
     std::unordered_map<std::string, MapData> maps;
@@ -48,7 +49,7 @@ private:
     float cameraPos, playerPos, dx, cameraSpeed, slider;
     C3D_RenderTarget *topRight, *topLeft, *botLeft;
     C2D_SpriteSheet hpSheet, gameOver1Sheet, gameOver2Sheet, gameOver3Sheet, logoSheet, menu1Sheet,
-    menu2Sheet, menu3Sheet, lowerMenuSheet;
+    menu2Sheet, menu3Sheet, lowerMenuSheet, enemyFlySheet;
     C2D_Image heartImg, gameOver1Img, gameOver2Img, gameOver3Img, logoImg, menu1Img, menu2Img,
     menu3Img, lowerMenuImg;
     C2D_TextBuf g_staticBuf;

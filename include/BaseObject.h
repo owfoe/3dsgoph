@@ -1,6 +1,7 @@
 #pragma once
 #include <citro2d.h>
 #include <math.h>
+#include "Animator.h"
 #include "HitBox.h"
 #include <string>
 #include "Core.h"
@@ -13,8 +14,7 @@ protected:
     float spawnX;
     float spawnY;
     float speed;
-    int animFrame = 0;
-    int frameCount;
+
     float vy = 0.0f;
     float vx = 0.0f;
     bool isDead = false;
@@ -31,6 +31,7 @@ public:
     virtual ~BaseObject() = default;
 
     HitBox hitbox;
+    Animator animator;
 
     float getX() const { return x; }
     float getY() const { return y; }
@@ -65,7 +66,4 @@ public:
 
     virtual void draw(float cameraPos, int layer) = 0;
     virtual void update() {}
-    void animContinue() {
-        animFrame = (animFrame + 1) % frameCount;
-    }
 };

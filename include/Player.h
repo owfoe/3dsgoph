@@ -15,6 +15,7 @@ private:
     float jumpVelocity = 10.0f;
     float jumpGravityLow = 0.25f;
     float jumpGravityHigh = 0.45f;
+    float scaleX = 1.0f;
     // float gravity = 0.5f;
     // float maxFallSpeed = 10.0f;
     int charge = 0;

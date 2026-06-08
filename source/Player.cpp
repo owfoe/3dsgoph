@@ -1,8 +1,14 @@
 #include "Player.h"
 #include "Ground.h"
+#include "../include/Core.h"
 
 Player::Player(float x, float y)
-    : Entity(x, y, PlayerSettings::HEIGHT, PlayerSettings::WIDTH, PlayerSettings::HP, PlayerSettings::SPEED, PlayerSettings::COOLDOWN, AttackType::Bubble) {}
+    : Entity(x, y, PlayerSettings::HEIGHT, PlayerSettings::WIDTH, PlayerSettings::HP, PlayerSettings::SPEED, PlayerSettings::COOLDOWN, AttackType::Bubble) {
+    animator.add("idle", C2D_SpriteSheetLoad(Path::PLAYER_IDLE_SHEET), 6, LOOP);
+    animator.add("run", C2D_SpriteSheetLoad(Path::PLAYER_MOVE_SHEET), 6, LOOP);
+    animator.play("idle");
+    setScaleX(1.0f);
+}
 
 void Player::jump()
 {
@@ -34,11 +40,34 @@ void Player::update(bool jumpButtonDown)
 {
     checkDeath();
     updateJump(jumpButtonDown);
+    state = getState();
     bool isOnGround = (groundPlatform == nullptr) ? false : true;
     vy = fallLogic.updateFall(isOnGround, isJump, vy);
+    if (state == EntityActionState::Run)
+    {
+        animator.play("run");
+    }
+    else
+    {
+        animator.play("idle");
+    }
+
+    animator.update();
+
 }
 
-void Player::draw(float cameraPos, int layer) { C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(1, 0, 0, 1)); }
+void Player::draw(float cameraPos, int layer) {
+    // C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(1, 0, 0, 1));
+    currentImage = animator.getImage();
+    if (getScaleX() > 0) {
+        C2D_DrawImageAt(currentImage, x - (cameraPos + 55), y - 12, layer, nullptr, 1.0f, 1.0f);
+    }
+    else {
+        C2D_DrawImageAt(currentImage, x - (cameraPos + 17), y - 12, layer, nullptr, -1.0f, 1.0f);
+    }
+
+
+}
 
 void Player::erasePowerups()
 {

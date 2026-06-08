@@ -76,6 +76,8 @@ namespace Path
     constexpr const char *LOWER_MENU_SHEET = "romfs:/gfx/lowermenu.t3x";
     constexpr const char *PWUP_NUT_SHEET = "romfs:/gfx/pwup_nut.t3x";
     constexpr const char *PWUP_SWD_SHEET = "romfs:/gfx/pwup_swd.t3x";
+    constexpr const char *PLAYER_MOVE_SHEET = "romfs:/gfx/playermove.t3x";
+    constexpr const char *PLAYER_IDLE_SHEET = "romfs:/gfx/playeridle.t3x";
     const std::string MARKER = "romfs:/gfx/marker.t3x";
     const std::string LOWER_SCREEN = "romfs:/gfx/lower_screen.t3x";
     const std::string MAPS = "romfs:/maps/";
