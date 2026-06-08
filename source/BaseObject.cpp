@@ -6,12 +6,11 @@
 
 void BaseObject::loadSheet(std::string fileName) {
     C2D_SpriteSheet loadedSheet = C2D_SpriteSheetLoad(fileName.c_str());
-    BaseObject::setSheetPtr(loadedSheet);
+    sheet = loadedSheet;
 
 }
 void BaseObject::freeSheet() {
-    C2D_SpriteSheet* sheet = BaseObject::getSheetPtr();
-    C2D_SpriteSheetFree(*sheet);
+    C2D_SpriteSheetFree(sheet);
 }
 
 

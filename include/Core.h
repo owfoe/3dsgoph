@@ -62,7 +62,20 @@ namespace Path
 {
     constexpr const char *CUSTOM_FONT = "romfs:/gfx/Nintendo-NES-Font.bcfnt";
     constexpr const char *HP_SHEET = "romfs:/gfx/hp.t3x";
-    constexpr const char *GAME_OVER_SHEET = "romfs:/gfx/gameover.t3x";
+    constexpr const char *GAME_OVER1_SHEET = "romfs:/gfx/gameover1.t3x";
+    constexpr const char *GAME_OVER2_SHEET = "romfs:/gfx/gameover2.t3x";
+    constexpr const char *GAME_OVER3_SHEET = "romfs:/gfx/gameover3.t3x";
+    constexpr const char *LOGO_SHEET = "romfs:/gfx/logo.t3x";
+    constexpr const char *BUBBLE_SHEET = "romfs:/gfx/bubble.t3x";
+    constexpr const char *HEAVY_BUBBLE_SHEET = "romfs:/gfx/bigbubble.t3x";
+    constexpr const char *NUT_SHEET = "romfs:/gfx/nut.t3x";
+    constexpr const char *ENEMY_FLY_SHEET = "romfs:/gfx/enemyfly.t3x";
+    constexpr const char *MENU1_SHEET = "romfs:/gfx/menu1.t3x";
+    constexpr const char *MENU2_SHEET = "romfs:/gfx/menu2.t3x";
+    constexpr const char *MENU3_SHEET = "romfs:/gfx/menu3.t3x";
+    constexpr const char *LOWER_MENU_SHEET = "romfs:/gfx/lowermenu.t3x";
+    constexpr const char *PWUP_NUT_SHEET = "romfs:/gfx/pwup_nut.t3x";
+    constexpr const char *PWUP_SWD_SHEET = "romfs:/gfx/pwup_swd.t3x";
     const std::string MARKER = "romfs:/gfx/marker.t3x";
     const std::string LOWER_SCREEN = "romfs:/gfx/lower_screen.t3x";
     const std::string MAPS = "romfs:/maps/";

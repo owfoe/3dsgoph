@@ -13,9 +13,12 @@ protected:
     float spawnX;
     float spawnY;
     float speed;
+    int animFrame = 0;
+    int frameCount;
     float vy = 0.0f;
     float vx = 0.0f;
     bool isDead = false;
+    std::string fileName;
     C2D_SpriteSheet sheet;
     C2D_Image currentImage = {};
 
@@ -60,9 +63,9 @@ public:
 
     void setImage(C2D_Image newImage);
 
-    C2D_SpriteSheet *getSheetPtr() { return &this->sheet; }
-    void setSheetPtr(C2D_SpriteSheet newSheet) { this->sheet = newSheet; }
-    C2D_Image *getImagePtr() { return &this->currentImage; }
     virtual void draw(float cameraPos, int layer) = 0;
     virtual void update() {}
+    void animContinue() {
+        animFrame = (animFrame + 1) % frameCount;
+    }
 };

@@ -43,11 +43,14 @@ private:
     long long switchTimer;
     GameManagerState nextState;
     bool isJumpButtonDown;
-    int playerHp, powerupSize, menuSelect = 1, maxSelect = ProjectSettings::MENUS_COUNT;
-    float cameraPos, playerPos, dx, cameraSpeed;
-    C3D_RenderTarget *topRight, *botLeft;
-    C2D_SpriteSheet hpSheet, gameOverSheet;
-    C2D_Image heartImg, gameOverImg;
+    int offset1, offset2, offset3, playerHp, target, powerupSize, menuSelect = 1,
+    maxSelect = ProjectSettings::MENUS_COUNT;
+    float cameraPos, playerPos, dx, cameraSpeed, slider;
+    C3D_RenderTarget *topRight, *topLeft, *botLeft;
+    C2D_SpriteSheet hpSheet, gameOver1Sheet, gameOver2Sheet, gameOver3Sheet, logoSheet, menu1Sheet,
+    menu2Sheet, menu3Sheet, lowerMenuSheet;
+    C2D_Image heartImg, gameOver1Img, gameOver2Img, gameOver3Img, logoImg, menu1Img, menu2Img,
+    menu3Img, lowerMenuImg;
     C2D_TextBuf g_staticBuf;
     C2D_Font customFont;
     C2D_Text g_staticText[10];
@@ -63,6 +66,7 @@ private:
 public:
     GameManager(int s);
     void init();
+    void textInit();
     void exit();
     void update(int &s);
     void loadUpdate(int& s);
@@ -100,4 +104,9 @@ public:
     void loadMap(std::string fileName);
     void createMap();
     std::vector<std::string> getFiles(const std::string &folder);
+
+    void drawGameHelp();
+    void drawMapsHelp(int target);
+    void drawTitleHelp(int target);
+    void drawGameOverHelp(int target);
 };

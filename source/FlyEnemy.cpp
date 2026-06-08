@@ -1,9 +1,15 @@
 #include "FlyEnemy.h"
 #include <algorithm>
 
+#include "../include/Core.h"
+
 FlyEnemy::FlyEnemy(float x, float y, float height, float width, int hp, float speed, uint64_t cooldown,
                    AttackType attackType, float aggrRadius, float attackRadius, EnemyPatrolType patrolType, float patrolRadius)
-    : Enemy(x, y, height, width, hp, speed, cooldown, attackType, aggrRadius, attackRadius, patrolType, patrolRadius) {}
+    : Enemy(x, y, height, width, hp, speed, cooldown, attackType, aggrRadius, attackRadius, patrolType, patrolRadius) {
+    fileName = Path::ENEMY_FLY_SHEET;
+    this->BaseObject::loadSheet(fileName);
+    frameCount = C2D_SpriteSheetCount(sheet);
+}
 
 void FlyEnemy::update(std::vector<Projectile> &projectiles, float playerCentreX, float playerCentreY, uint64_t timer)
 {
@@ -94,5 +100,9 @@ void FlyEnemy::goToSpawn()
 
 void FlyEnemy::draw(float cameraPos, int layer)
 {
-    C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(0, 1, 1, 1));
+    // C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(0, 1, 1, 1));
+    this->BaseObject::setImage(C2D_SpriteSheetGetImage(sheet, animFrame));
+    C2D_DrawImageAt(currentImage, x - (cameraPos + 12), y - 7, layer);
+    animContinue();
+
 }

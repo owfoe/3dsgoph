@@ -12,16 +12,12 @@ public:
         : BaseObject(x, y, height, width)
     {
         this->BaseObject::loadSheet(fileName);
-        C2D_SpriteSheet *spriteSheetPtr = BaseObject::getSheetPtr();
-        C2D_SpriteSheet spriteSheet = *spriteSheetPtr;
-        this->BaseObject::setImage(C2D_SpriteSheetGetImage(spriteSheet, 0));
+        this->BaseObject::setImage(C2D_SpriteSheetGetImage(sheet, 0));
     };
 
     void draw(float cameraPos, int layer)
     {
-        C2D_Image *imgPtr = this->BaseObject::getImagePtr();
-        C2D_Image image = *imgPtr;
-        C2D_DrawImageAt(image, x, y, layer);
+        C2D_DrawImageAt(currentImage, x, y, layer);
     }
     void setMaxPos(float x)
     {
