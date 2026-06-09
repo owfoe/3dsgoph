@@ -2,18 +2,7 @@
 #include <citro2d.h>
 #include <unordered_map>
 #include <string>
-
-enum AnimMode {
-    LOOP,
-    ONCE
-};
-
-struct Animation {
-    C2D_SpriteSheet sheet;
-    size_t frameCount;
-    int animSpeed;
-    AnimMode mode;
-};
+#include "Core.h"
 
 class Animator
 {
@@ -26,13 +15,15 @@ private:
     int timer = 0;
 
     bool finished = false;
+
 public:
-    void add(const std::string& name, C2D_SpriteSheet sheet, int speed, AnimMode mode)
+    void add(const std::string &name, C2D_SpriteSheet sheet, int speed, AnimMode mode)
     {
-        animations[name] = { sheet, C2D_SpriteSheetCount(sheet), speed, mode };
+        animations[name] = {sheet, C2D_SpriteSheetCount(sheet), speed, mode};
     }
 
-    void play(const std::string& name) {
+    void play(const std::string &name)
+    {
         auto it = animations.find(name);
         if (it == animations.end())
             return;
@@ -54,12 +45,11 @@ public:
         if (it == animations.end())
             return;
 
-        Animation& anim = it->second;
+        Animation &anim = it->second;
         if (anim.frameCount == 0)
             return;
 
-
-        timer++;
+        timer += 1;
         if (timer >= anim.animSpeed)
         {
             timer = 0;
@@ -86,14 +76,15 @@ public:
         if (it == animations.end())
             return C2D_Image{};
 
-        Animation& anim = it->second;
+        Animation &anim = it->second;
 
         if (anim.frameCount == 0)
             return C2D_Image{};
 
         return C2D_SpriteSheetGetImage(anim.sheet, frame);
     }
-    void exit() {
+    void exit()
+    {
         animations.clear();
         current.clear();
         frame = 0;

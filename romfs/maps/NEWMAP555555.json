@@ -1,0 +1,75 @@
+{
+  "map_params": {
+    "width": 780,
+    "title": "NEWMAP555555"
+  },
+  "player": {
+    "x": 40,
+    "y": 160
+  },
+  "grounds": [
+    {
+      "x": 0,
+      "y": 220,
+      "height": 20,
+      "width": 160,
+      "is_barrier": false,
+      "mode": "static",
+      "radius": 0,
+      "speed": 1
+    },
+    {
+      "x": 170,
+      "y": 100,
+      "height": 20,
+      "width": 120,
+      "is_barrier": false,
+      "mode": "vertical",
+      "radius": 100,
+      "speed": 1
+    },
+    {
+      "x": 300,
+      "y": 220,
+      "height": 20,
+      "width": 390,
+      "is_barrier": false,
+      "mode": "static",
+      "radius": 0,
+      "speed": 1
+    }
+  ],
+  "ground_enemies": [
+    {
+      "x": 390,
+      "y": 150,
+      "height": 60,
+      "width": 30,
+      "hp": 3,
+      "speed": 1,
+      "cooldown": 120,
+      "attack_type": "shot",
+      "aggr_radius": 200,
+      "attack_radius": 100,
+      "patrol_type": "radius",
+      "patrol_radius": 60
+    }
+  ],
+  "fly_enemies": [
+    {
+      "x": 680,
+      "y": 70,
+      "height": 30,
+      "width": 30,
+      "hp": 3,
+      "speed": 1,
+      "cooldown": 120,
+      "attack_type": "shot",
+      "aggr_radius": 220,
+      "attack_radius": 120,
+      "patrol_type": "horizontal",
+      "patrol_radius": 70
+    }
+  ],
+  "powerups": []
+}

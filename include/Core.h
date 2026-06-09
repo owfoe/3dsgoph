@@ -5,7 +5,7 @@
 namespace ProjectSettings
 {
     const std::string NAME = "3dsGAME";
-    constexpr bool DEBUG = false;
+    constexpr bool DEBUG = true;
     constexpr bool CONSOLE = false;
     constexpr int FPS = 60;
     constexpr int MENUS_COUNT = 3;
@@ -221,4 +221,18 @@ struct MapData
     std::vector<EnemyData> groundEnemies;
     std::vector<EnemyData> flyEnemies;
     std::vector<PowerupData> powerups;
+};
+
+enum AnimMode
+{
+    LOOP,
+    ONCE
+};
+
+struct Animation
+{
+    C2D_SpriteSheet sheet;
+    size_t frameCount;
+    int animSpeed;
+    AnimMode mode;
 };

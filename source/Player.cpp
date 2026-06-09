@@ -52,6 +52,7 @@ void Player::update(bool jumpButtonDown)
         if (animator.isFinished()) {
             isSwd = false;
             isAttacking = false;
+            animator.play(state == EntityActionState::Run ? "run" : "idle");
         }
     }
     else if (isAttacking) {

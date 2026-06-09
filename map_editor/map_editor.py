@@ -41,6 +41,7 @@ DEFAULT_PRESETS = {
     "fly_enemy": {"width": 30, "height": 30},
 }
 POWERUP_SIZE = 30
+MIN_GROUND_WIDTH = 20
 
 
 def project_root():
@@ -206,7 +207,10 @@ class MapModel:
                 max(0.0, float(obj["y"])), max(0.0, MAP_HEIGHT - height)
             )
             if obj["_type"] not in ("player", "powerup"):
-                obj["width"] = max(1.0, float(obj["width"]))
+                min_width = (
+                    MIN_GROUND_WIDTH if obj["_type"] == "ground" else 1.0
+                )
+                obj["width"] = max(min_width, float(obj["width"]))
                 obj["height"] = min(MAP_HEIGHT, max(1.0, float(obj["height"])))
 
     def add_object(self, object_type, x, y, width=None, height=None):
@@ -462,6 +466,8 @@ class PresetDialog(tk.Toplevel):
                 height = float(variables[1].get())
                 if width <= 0 or height <= 0:
                     raise ValueError
+                if object_type == "ground":
+                    width = max(MIN_GROUND_WIDTH, width)
                 result[object_type] = {
                     "width": clean_number(width),
                     "height": clean_number(height),
@@ -1467,7 +1473,10 @@ class MapEditor(tk.Tk):
             height = self.snap(
                 max(1, float(self.drag_original["height"]) + dy)
             )
-            obj["width"] = max(1, width)
+            min_width = (
+                MIN_GROUND_WIDTH if obj["_type"] == "ground" else 1
+            )
+            obj["width"] = max(min_width, width)
             obj["height"] = min(max(1, height), MAP_HEIGHT - float(obj["y"]))
 
         self.redraw_canvas()
@@ -1974,6 +1983,12 @@ class MapEditor(tk.Tk):
             elif field in ("width", "height"):
                 if value <= 0:
                     raise ValueError
+                if (
+                    field == "width"
+                    and obj["_type"] == "ground"
+                    and value < MIN_GROUND_WIDTH
+                ):
+                    value = MIN_GROUND_WIDTH
             elif field not in ("x", "y", "speed"):
                 if value < 0:
                     raise ValueError
