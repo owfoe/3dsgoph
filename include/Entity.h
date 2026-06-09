@@ -9,12 +9,12 @@ class Entity : public BaseObject
 {
 protected:
     int view = 1;
-
     int hp;
     int maxHP;
     int damage = 1.0f;
     int lastHitX = 0;
     int lastHitY = 0;
+    float scaleX;
     Ground *groundPlatform = nullptr;
 
     uint64_t cooldown;
@@ -65,7 +65,9 @@ public:
         BaseObject::setNullVX();
         actionState = EntityActionState::Stay;
     }
-
+    EntityActionState getState() { return actionState; }
+    void setScaleX(float scale) { scaleX = scale; }
+    float getScaleX() { return scaleX; }
     int getLastHitX() { return lastHitX; }
     int getLastHitY() { return lastHitY; }
     void setLastHitX(int normalX) { lastHitX = normalX; }
@@ -74,6 +76,7 @@ public:
     Ground *getGroundPlatform() { return groundPlatform; }
     void setGroundPlatform(Ground *ground) { groundPlatform = ground; }
     void resetGroundPlatform() { groundPlatform = nullptr; }
+    virtual void onAttackStart(AttackType type) {}
     virtual void landOnGround(Ground *ground)
     {
         setNullVY();
@@ -84,6 +87,8 @@ public:
     virtual uint64_t getAttackStartup(AttackType type);
     bool startAttack(AttackType type, uint64_t timer, float targetX = Const::DEFAULT_X, float targetY = Const::DEFAULT_Y, bool heavyBubble = false, float strength = 0.0f)
     {
+        onAttackStart(type);
+
         if (pendingAttack.active)
             return false;
 
@@ -100,8 +105,10 @@ public:
         pendingAttack.heavyBubble = heavyBubble;
 
         actionState = EntityActionState::Attack;
+
         return true;
     }
+
 
     bool consumeReadyAttack(uint64_t timer, PendingAttack &out)
     {

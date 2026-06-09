@@ -10,16 +10,21 @@ private:
     // bool onGround = true;
     bool isJump = false;
     // bool isFall = true;
+    bool isAttacking = false;
+    bool isSwd = false;
 
     float jumpVelocity = 10.0f;
     float jumpGravityLow = 0.25f;
     float jumpGravityHigh = 0.45f;
+    float scaleX = 1.0f;
     // float gravity = 0.5f;
     // float maxFallSpeed = 10.0f;
     int charge = 0;
     int startCharging = 0;
 
     EntityActionState state = EntityActionState::Stay;
+
+    C2D_SpriteSheet jumpSheet;
 
     std::vector<Powerup> powerups;
     bool isUsingPowerup = false;
@@ -37,7 +42,11 @@ public:
     using Entity::update;
     void update(bool jumpButtonDown);
     void updateJump(bool jumpButtonDown);
+    void setAttack(bool flag) { isAttacking = flag; }
+    bool getAttack() { return isAttacking; }
 
+    void setSwd(bool flag) { isSwd = flag; }
+    bool getSwd() { return isSwd; }
     void landOnGround(Ground *ground) override
     {
         Entity::landOnGround(ground);
@@ -47,6 +56,8 @@ public:
 
     void setIsJump(bool flag) { isJump = flag; }
     bool getIsJump() { return isJump; }
+    
+    void onAttackStart(AttackType type) override;
 
     void pickUpPowerup(std::vector<Powerup>::iterator pu);
 
@@ -54,5 +65,6 @@ public:
     void erasePowerups();
     void usePowerup(int index);
     void updatePowerup(uint64_t timer);
+    void freeJumpSheet();
     uint64_t getAttackStartup(AttackType type) override;
 };

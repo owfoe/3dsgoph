@@ -1,14 +1,19 @@
 #include "FlyEnemy.h"
 #include <algorithm>
+#include <memory>
+#include "../include/Core.h"
 
 FlyEnemy::FlyEnemy(float x, float y, float height, float width, int hp, float speed, uint64_t cooldown,
-                   AttackType attackType, float aggrRadius, float attackRadius, EnemyPatrolType patrolType, float patrolRadius)
-    : Enemy(x, y, height, width, hp, speed, cooldown, attackType, aggrRadius, attackRadius, patrolType, patrolRadius) {}
+                   AttackType attackType, float aggrRadius, float attackRadius, C2D_SpriteSheet flySheet, EnemyPatrolType patrolType, float patrolRadius)
+    : Enemy(x, y, height, width, hp, speed, cooldown, attackType, aggrRadius, attackRadius, patrolType, patrolRadius) {
+    animator.add("fly", flySheet, 6, LOOP);
+    animator.play("fly");
+}
 
 void FlyEnemy::update(float playerCentreX, float playerCentreY, uint64_t timer)
 {
     Enemy::update(playerCentreX, playerCentreY, timer);
-
+    animator.update();
     switch (state)
     {
     case EnemyState::Patrol:
@@ -94,5 +99,7 @@ void FlyEnemy::goToSpawn()
 
 void FlyEnemy::draw(float cameraPos, int layer)
 {
-    C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(0, 1, 1, 1));
+    // C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(0, 1, 1, 1));
+    currentImage = animator.getImage();
+    C2D_DrawImageAt(currentImage, x - (cameraPos + 12), y - 7, layer);
 }

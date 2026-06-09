@@ -13,9 +13,19 @@ private:
 
 public:
     Powerup() {}
-    Powerup(float x, float y, AttackType type, uint64_t duration)
+    Powerup(float x, float y, float height, float width, AttackType type, uint64_t duration)
         : BaseObject(x, y, Const::POWERUP_SIZE, Const::POWERUP_SIZE), type(type), duration(duration),
-          clickHitBox(-Const::POWERUP_DIFF_HITBOX, -Const::POWERUP_DIFF_HITBOX, height + 2 * Const::POWERUP_DIFF_HITBOX, width + 2 * Const::POWERUP_DIFF_HITBOX) {}
+          clickHitBox(-Const::POWERUP_DIFF_HITBOX, -Const::POWERUP_DIFF_HITBOX, height + 2 * Const::POWERUP_DIFF_HITBOX, width + 2 * Const::POWERUP_DIFF_HITBOX) {
+        if (type == AttackType::Shot) {
+            fileName = Path::PWUP_NUT_SHEET;
+        }
+        else if (type == AttackType::Sword) {
+            fileName = Path::PWUP_SWD_SHEET;
+        }
+        this->BaseObject::loadSheet(fileName);
+        this->BaseObject::setImage(C2D_SpriteSheetGetImage(sheet, 0));
+
+    }
 
     HitBox clickHitBox;
     bool getIsPickedUp() { return isPickedUp; }
@@ -42,7 +52,9 @@ public:
     }
     void draw(float cameraPos, int layer) override
     {
-        C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(128, 0, 128, 1.0));
+        //C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(128, 0, 128, 1.0));
+
+        C2D_DrawImageAt(currentImage, x - cameraPos, y, layer, nullptr, 1.25f, 1.25f);
     }
     using BaseObject::update;
     void update(uint64_t timer)
@@ -54,4 +66,5 @@ public:
         }
         checkDeath(timer);
     }
+    uint64_t getDuration() { return duration; }
 };

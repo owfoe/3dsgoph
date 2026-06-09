@@ -1,6 +1,6 @@
 #pragma once
 #include "BaseObject.h"
-
+#include <string>
 class Projectile : public BaseObject
 {
 private:
@@ -20,6 +20,8 @@ public:
     {
         if (type == AttackType::Shot)
         {
+            animator.add("shot", C2D_SpriteSheetLoad(Path::NUT_SHEET), 1, LOOP);
+            animator.play("shot");
             float dx = getDXtoObj(targetX);
             float dy = getDYtoObj(targetY);
             float len = distToObj(targetX, targetY);
@@ -34,14 +36,24 @@ public:
     {
         if (type == AttackType::Bubble)
         {
+            sheet = C2D_SpriteSheetLoad(isHeavy ? Path::HEAVY_BUBBLE_SHEET : Path::BUBBLE_SHEET);
+            animator.add("bubble", sheet, 6, LOOP);
+            animator.play("bubble");
             vx = speed * (power + 1) * view;
         }
     }
 
     OwnerType getOwner() { return owner; }
-    void draw(float cameraPos, int layer) override { C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(255, 255, 0, 1)); }
+    void draw(float cameraPos, int layer) override {
+        // C2D_DrawRectSolid(x - cameraPos, y, layer, width, height, C2D_Color32f(255, 255, 0, 1));
+        currentImage = animator.getImage();
+
+        if (type == AttackType::Shot) C2D_DrawImageAt(currentImage, x - cameraPos, y, layer);
+        else C2D_DrawImageAt(currentImage, x - (cameraPos + 2), y - 2, layer, nullptr, 0.5f, 0.5f);
+    }
     void update() override
     {
+        animator.update();
         x += vx;
         y += vy;
         int k = 1;

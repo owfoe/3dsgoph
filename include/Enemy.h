@@ -1,6 +1,6 @@
 #pragma once
 #include "Entity.h"
-
+#include <memory>
 class Enemy : public Entity
 {
 protected:

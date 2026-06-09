@@ -5,12 +5,12 @@
 namespace ProjectSettings
 {
     const std::string NAME = "3dsGAME";
-    constexpr bool DEBUG = true;
+    constexpr bool DEBUG = false;
     constexpr bool CONSOLE = false;
     constexpr int FPS = 60;
     constexpr int MENUS_COUNT = 3;
     constexpr int VISIBLE_MAP_COUNT = 6;
-    constexpr int GAME_MODE_COUNT = 3;
+    constexpr int GAME_MODE_COUNT = 2;
     constexpr int LOAD_TIME = FPS * 0.5f;
 }
 
@@ -67,7 +67,29 @@ namespace Path
 {
     constexpr const char *CUSTOM_FONT = "romfs:/gfx/Nintendo-NES-Font.bcfnt";
     constexpr const char *HP_SHEET = "romfs:/gfx/hp.t3x";
-    constexpr const char *GAME_OVER_SHEET = "romfs:/gfx/gameover.t3x";
+    constexpr const char *GAME_OVER1_SHEET = "romfs:/gfx/gameover1.t3x";
+    constexpr const char *GAME_OVER2_SHEET = "romfs:/gfx/gameover2.t3x";
+    constexpr const char *GAME_OVER3_SHEET = "romfs:/gfx/gameover3.t3x";
+    constexpr const char *LOGO_SHEET = "romfs:/gfx/logo.t3x";
+    constexpr const char *BUBBLE_SHEET = "romfs:/gfx/bubble.t3x";
+    constexpr const char *HEAVY_BUBBLE_SHEET = "romfs:/gfx/bigbubble.t3x";
+    constexpr const char *NUT_SHEET = "romfs:/gfx/nut.t3x";
+    constexpr const char *ENEMY_FLY_SHEET = "romfs:/gfx/enemyfly.t3x";
+    constexpr const char *MENU1_SHEET = "romfs:/gfx/menu1.t3x";
+    constexpr const char *MENU2_SHEET = "romfs:/gfx/menu2.t3x";
+    constexpr const char *MENU3_SHEET = "romfs:/gfx/menu3.t3x";
+    constexpr const char *LOWER_MENU_SHEET = "romfs:/gfx/lowermenu.t3x";
+    constexpr const char *PWUP_NUT_SHEET = "romfs:/gfx/pwup_nut.t3x";
+    constexpr const char *PWUP_SWD_SHEET = "romfs:/gfx/pwup_swd.t3x";
+    constexpr const char *INDICATOR_SHEET = "romfs:/gfx/indicator.t3x";
+    constexpr const char *PLAYER_MOVE_SHEET = "romfs:/gfx/playermove.t3x";
+    constexpr const char *PLAYER_IDLE_SHEET = "romfs:/gfx/playeridle.t3x";
+    constexpr const char *PLAYER_JUMP_SHEET = "romfs:/gfx/playerjump.t3x";
+    constexpr const char *PLAYER_ATTK_SHEET = "romfs:/gfx/playerattk.t3x";
+    constexpr const char *PLAYER_SWD_SHEET = "romfs:/gfx/playerswd.t3x";
+    constexpr const char *VICTORY_SHEET = "romfs:/gfx/victory.t3x";
+    constexpr const char *PLATFORM_EDGE_SHEET = "romfs:/gfx/platformedge.t3x";
+    constexpr const char *PLATFORM_TILE_SHEET = "romfs:/gfx/platformtile.t3x";
     const std::string MARKER = "romfs:/gfx/marker.t3x";
     const std::string LOWER_SCREEN = "romfs:/gfx/lower_screen.t3x";
     const std::string MAPS = "romfs:/maps/";

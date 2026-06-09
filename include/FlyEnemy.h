@@ -8,7 +8,7 @@ private:
 
 public:
     FlyEnemy(float x, float y, float height, float width, int hp, float speed, uint64_t cooldown,
-             AttackType attackType, float aggrRadius, float attackRadius, EnemyPatrolType patrolType, float patrolRadius = 0.0f);
+             AttackType attackType, float aggrRadius, float attackRadius, C2D_SpriteSheet flySheet, EnemyPatrolType patrolType, float patrolRadius = 0.0f);
 
     void update(float playerCentreX, float playerCentreY, uint64_t timer) override;
     void draw(float cameraPos, int layer) override;

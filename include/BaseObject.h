@@ -1,6 +1,7 @@
 #pragma once
 #include <citro2d.h>
 #include <math.h>
+#include "Animator.h"
 #include "HitBox.h"
 #include <string>
 #include "Core.h"
@@ -13,9 +14,11 @@ protected:
     float spawnX;
     float spawnY;
     float speed;
+
     float vy = 0.0f;
     float vx = 0.0f;
     bool isDead = false;
+    std::string fileName;
     C2D_SpriteSheet sheet;
     C2D_Image currentImage = {};
 
@@ -28,6 +31,7 @@ public:
     virtual ~BaseObject() = default;
 
     HitBox hitbox;
+    Animator animator;
 
     float getX() const { return x; }
     float getY() const { return y; }
@@ -60,9 +64,6 @@ public:
 
     void setImage(C2D_Image newImage);
 
-    C2D_SpriteSheet *getSheetPtr() { return &this->sheet; }
-    void setSheetPtr(C2D_SpriteSheet newSheet) { this->sheet = newSheet; }
-    C2D_Image *getImagePtr() { return &this->currentImage; }
     virtual void draw(float cameraPos, int layer) = 0;
     virtual void update() {}
 };

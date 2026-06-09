@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <memory>
 #include <3ds.h>
 #include "BaseObject.h"
 #include "Player.h"
@@ -25,7 +26,7 @@ private:
     std::vector<Ground> grounds;
     std::vector<GroundEnemy> groundEnemies;
     std::vector<FlyEnemy> flyEnemies;
-    std::vector<Projectile> projectiles;
+    std::vector<std::unique_ptr<Projectile>> projectiles;
     std::vector<Powerup> powerups;
     Player player;
     std::unordered_map<std::string, MapData> maps;
@@ -42,19 +43,22 @@ private:
 
     float nearestEnemyX;
     float nearestEnemyY;
-
+    uint64_t currentPowerupDuration;
     u32 kDown, kHeld;
-    long long switchTimer;
+    long long switchTimer, powerupStartTimer;
     GameManagerState nextState;
     bool isJumpButtonDown;
-    int playerHp, powerupSize, menuSelect = 1, maxSelect = ProjectSettings::MENUS_COUNT;
-    float cameraPos, playerPos, dx, cameraSpeed;
-    C3D_RenderTarget *topRight, *botLeft;
-    C2D_SpriteSheet hpSheet, gameOverSheet;
-    C2D_Image heartImg, gameOverImg;
+    int offset1, offset2, offset3, playerHp, target, powerupSize, menuSelect = 1,
+    maxSelect = ProjectSettings::MENUS_COUNT;
+    float cameraPos, playerPos, dx, cameraSpeed, slider;
+    C3D_RenderTarget *topRight, *topLeft, *botLeft;
+    C2D_SpriteSheet hpSheet, gameOver1Sheet, gameOver2Sheet, gameOver3Sheet, logoSheet, menu1Sheet,
+    menu2Sheet, menu3Sheet, lowerMenuSheet, enemyFlySheet, victorySheet, indicatorSheet;
+    C2D_Image heartImg, gameOver1Img, gameOver2Img, gameOver3Img, logoImg, menu1Img, menu2Img,
+    menu3Img, lowerMenuImg, victoryImg;
     C2D_TextBuf g_staticBuf;
     C2D_Font customFont;
-    C2D_Text g_staticText[15];
+    C2D_Text g_staticText[20];
     Camera camera;
     touchPosition touch;
     Pointer pointer;
@@ -63,10 +67,12 @@ private:
 
     MicrophoneInput microphone;
     bool microphoneReady = false;
+    bool indicatorDraw = false;
 
 public:
     GameManager(int s);
     void init();
+    void textInit();
     void exit();
     void update(int &s);
     void loadUpdate(int &s);
@@ -81,6 +87,7 @@ public:
     void gameOverDraw();
     void gameDraw();
     void gameModeDraw();
+    void victoryDraw();
     void checkGameEnd();
     long long getTime() { return timer; }
 
@@ -108,6 +115,19 @@ public:
     void createMap();
     std::vector<std::string> getFiles(const std::string &folder);
 
+    void drawGameHelp();
+    void drawMapsHelp(int target);
+    void drawTitleHelp(int target);
+    void drawGameOverHelp(int target);
+    void drawGameModeHelp(int target);
+    void drawVictoryHelp();
+
+    void drawPowerupIndicator(uint64_t powerupDuration);
+
     void sideOfManager();
     int objInDeathArea(BaseObject &obj);
+
+    void citro2dFreeStuff();
+    void sheetInit();
+    void imgInit();
 };
