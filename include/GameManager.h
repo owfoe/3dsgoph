@@ -126,4 +126,8 @@ public:
 
     void sideOfManager();
     int objInDeathArea(BaseObject &obj);
+
+    void citro2dFreeStuff();
+    void sheetInit();
+    void imgInit();
 };

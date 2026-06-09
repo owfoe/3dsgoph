@@ -42,33 +42,11 @@ void GameManager::init()
         consoleInit(GFX_BOTTOM, NULL);
     }
 
-    // flyEnemies.reserve(50);
-
     // sheets init
-    hpSheet = C2D_SpriteSheetLoad(Path::HP_SHEET);
-    gameOver1Sheet = C2D_SpriteSheetLoad(Path::GAME_OVER1_SHEET);
-    gameOver2Sheet = C2D_SpriteSheetLoad(Path::GAME_OVER2_SHEET);
-    gameOver3Sheet = C2D_SpriteSheetLoad(Path::GAME_OVER3_SHEET);
-    logoSheet = C2D_SpriteSheetLoad(Path::LOGO_SHEET);
-    menu1Sheet = C2D_SpriteSheetLoad(Path::MENU1_SHEET);
-    menu2Sheet = C2D_SpriteSheetLoad(Path::MENU2_SHEET);
-    menu3Sheet = C2D_SpriteSheetLoad(Path::MENU3_SHEET);
-    lowerMenuSheet = C2D_SpriteSheetLoad(Path::LOWER_MENU_SHEET);
-    enemyFlySheet = C2D_SpriteSheetLoad(Path::ENEMY_FLY_SHEET);
-    victorySheet = C2D_SpriteSheetLoad(Path::VICTORY_SHEET);
-    indicatorSheet = C2D_SpriteSheetLoad(Path::INDICATOR_SHEET);
+    sheetInit();
 
     // images init
-    heartImg = C2D_SpriteSheetGetImage(hpSheet, 0);
-    gameOver1Img = C2D_SpriteSheetGetImage(gameOver1Sheet, 0);
-    gameOver2Img = C2D_SpriteSheetGetImage(gameOver2Sheet, 0);
-    gameOver3Img = C2D_SpriteSheetGetImage(gameOver3Sheet, 0);
-    logoImg = C2D_SpriteSheetGetImage(logoSheet, 0);
-    menu1Img = C2D_SpriteSheetGetImage(menu1Sheet, 0);
-    menu2Img = C2D_SpriteSheetGetImage(menu2Sheet, 0);
-    menu3Img = C2D_SpriteSheetGetImage(menu3Sheet, 0);
-    lowerMenuImg = C2D_SpriteSheetGetImage(lowerMenuSheet, 0);
-    victoryImg = C2D_SpriteSheetGetImage(victorySheet, 0);
+    imgInit();
 
     // util objects init
     camera = Camera(0, 0, 0.1, 0.1, 0.15f);
@@ -92,6 +70,7 @@ void GameManager::init()
 
     // text init!! a lot of stuff
     textInit();
+    
     microphoneReady = microphone.init();
 }
 
@@ -111,20 +90,7 @@ void GameManager::exit()
     if (microphoneReady)
         microphone.exit();
 
-    C2D_SpriteSheetFree(hpSheet);
-    C2D_SpriteSheetFree(logoSheet);
-    C2D_SpriteSheetFree(gameOver1Sheet);
-    C2D_SpriteSheetFree(gameOver2Sheet);
-    C2D_SpriteSheetFree(gameOver3Sheet);
-    C2D_SpriteSheetFree(menu1Sheet);
-    C2D_SpriteSheetFree(menu2Sheet);
-    C2D_SpriteSheetFree(menu3Sheet);
-    C2D_SpriteSheetFree(lowerMenuSheet);
-    C2D_SpriteSheetFree(enemyFlySheet);
-    C2D_SpriteSheetFree(indicatorSheet);
-    C2D_TextBufDelete(g_staticBuf);
-    C2D_TextBufDelete(mapTextBuf);
-    C2D_FontFree(customFont);
+    citro2dFreeStuff();
 
     C2D_Fini();
     C3D_Fini();
@@ -1293,4 +1259,49 @@ void GameManager::drawPowerupIndicator(uint64_t powerupDuration)
     C2D_Image img = C2D_SpriteSheetGetImage(indicatorSheet, frame);
 
     C2D_DrawImageAt(img, player.getX() - (cameraPos - 35), player.getY() - 5, 1, nullptr, 1.5f, 1.5f);
+}
+
+void GameManager::citro2dFreeStuff() {
+    C2D_SpriteSheetFree(hpSheet);
+    C2D_SpriteSheetFree(logoSheet);
+    C2D_SpriteSheetFree(gameOver1Sheet);
+    C2D_SpriteSheetFree(gameOver2Sheet);
+    C2D_SpriteSheetFree(gameOver3Sheet);
+    C2D_SpriteSheetFree(menu1Sheet);
+    C2D_SpriteSheetFree(menu2Sheet);
+    C2D_SpriteSheetFree(menu3Sheet);
+    C2D_SpriteSheetFree(lowerMenuSheet);
+    C2D_SpriteSheetFree(enemyFlySheet);
+    C2D_SpriteSheetFree(indicatorSheet);
+    C2D_TextBufDelete(g_staticBuf);
+    C2D_TextBufDelete(mapTextBuf);
+    C2D_FontFree(customFont);
+}
+
+void GameManager::sheetInit() {
+    hpSheet = C2D_SpriteSheetLoad(Path::HP_SHEET);
+    gameOver1Sheet = C2D_SpriteSheetLoad(Path::GAME_OVER1_SHEET);
+    gameOver2Sheet = C2D_SpriteSheetLoad(Path::GAME_OVER2_SHEET);
+    gameOver3Sheet = C2D_SpriteSheetLoad(Path::GAME_OVER3_SHEET);
+    logoSheet = C2D_SpriteSheetLoad(Path::LOGO_SHEET);
+    menu1Sheet = C2D_SpriteSheetLoad(Path::MENU1_SHEET);
+    menu2Sheet = C2D_SpriteSheetLoad(Path::MENU2_SHEET);
+    menu3Sheet = C2D_SpriteSheetLoad(Path::MENU3_SHEET);
+    lowerMenuSheet = C2D_SpriteSheetLoad(Path::LOWER_MENU_SHEET);
+    enemyFlySheet = C2D_SpriteSheetLoad(Path::ENEMY_FLY_SHEET);
+    victorySheet = C2D_SpriteSheetLoad(Path::VICTORY_SHEET);
+    indicatorSheet = C2D_SpriteSheetLoad(Path::INDICATOR_SHEET);
+}
+
+void GameManager::imgInit() {
+    heartImg = C2D_SpriteSheetGetImage(hpSheet, 0);
+    gameOver1Img = C2D_SpriteSheetGetImage(gameOver1Sheet, 0);
+    gameOver2Img = C2D_SpriteSheetGetImage(gameOver2Sheet, 0);
+    gameOver3Img = C2D_SpriteSheetGetImage(gameOver3Sheet, 0);
+    logoImg = C2D_SpriteSheetGetImage(logoSheet, 0);
+    menu1Img = C2D_SpriteSheetGetImage(menu1Sheet, 0);
+    menu2Img = C2D_SpriteSheetGetImage(menu2Sheet, 0);
+    menu3Img = C2D_SpriteSheetGetImage(menu3Sheet, 0);
+    lowerMenuImg = C2D_SpriteSheetGetImage(lowerMenuSheet, 0);
+    victoryImg = C2D_SpriteSheetGetImage(victorySheet, 0);
 }
