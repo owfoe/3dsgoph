@@ -8,7 +8,6 @@ FlyEnemy::FlyEnemy(float x, float y, float height, float width, int hp, float sp
     : Enemy(x, y, height, width, hp, speed, cooldown, attackType, aggrRadius, attackRadius, patrolType, patrolRadius) {
     animator.add("fly", flySheet, 6, LOOP);
     animator.play("fly");
-
 }
 
 void FlyEnemy::update(float playerCentreX, float playerCentreY, uint64_t timer)

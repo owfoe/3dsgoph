@@ -14,7 +14,7 @@ private:
 public:
     Powerup() {}
     Powerup(float x, float y, float height, float width, AttackType type, uint64_t duration)
-        : BaseObject(x, y, height, width), type(type), duration(duration),
+        : BaseObject(x, y, Const::POWERUP_SIZE, Const::POWERUP_SIZE), type(type), duration(duration),
           clickHitBox(-Const::POWERUP_DIFF_HITBOX, -Const::POWERUP_DIFF_HITBOX, height + 2 * Const::POWERUP_DIFF_HITBOX, width + 2 * Const::POWERUP_DIFF_HITBOX) {
         if (type == AttackType::Shot) {
             fileName = Path::PWUP_NUT_SHEET;
@@ -66,4 +66,5 @@ public:
         }
         checkDeath(timer);
     }
+    uint64_t getDuration() { return duration; }
 };

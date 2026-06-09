@@ -10,6 +10,8 @@ namespace ProjectSettings
     constexpr int FPS = 60;
     constexpr int MENUS_COUNT = 3;
     constexpr int VISIBLE_MAP_COUNT = 6;
+    constexpr int GAME_MODE_COUNT = 2;
+    constexpr int LOAD_TIME = FPS * 0.5f;
 }
 
 namespace PlayerSettings
@@ -25,6 +27,7 @@ namespace WorldSettings
 {
     constexpr float GRAVITY = 0.5f;
     constexpr float MAX_FALL_SPEED = 10.0f;
+    constexpr float DEATH_AREA = 100.0f;
 }
 
 namespace Const
@@ -56,6 +59,8 @@ namespace Const
 
     constexpr float MARKER_START_X = 34.0f;
     constexpr float MARKER_FORMULA_CONST = 240.0f;
+
+    constexpr float WIN_DX = 10.0f;
 }
 
 namespace Path
@@ -76,8 +81,15 @@ namespace Path
     constexpr const char *LOWER_MENU_SHEET = "romfs:/gfx/lowermenu.t3x";
     constexpr const char *PWUP_NUT_SHEET = "romfs:/gfx/pwup_nut.t3x";
     constexpr const char *PWUP_SWD_SHEET = "romfs:/gfx/pwup_swd.t3x";
+    constexpr const char *INDICATOR_SHEET = "romfs:/gfx/indicator.t3x";
     constexpr const char *PLAYER_MOVE_SHEET = "romfs:/gfx/playermove.t3x";
     constexpr const char *PLAYER_IDLE_SHEET = "romfs:/gfx/playeridle.t3x";
+    constexpr const char *PLAYER_JUMP_SHEET = "romfs:/gfx/playerjump.t3x";
+    constexpr const char *PLAYER_ATTK_SHEET = "romfs:/gfx/playerattk.t3x";
+    constexpr const char *PLAYER_SWD_SHEET = "romfs:/gfx/playerswd.t3x";
+    constexpr const char *VICTORY_SHEET = "romfs:/gfx/victory.t3x";
+    constexpr const char *PLATFORM_EDGE_SHEET = "romfs:/gfx/platformedge.t3x";
+    constexpr const char *PLATFORM_TILE_SHEET = "romfs:/gfx/platformtile.t3x";
     const std::string MARKER = "romfs:/gfx/marker.t3x";
     const std::string LOWER_SCREEN = "romfs:/gfx/lower_screen.t3x";
     const std::string MAPS = "romfs:/maps/";
@@ -149,10 +161,19 @@ struct PendingAttack
 enum class GameManagerState
 {
     Title,
+    GameModeSelect,
     Game,
     GameOver,
+    Victory,
     Load,
     Maps
+};
+
+enum class GameMode
+{
+    Race,
+    Clear,
+    Testing
 };
 
 struct GroundData
@@ -182,7 +203,6 @@ struct EnemyData
 struct PowerupData
 {
     float x, y;
-    float height, width;
     AttackType attackType;
     uint64_t duration;
 };

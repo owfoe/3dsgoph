@@ -9,7 +9,6 @@ class Entity : public BaseObject
 {
 protected:
     int view = 1;
-
     int hp;
     int maxHP;
     int damage = 1.0f;
@@ -77,6 +76,7 @@ public:
     Ground *getGroundPlatform() { return groundPlatform; }
     void setGroundPlatform(Ground *ground) { groundPlatform = ground; }
     void resetGroundPlatform() { groundPlatform = nullptr; }
+    virtual void onAttackStart(AttackType type) {}
     virtual void landOnGround(Ground *ground)
     {
         setNullVY();
@@ -87,6 +87,8 @@ public:
     virtual uint64_t getAttackStartup(AttackType type);
     bool startAttack(AttackType type, uint64_t timer, float targetX = Const::DEFAULT_X, float targetY = Const::DEFAULT_Y, bool heavyBubble = false, float strength = 0.0f)
     {
+        onAttackStart(type);
+
         if (pendingAttack.active)
             return false;
 
@@ -103,8 +105,10 @@ public:
         pendingAttack.heavyBubble = heavyBubble;
 
         actionState = EntityActionState::Attack;
+
         return true;
     }
+
 
     bool consumeReadyAttack(uint64_t timer, PendingAttack &out)
     {

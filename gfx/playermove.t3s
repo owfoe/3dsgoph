@@ -1,8 +1,9 @@
 --atlas -f rgba -z auto
 
-playermove1.png
-playermove2.png
-playermove3.png
-playermove4.png
-playermove5.png
-playermove6.png
+assets/playermove/playermove1.png
+assets/playermove/playermove2.png
+assets/playermove/playermove3.png
+assets/playermove/playermove4.png
+assets/playermove/playermove5.png
+assets/playermove/playermove6.png
+

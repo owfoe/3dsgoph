@@ -114,8 +114,6 @@ public:
         PowerupData data;
         data.x = object["x"].get<float>();
         data.y = object["y"].get<float>();
-        data.height = object["height"].get<float>();
-        data.width = object["width"].get<float>();
         data.attackType = getAttackType(object["attack_type"].get<std::string>());
         data.duration = object["duration"].get<uint64_t>();
         return data;

@@ -36,12 +36,16 @@ private:
     float mapWidth = Const::SCREEN_WIDTH;
     C2D_TextBuf mapTextBuf;
     int mapSelect = 0, mapScroll = 0, mapCount, visibleMapCount = ProjectSettings::VISIBLE_MAP_COUNT;
+    bool mapHasClearMode;
+
+    GameMode gameMode;
+    int gameModeSelect = 0;
 
     float nearestEnemyX;
     float nearestEnemyY;
-
+    uint64_t currentPowerupDuration;
     u32 kDown, kHeld;
-    long long switchTimer;
+    long long switchTimer, powerupStartTimer;
     GameManagerState nextState;
     bool isJumpButtonDown;
     int offset1, offset2, offset3, playerHp, target, powerupSize, menuSelect = 1,
@@ -49,12 +53,12 @@ private:
     float cameraPos, playerPos, dx, cameraSpeed, slider;
     C3D_RenderTarget *topRight, *topLeft, *botLeft;
     C2D_SpriteSheet hpSheet, gameOver1Sheet, gameOver2Sheet, gameOver3Sheet, logoSheet, menu1Sheet,
-    menu2Sheet, menu3Sheet, lowerMenuSheet, enemyFlySheet;
+    menu2Sheet, menu3Sheet, lowerMenuSheet, enemyFlySheet, victorySheet, indicatorSheet;
     C2D_Image heartImg, gameOver1Img, gameOver2Img, gameOver3Img, logoImg, menu1Img, menu2Img,
-    menu3Img, lowerMenuImg;
+    menu3Img, lowerMenuImg, victoryImg;
     C2D_TextBuf g_staticBuf;
     C2D_Font customFont;
-    C2D_Text g_staticText[10];
+    C2D_Text g_staticText[20];
     Camera camera;
     touchPosition touch;
     Pointer pointer;
@@ -63,6 +67,7 @@ private:
 
     MicrophoneInput microphone;
     bool microphoneReady = false;
+    bool indicatorDraw = false;
 
 public:
     GameManager(int s);
@@ -70,16 +75,20 @@ public:
     void textInit();
     void exit();
     void update(int &s);
-    void loadUpdate(int& s);
-    void titleUpdate(int& s);
+    void loadUpdate(int &s);
+    void titleUpdate(int &s);
     void mapsUpdate();
     void gameUpdate();
+    void gameModeUpdate();
     void draw();
     void loadDraw();
     void titleDraw();
     void mapsDraw();
     void gameOverDraw();
     void gameDraw();
+    void gameModeDraw();
+    void victoryDraw();
+    void checkGameEnd();
     long long getTime() { return timer; }
 
     void collisionsManager();
@@ -110,4 +119,11 @@ public:
     void drawMapsHelp(int target);
     void drawTitleHelp(int target);
     void drawGameOverHelp(int target);
+    void drawGameModeHelp(int target);
+    void drawVictoryHelp();
+
+    void drawPowerupIndicator(uint64_t powerupDuration);
+
+    void sideOfManager();
+    int objInDeathArea(BaseObject &obj);
 };

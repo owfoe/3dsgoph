@@ -1,10 +1,10 @@
 --atlas -f rgba -z auto
 
-bigbubble1.png
-bigbubble2.png
-bigbubble3.png
-bigbubble4.png
-bigbubble5.png
-bigbubble6.png
-bigbubble7.png
-bigbubble8.png
+assets/bigbubble/bigbubble1.png
+assets/bigbubble/bigbubble2.png
+assets/bigbubble/bigbubble3.png
+assets/bigbubble/bigbubble4.png
+assets/bigbubble/bigbubble5.png
+assets/bigbubble/bigbubble6.png
+assets/bigbubble/bigbubble7.png
+assets/bigbubble/bigbubble8.png

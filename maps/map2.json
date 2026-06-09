@@ -253,8 +253,6 @@
     {
       "x": 225,
       "y": 130,
-      "height": 30,
-      "width": 30,
       "attack_type": "shot",
       "duration": 360
     },
