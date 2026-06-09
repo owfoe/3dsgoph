@@ -47,7 +47,7 @@ void GameManager::init()
     gameOverImg = C2D_SpriteSheetGetImage(gameOverSheet, 0);
 
     // util objects init
-    camera = Camera(0, Const::SCREEN_HEIGHT, 0.1, 0.1, 0.15f);
+    camera = Camera(0, 0, 0.1, 0.1, 0.15f);
     camera.setFrameSpeed(15);
     pointer = Pointer(0, 0, 0.01, 0.01);
     marker = Marker(Const::MARKER_START_X, 149, 0, 0, Path::MARKER);
@@ -60,6 +60,7 @@ void GameManager::init()
     currentMapInd = 0;
     mapCount = maps.size();
     createMap();
+    mapHasClearMode = !(groundEnemies.empty() && flyEnemies.empty());
 
     // text init!! a lot of stuff
     C2D_TextFontParse(&g_staticText[0], customFont, g_staticBuf, "START GAME");
@@ -69,6 +70,10 @@ void GameManager::init()
     C2D_TextFontParse(&g_staticText[4], customFont, g_staticBuf, "PRESS ANY KEY");
     C2D_TextFontParse(&g_staticText[5], customFont, g_staticBuf, "TO START AGAIN");
     C2D_TextFontParse(&g_staticText[6], customFont, g_staticBuf, "MAPS");
+    C2D_TextFontParse(&g_staticText[7], customFont, g_staticBuf, "SELECT GAME MODE");
+    C2D_TextFontParse(&g_staticText[8], customFont, g_staticBuf, "RACE");
+    C2D_TextFontParse(&g_staticText[9], customFont, g_staticBuf, "CLEAR");
+    C2D_TextFontParse(&g_staticText[10], customFont, g_staticBuf, "TESTING");
 
     C2D_TextOptimize(&g_staticText[0]);
     C2D_TextOptimize(&g_staticText[1]);
@@ -77,6 +82,10 @@ void GameManager::init()
     C2D_TextOptimize(&g_staticText[4]);
     C2D_TextOptimize(&g_staticText[5]);
     C2D_TextOptimize(&g_staticText[6]);
+    C2D_TextOptimize(&g_staticText[7]);
+    C2D_TextOptimize(&g_staticText[8]);
+    C2D_TextOptimize(&g_staticText[9]);
+    C2D_TextOptimize(&g_staticText[10]);
 
     microphoneReady = microphone.init();
 }
@@ -101,22 +110,28 @@ void GameManager::exit()
 
 void GameManager::draw()
 {
-    switch (getState()) {
-        case GameManagerState::Load:
-            loadDraw();
-            break;
-        case GameManagerState::Title:
-            titleDraw();
-            break;
-        case GameManagerState::Maps:
-            mapsDraw();
-            break;
-        case GameManagerState::GameOver:
-            gameOverDraw();
-            break;
-        case GameManagerState::Game:
-            gameDraw();
-            break;
+    switch (getState())
+    {
+    case GameManagerState::Load:
+        loadDraw();
+        break;
+    case GameManagerState::Title:
+        titleDraw();
+        break;
+    case GameManagerState::Maps:
+        mapsDraw();
+        break;
+    case GameManagerState::GameOver:
+        gameOverDraw();
+        break;
+    case GameManagerState::Game:
+        gameDraw();
+        break;
+    case GameManagerState::GameModeSelect:
+        gameModeDraw();
+        break;
+    default:
+        break;
     }
 }
 
@@ -130,25 +145,29 @@ void GameManager::update(int &s)
     if (kDown & KEY_START)
         s = -1;
 
-    switch (getState()) {
-        case GameManagerState::Load:
-            loadUpdate(s);
-            break;
-        case GameManagerState::Title:
-            titleUpdate(s);
-            break;
-        case GameManagerState::Maps:
-            mapsUpdate();
-            break;
-        case GameManagerState::GameOver:
-            if (kDown)
-            {
-                loadSwitch(GameManagerState::Title);
-            }
-            break;
-        case GameManagerState::Game:
-            gameUpdate();
-            break;
+    switch (getState())
+    {
+    case GameManagerState::Load:
+        loadUpdate(s);
+        break;
+    case GameManagerState::Title:
+        titleUpdate(s);
+        break;
+    case GameManagerState::Maps:
+        mapsUpdate();
+        break;
+    case GameManagerState::GameOver:
+        if (kDown)
+            loadSwitch(GameManagerState::Title);
+        break;
+    case GameManagerState::Game:
+        gameUpdate();
+        break;
+    case GameManagerState::GameModeSelect:
+        gameModeUpdate();
+        break;
+    default:
+        break;
     }
 }
 
@@ -213,7 +232,7 @@ void GameManager::createMap()
                                 data.aggrRadius, data.attackRadius, data.patrolType, data.patrolRadius);
 
     for (PowerupData &data : map.powerups)
-        powerups.emplace_back(data.x, data.y, data.height, data.width, data.attackType, data.duration);
+        powerups.emplace_back(data.x, data.y, data.attackType, data.duration);
 
     player = Player(map.player.x, map.player.y);
     mapWidth = map.width;
@@ -604,13 +623,15 @@ void GameManager::resolveY(Entity &entity, Ground &ground)
     entity.setNullVY();
 }
 
-void GameManager::loadSwitch(GameManagerState ns) {
+void GameManager::loadSwitch(GameManagerState ns)
+{
     setState(GameManagerState::Load);
     switchTimer = timer;
     nextState = ns;
 }
 
-void GameManager::loadDraw() {
+void GameManager::loadDraw()
+{
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
     C2D_TargetClear(botLeft, C2D_Color32(0, 0, 0, 255));
     C2D_SceneBegin(botLeft);
@@ -621,7 +642,8 @@ void GameManager::loadDraw() {
     C3D_FrameEnd(0);
 }
 
-void GameManager::titleDraw() {
+void GameManager::titleDraw()
+{
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
     C2D_TargetClear(botLeft, C2D_Color32(0, 0, 0, 255));
@@ -637,7 +659,32 @@ void GameManager::titleDraw() {
     C3D_FrameEnd(0);
 }
 
-void GameManager::mapsDraw() {
+void GameManager::gameModeDraw()
+{
+    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+
+    C2D_TargetClear(botLeft, C2D_Color32(0, 0, 0, 255));
+    C2D_SceneBegin(botLeft);
+
+    C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
+    C2D_SceneBegin(topRight);
+    C2D_DrawText(&g_staticText[7], C2D_WithColor + C2D_AlignCenter, 200.0f, 30.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+    C2D_DrawText(&g_staticText[8], C2D_WithColor + C2D_AlignCenter, 200.0f, 90.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+
+    if (mapHasClearMode)
+    {
+        C2D_DrawText(&g_staticText[9], C2D_WithColor + C2D_AlignCenter, 200.0f, 120.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+        C2D_DrawText(&g_staticText[10], C2D_WithColor + C2D_AlignCenter, 200.0f, 150.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+    }
+    else
+        C2D_DrawText(&g_staticText[10], C2D_WithColor + C2D_AlignCenter, 200.0f, 120.0f, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+    C2D_DrawText(&g_staticText[2], C2D_WithColor, 100.0f, 90.0f + (gameModeSelect) * 30, 0.0f, 0.5f, 0.5f, C2D_Color32(255, 255, 255, 255));
+
+    C3D_FrameEnd(0);
+}
+
+void GameManager::mapsDraw()
+{
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
     C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
@@ -665,7 +712,8 @@ void GameManager::mapsDraw() {
     C3D_FrameEnd(0);
 }
 
-void GameManager::gameOverDraw() {
+void GameManager::gameOverDraw()
+{
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
     C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
@@ -681,7 +729,8 @@ void GameManager::gameOverDraw() {
     C3D_FrameEnd(0);
 }
 
-void GameManager::gameDraw() {
+void GameManager::gameDraw()
+{
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
     C2D_TargetClear(topRight, C2D_Color32(0, 0, 0, 255));
@@ -733,29 +782,39 @@ void GameManager::gameDraw() {
     C3D_FrameEnd(0);
 }
 
-void GameManager::loadUpdate(int &s) {
-    if (timer - switchTimer > 120) {
-        switch (nextState) {
-            case GameManagerState::Game:
-                setState(GameManagerState::Game);
-                break;
-            case GameManagerState::GameOver:
-                setState(GameManagerState::GameOver);
-                break;
-            case GameManagerState::Title:
-                setState(GameManagerState::Title);
-                break;
-            case GameManagerState::Maps:
-                setState(GameManagerState::Maps);
-                break;
+void GameManager::loadUpdate(int &s)
+{
+    if (timer - switchTimer > ProjectSettings::LOAD_TIME)
+    {
+        switch (nextState)
+        {
+        case GameManagerState::Game:
+            setState(GameManagerState::Game);
+            break;
+        case GameManagerState::GameOver:
+            setState(GameManagerState::GameOver);
+            break;
+        case GameManagerState::Title:
+            setState(GameManagerState::Title);
+            break;
+        case GameManagerState::Maps:
+            setState(GameManagerState::Maps);
+            break;
+        case GameManagerState::GameModeSelect:
+            setState(GameManagerState::GameModeSelect);
+            break;
+        case GameManagerState::Victory:
+            setState(GameManagerState::Victory);
+            break;
 
-            default:
-                s = -1;
+        default:
+            s = -1;
         }
     }
 }
 
-void GameManager::titleUpdate(int &s) {
+void GameManager::titleUpdate(int &s)
+{
     if (kDown & KEY_DOWN)
     {
         menuSelect += 1;
@@ -778,25 +837,48 @@ void GameManager::titleUpdate(int &s) {
     {
         switch (menuSelect)
         {
-            case 1:
-                createMap();
-                loadSwitch(GameManagerState::Game);
-                break;
+        case 1:
+            gameModeSelect = 0;
+            loadSwitch(GameManagerState::GameModeSelect);
+            break;
 
-            case 2:
-                mapSelect = 0;
-                mapScroll = 0;
-                loadSwitch(GameManagerState::Maps);
-                break;
+        case 2:
+            mapSelect = 0;
+            mapScroll = 0;
+            loadSwitch(GameManagerState::Maps);
+            break;
 
-            case 3:
-                s = -1;
-                break;
+        case 3:
+            s = -1;
+            break;
         }
     }
 }
 
-void GameManager::mapsUpdate() {
+void GameManager::gameModeUpdate()
+{
+    int gameModeCount = ProjectSettings::GAME_MODE_COUNT;
+    if (!mapHasClearMode)
+        gameModeCount -= 1;
+
+    if (kDown & KEY_DOWN)
+        gameModeSelect = (gameModeSelect + 1) % gameModeCount;
+
+    if (kDown & KEY_UP)
+        gameModeSelect = (gameModeSelect - 1 + gameModeCount) % gameModeCount;
+
+    if (kDown & KEY_A)
+    {
+        if (gameModeSelect == 2 && !mapHasClearMode)
+            gameModeSelect += 1;
+        gameMode = static_cast<GameMode>(gameModeSelect);
+        createMap();
+        loadSwitch(GameManagerState::Game);
+    }
+}
+
+void GameManager::mapsUpdate()
+{
     if (mapCount > 0)
     {
         if (kDown & KEY_DOWN)
@@ -829,19 +911,19 @@ void GameManager::mapsUpdate() {
             std::vector<std::string>::iterator it = std::find(mapTitles.begin(), mapTitles.end(), currentMap);
             currentMapInd = it - mapTitles.begin();
             createMap();
+            mapHasClearMode = !(groundEnemies.empty() && flyEnemies.empty());
             menuSelect = 1;
             setState(GameManagerState::Title);
         }
     }
 }
 
-void GameManager::gameUpdate() {
+void GameManager::gameUpdate()
+{
     playerHp = player.getHP();
     cameraPos = camera.getX();
 
-    if (playerHp == 0) {
-        loadSwitch(GameManagerState::GameOver);
-    }
+    checkGameEnd();
 
     if (kHeld & KEY_LEFT)
         player.moveLeft();
@@ -858,14 +940,14 @@ void GameManager::gameUpdate() {
             float strength = microphone.getLevel();
             bool isKDown = (kHeld & KEY_DOWN);
 
-            player.startAttack(
-                player.getAttackType(),
-                timer,
-                nearestEnemyX,
-                nearestEnemyY,
-                isKDown,
-                strength);
+            player.startAttack(player.getAttackType(), timer, nearestEnemyX, nearestEnemyY, isKDown, strength);
         }
+    }
+    if (ProjectSettings::DEBUG && kDown & KEY_B)
+    {
+        bool isKDown = (kHeld & KEY_DOWN);
+        float strength = 6.0f;
+        player.startAttack(player.getAttackType(), timer, nearestEnemyX, nearestEnemyY, isKDown, strength);
     }
 
     if (kHeld & KEY_TOUCH)
@@ -888,14 +970,14 @@ void GameManager::gameUpdate() {
     }
     isJumpButtonDown = (kHeld & KEY_A) ? true : false;
     for (Ground &ground : grounds)
-       ground.update(timer);
+        ground.update(timer);
 
     float minDist = std::numeric_limits<float>::max();
     nearestEnemyX = Const::DEFAULT_X;
     nearestEnemyY = Const::DEFAULT_Y;
     for (GroundEnemy &groundEnemy : groundEnemies)
     {
-        groundEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
+        groundEnemy.update(player.getCentreX(), player.getCentreY(), timer);
         float enemyX = groundEnemy.getCentreX();
         if (player.isObjForward(enemyX))
         {
@@ -911,7 +993,7 @@ void GameManager::gameUpdate() {
     }
     for (FlyEnemy &flyEnemy : flyEnemies)
     {
-        flyEnemy.update(projectiles, player.getCentreX(), player.getCentreY(), timer);
+        flyEnemy.update(player.getCentreX(), player.getCentreY(), timer);
         float enemyX = flyEnemy.getCentreX();
         if (player.isObjForward(enemyX))
         {
@@ -940,5 +1022,75 @@ void GameManager::gameUpdate() {
     collisionsManager();
     eraseManager();
     updateCamera();
+    sideOfManager();
     cameraPos = camera.getX();
+}
+
+void GameManager::checkGameEnd()
+{
+    if (player.getIsDead())
+    {
+        loadSwitch(GameManagerState::GameOver);
+        return;
+    }
+
+    switch (gameMode)
+    {
+    case GameMode::Race:
+        if (player.hitbox.rightB(player.getX()) >= mapWidth - Const::WIN_DX)
+            loadSwitch(GameManagerState::Victory);
+        break;
+
+    case GameMode::Clear:
+        if (groundEnemies.empty() && flyEnemies.empty())
+            loadSwitch(GameManagerState::Victory);
+        break;
+
+    case GameMode::Testing:
+        break;
+    }
+}
+
+void GameManager::sideOfManager()
+{
+    for (Projectile &p : projectiles)
+    {
+        if (objInDeathArea(p) != 0)
+            p.setIsDead(true);
+    }
+
+    for (GroundEnemy &groundEnemy : groundEnemies)
+    {
+        if (objInDeathArea(groundEnemy) == 2)
+            groundEnemy.setIsDead(true);
+    }
+
+    if (objInDeathArea(player) == 2)
+        player.setIsDead(true);
+}
+
+int GameManager::objInDeathArea(BaseObject &obj)
+{
+    float left = obj.hitbox.leftB(obj.getX());
+    float right = obj.hitbox.rightB(obj.getX());
+    float top = obj.hitbox.topB(obj.getY());
+    float bottom = obj.hitbox.bottomB(obj.getY());
+
+    float cameraX = camera.getX();
+    float cameraY = camera.getY();
+
+    float deathAreaRT = cameraX + Const::SCREEN_WIDTH + WorldSettings::DEATH_AREA;
+    float deathAreaLT = cameraX - WorldSettings::DEATH_AREA;
+    float deathAreaTOP = cameraY - WorldSettings::DEATH_AREA;
+    float deathAreaBTM = cameraY + Const::SCREEN_HEIGHT + WorldSettings::DEATH_AREA * 2;
+
+    if (left >= deathAreaRT)
+        return 1;
+    if (right <= deathAreaLT)
+        return -1;
+    if (top >= deathAreaBTM)
+        return 2;
+    if (bottom <= deathAreaTOP)
+        return -2;
+    return 0;
 }

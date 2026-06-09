@@ -1,7 +1,7 @@
 {
   "map_params": {
     "width": 1000,
-    "title": "ANAL1"
+    "title": "A"
   },
   "player": {
     "x": 500,
@@ -14,7 +14,7 @@
       "height": 2,
       "width": 50,
       "is_barrier": true,
-      "mode": "vertical",
+      "mode": "horizontal",
       "radius": 40,
       "speed": 1
     },
@@ -77,7 +77,7 @@
       "attack_type": "shot",
       "aggr_radius": 150,
       "attack_radius": 100,
-      "patrol_type": "vertical",
+      "patrol_type": "horizontal",
       "patrol_radius": 50
     }
   ],
@@ -85,16 +85,12 @@
     {
       "x": 200,
       "y": 120,
-      "height": 30,
-      "width": 30,
       "attack_type": "shot",
       "duration": 300
     },
     {
       "x": 250,
       "y": 120,
-      "height": 30,
-      "width": 30,
       "attack_type": "sword",
       "duration": 600
     }

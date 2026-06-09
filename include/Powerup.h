@@ -13,8 +13,8 @@ private:
 
 public:
     Powerup() {}
-    Powerup(float x, float y, float height, float width, AttackType type, uint64_t duration)
-        : BaseObject(x, y, height, width), type(type), duration(duration),
+    Powerup(float x, float y, AttackType type, uint64_t duration)
+        : BaseObject(x, y, Const::POWERUP_SIZE, Const::POWERUP_SIZE), type(type), duration(duration),
           clickHitBox(-Const::POWERUP_DIFF_HITBOX, -Const::POWERUP_DIFF_HITBOX, height + 2 * Const::POWERUP_DIFF_HITBOX, width + 2 * Const::POWERUP_DIFF_HITBOX) {}
 
     HitBox clickHitBox;

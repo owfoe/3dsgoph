@@ -5,11 +5,13 @@
 namespace ProjectSettings
 {
     const std::string NAME = "3dsGAME";
-    constexpr bool DEBUG = false;
+    constexpr bool DEBUG = true;
     constexpr bool CONSOLE = false;
     constexpr int FPS = 60;
     constexpr int MENUS_COUNT = 3;
     constexpr int VISIBLE_MAP_COUNT = 6;
+    constexpr int GAME_MODE_COUNT = 3;
+    constexpr int LOAD_TIME = FPS * 0.5f;
 }
 
 namespace PlayerSettings
@@ -25,6 +27,7 @@ namespace WorldSettings
 {
     constexpr float GRAVITY = 0.5f;
     constexpr float MAX_FALL_SPEED = 10.0f;
+    constexpr float DEATH_AREA = 100.0f;
 }
 
 namespace Const
@@ -56,6 +59,8 @@ namespace Const
 
     constexpr float MARKER_START_X = 34.0f;
     constexpr float MARKER_FORMULA_CONST = 240.0f;
+
+    constexpr float WIN_DX = 10.0f;
 }
 
 namespace Path
@@ -134,10 +139,19 @@ struct PendingAttack
 enum class GameManagerState
 {
     Title,
+    GameModeSelect,
     Game,
     GameOver,
+    Victory,
     Load,
     Maps
+};
+
+enum class GameMode
+{
+    Race,
+    Clear,
+    Testing
 };
 
 struct GroundData
@@ -167,7 +181,6 @@ struct EnemyData
 struct PowerupData
 {
     float x, y;
-    float height, width;
     AttackType attackType;
     uint64_t duration;
 };

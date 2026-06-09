@@ -5,9 +5,9 @@ FlyEnemy::FlyEnemy(float x, float y, float height, float width, int hp, float sp
                    AttackType attackType, float aggrRadius, float attackRadius, EnemyPatrolType patrolType, float patrolRadius)
     : Enemy(x, y, height, width, hp, speed, cooldown, attackType, aggrRadius, attackRadius, patrolType, patrolRadius) {}
 
-void FlyEnemy::update(std::vector<Projectile> &projectiles, float playerCentreX, float playerCentreY, uint64_t timer)
+void FlyEnemy::update(float playerCentreX, float playerCentreY, uint64_t timer)
 {
-    Enemy::update(projectiles, playerCentreX, playerCentreY, timer);
+    Enemy::update(playerCentreX, playerCentreY, timer);
 
     switch (state)
     {

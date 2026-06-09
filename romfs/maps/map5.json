@@ -1,7 +1,7 @@
 {
   "map_params": {
     "width": 600,
-    "title": "ANAL5"
+    "title": "A5"
   },
   "player": {
     "x": 40,
@@ -25,8 +25,6 @@
     {
       "x": 280,
       "y": 185,
-      "height": 30,
-      "width": 30,
       "attack_type": "shot",
       "duration": 300
     }

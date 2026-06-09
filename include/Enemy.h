@@ -28,7 +28,7 @@ public:
     }
 
     using BaseObject::update;
-    virtual void update(std::vector<Projectile> &projectiles, float playerCentreX, float playerCentreY, uint64_t timer)
+    virtual void update(float playerCentreX, float playerCentreY, uint64_t timer)
     {
         checkDeath();
         float dist = distToObj(playerCentreX, playerCentreY);

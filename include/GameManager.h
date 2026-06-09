@@ -35,6 +35,10 @@ private:
     float mapWidth = Const::SCREEN_WIDTH;
     C2D_TextBuf mapTextBuf;
     int mapSelect = 0, mapScroll = 0, mapCount, visibleMapCount = ProjectSettings::VISIBLE_MAP_COUNT;
+    bool mapHasClearMode;
+
+    GameMode gameMode;
+    int gameModeSelect = 0;
 
     float nearestEnemyX;
     float nearestEnemyY;
@@ -50,7 +54,7 @@ private:
     C2D_Image heartImg, gameOverImg;
     C2D_TextBuf g_staticBuf;
     C2D_Font customFont;
-    C2D_Text g_staticText[10];
+    C2D_Text g_staticText[15];
     Camera camera;
     touchPosition touch;
     Pointer pointer;
@@ -65,16 +69,19 @@ public:
     void init();
     void exit();
     void update(int &s);
-    void loadUpdate(int& s);
-    void titleUpdate(int& s);
+    void loadUpdate(int &s);
+    void titleUpdate(int &s);
     void mapsUpdate();
     void gameUpdate();
+    void gameModeUpdate();
     void draw();
     void loadDraw();
     void titleDraw();
     void mapsDraw();
     void gameOverDraw();
     void gameDraw();
+    void gameModeDraw();
+    void checkGameEnd();
     long long getTime() { return timer; }
 
     void collisionsManager();
@@ -100,4 +107,7 @@ public:
     void loadMap(std::string fileName);
     void createMap();
     std::vector<std::string> getFiles(const std::string &folder);
+
+    void sideOfManager();
+    int objInDeathArea(BaseObject &obj);
 };
