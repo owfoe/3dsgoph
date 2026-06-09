@@ -20,7 +20,7 @@ class Animator
 private:
     std::unordered_map<std::string, Animation> animations;
 
-    Animation* current = nullptr;
+    std::string current;
 
     size_t frame = 0;
     int timer = 0;
@@ -35,11 +35,11 @@ public:
     void play(const std::string& name) {
         auto it = animations.find(name);
         if (it == animations.end())
-            return; // or assert
+            return;
 
-        if (!current || current != &it->second)
+        if (current != name)
         {
-            current = &it->second;
+            current = name;
             frame = 0;
             timer = 0;
             finished = false;
@@ -47,20 +47,29 @@ public:
     }
     void update()
     {
-        if (current->frameCount == 0)
+        if (current.empty())
             return;
 
+        auto it = animations.find(current);
+        if (it == animations.end())
+            return;
+
+        Animation& anim = it->second;
+        if (anim.frameCount == 0)
+            return;
+
+
         timer++;
-        if (timer >= current->animSpeed)
+        if (timer >= anim.animSpeed)
         {
             timer = 0;
-            if (frame < current->frameCount - 1)
+            if (frame < anim.frameCount - 1)
             {
                 frame += 1;
             }
             else
             {
-                if (current->mode == LOOP)
+                if (anim.mode == LOOP)
                     frame = 0;
                 else
                     finished = true;
@@ -70,14 +79,26 @@ public:
 
     C2D_Image getImage()
     {
-        if (!current || current->frameCount == 0)
+        if (current.empty())
             return C2D_Image{};
 
-        return C2D_SpriteSheetGetImage(current->sheet, frame);
+        auto it = animations.find(current);
+        if (it == animations.end())
+            return C2D_Image{};
+
+        Animation& anim = it->second;
+
+        if (anim.frameCount == 0)
+            return C2D_Image{};
+
+        return C2D_SpriteSheetGetImage(anim.sheet, frame);
     }
     void exit() {
         animations.clear();
-        current = nullptr;
+        current.clear();
+        frame = 0;
+        timer = 0;
+        finished = false;
     }
     bool isFinished() const { return finished; }
 };

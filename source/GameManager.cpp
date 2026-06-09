@@ -155,6 +155,8 @@ void GameManager::update(int &s)
     if (kDown & KEY_SELECT) {
         player.animator.exit();
         loadSwitch(GameManagerState::Title);
+        for (auto &p : flyEnemies)
+            p.animator.exit();
     }
 
     if (kDown & KEY_START)
@@ -864,7 +866,11 @@ void GameManager::gameUpdate() {
     cameraPos = camera.getX();
 
     if (playerHp == 0) {
+        player.animator.exit();
+        for (auto &p : flyEnemies)
+            p.animator.exit();
         loadSwitch(GameManagerState::GameOver);
+        return;
     }
 
     if (kHeld & KEY_LEFT) {
