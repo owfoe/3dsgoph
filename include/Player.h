@@ -1,6 +1,5 @@
 #pragma once
 #include "Entity.h"
-#include "Raycast.h"
 #include "FallLogic.h"
 #include "Powerup.h"
 #include <algorithm>
@@ -30,7 +29,6 @@ public:
     Player() {}
     Player(float x, float y);
 
-    // Raycast raycast;
     FallLogic fallLogic;
 
     void jump();
@@ -50,9 +48,6 @@ public:
     void setIsJump(bool flag) { isJump = flag; }
     bool getIsJump() { return isJump; }
 
-    void attackBubble();
-    void attackShot();
-    void attackSword();
     void pickUpPowerup(std::vector<Powerup>::iterator pu);
 
     std::vector<Powerup> &getPowerups() { return powerups; }
