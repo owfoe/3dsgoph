@@ -66,7 +66,20 @@
     }
   ],
   "fly_enemies": [
-
+    {
+      "x": 200,
+      "y": 60,
+      "height": 30,
+      "width": 30,
+      "hp": 3,
+      "speed": 1,
+      "cooldown": 120,
+      "attack_type": "shot",
+      "aggr_radius": 150,
+      "attack_radius": 100,
+      "patrol_type": "vertical",
+      "patrol_radius": 50
+    }
   ],
   "powerups": [
     {
