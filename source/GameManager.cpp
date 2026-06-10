@@ -493,18 +493,12 @@ void GameManager::entityGroundCollisions(Entity &entity)
             if (prevBottom <= groundTop + 2.0f)
             {
                 entity.landOnGround(&ground);
-            }
-            else if (ground.getIsBarrier())
-            {
-                resolveY(entity, ground);
+                continue;
             }
         }
-        else
+        if (ground.getIsBarrier())
         {
-            if (ground.getIsBarrier())
-            {
-                resolveY(entity, ground);
-            }
+            resolveY(entity, ground);
         }
     }
 }
